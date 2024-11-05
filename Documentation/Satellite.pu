@@ -1,0 +1,198 @@
+@startuml Satellite
+class Satellite{
+    ..Fields..
+    +Name : string
+    +Orbit : Orbit
+    ..Constructor..
+    +Satellite(TLE,string)
+    +Satellite(Orbit,string)
+    ..Methods..
+    +PositionEci(DataTime) : EciTime
+    +PositionEci(double) : EciTime
+}
+
+class Orbit{
+    ..Fields..
+    +Elements : OrbitalElements
+    +Epoch : Julian
+    +EpochTime : DateTime
+    -NoradModel : NoradBase
+
+    +SemiMajorRec : double
+    +SemiMinorRec : double
+    +MajorRec : double
+    +MinorRec : double
+    +MeanMotionRec : double
+    +PerigeeKmRec : double
+    +ApogeeKmRec : double
+    
+    +SatName : string
+    +SatNameLong : string
+    +SatNoradId : string
+    +SatDesignator : string
+
+    +Period : TimeSpan
+    ..Constructor..
+    +Orbit(OrbitalElements)
+    ..Methods..
+    +PositionEci(DataTime) : EciTime
+    +PositionEci(double) : EciTime
+    +TPlusEpoch(DateTime) : TimeSpan
+    +TPlusEpoch()) : TimeSpan
+}
+
+note right of Orbit::NoradModel
+    SDP4(Period>=225)
+    SGP4(Period< 225)
+end note
+
+abstract class NoradBase {
+    #Orbit Orbit
+    ..Constructor..
+    +NoradBase(Orbit)
+    ..Methods..
+    +{abstract} GetPosition(double) : EciTime
+}
+
+class NoradSDP4 {
+    +NoradSDP4()
+    +GetPosition(double) : EciTime
+}
+
+class NoradSGP4 {
+    +NoradSGP4()
+    +GetPosition(double) : EciTime
+}
+NoradBase <|-- NoradSDP4
+NoradBase <|-- NoradSGP4
+
+abstract class OrbitalElements {
+    +InclinationDeg : double
+    +InclinationRad : double
+    +Eccentricity : double
+    +RAANodeDeg : double
+    +RAANodeRad : double
+    +ArgPerigeeDeg : double
+    +ArgPerigeeRad : double
+    +MeanAnomalyDeg : double
+    +MeanAnomalyRad : double
+    +BStar : double
+    +MeanMotion : double
+    +MeanMotionDt : double
+    +RevAtEpoch : int
+    +SetNumber : int
+    +SatelliteName : string
+    +NoradIdStr : string
+    +IntlDesignatorStr : string
+    +Epoch : Julian
+}
+
+class TLE{
+    ..Consturctor..
+    TLE(string,string,string)
+}
+
+OrbitalElements <|-- TLE
+
+class Julian {
+    ..Constructor..
+    +Julian(DateTime)
+    +Julian(Julian)
+    +Julian(int,double)
+    ..Methods..
+    +AddDay(double)
+    +AddHour(double)
+    +AddMin(double)
+    +AddSec(double)
+    +Diff(Julian) : TimeSpan
+    #Initialize(int,double)
+    +ToGmst() : double
+    +ToLmst() : double
+    +ToTime() : DateTime
+}
+
+class Eci {
+    ..Fields..
+    +Position : Vector
+    +Velocity : Vector
+    ..Constructor..
+    +Eci()
+    +Eci(Vector)
+    +Eci(Vector,Vector)
+    +Eci(Eci)
+    +Eci(Geo,Julian)
+    ..Methods..
+    +ScalePosVector(double)
+    +ScaleVelVector()
+    +ToString() : string
+}
+
+note right of Eci
+    Earth centered inertial coordinate
+end note
+
+class EciTime {
+    +Date : Julian
+    ..Constructor..
+    +EciTime(Vector,Vector,Julian)
+    +EciTime(Eci,Julian)
+    +EciTime(Geo,Julian)
+    +EciTime(GeoTime)
+}
+
+Eci <|-- EciTime
+
+class Geo {
+    ..Fields..
+    +LatitudeRad : double
+    +LongitudeRad : double
+    +LatitudeDeg : double
+    +LongitudeDeg : double
+    +Altitude : double
+    ..Consturctor..
+    +Geo(Geo)
+    +Geo(double,double,double)
+    +Geo(Eci,Julian)
+    +Geo(Vector,double)
+    ..Methods..
+    +ToString() : string
+}
+
+note right of Geo
+    Geocentric coordinates
+end note
+
+class GeoTime {
+    +Date : Julian
+    ..Constructor..
+    +GeoTime(double,double,double,Julian)
+    +GeoTime(Geo,Julian)
+    +GeoTime(EciTime)
+    +GeoTime(Eci,Julian)
+}
+
+Geo <|-- GeoTime
+
+class Topo {
+    ..Fields..
+    +AzimuthRad : double
+    +ElevationRad : double
+    +AzimuthDeg : double
+    +ElevationDeg : double
+    +Range : double
+    +RangeRate : double
+    ..Consturctor..
+    +Topo(double,double,double,double)
+}
+
+note right of Topo
+    Topo centric coordinate
+end note
+
+class TopoTime {
+    +Date : Julian
+    ..Constructor..
+    +TopoTime(Topo,Julian)
+    +TopoTime(double,double,double,double,Julian)
+}
+@enduml

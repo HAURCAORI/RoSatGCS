@@ -1,0 +1,25 @@
+@startuml Views
+package MainWindow {
+    object PageArchive {
+        **데이터베이스 확인**
+        
+    }
+    object PageCommand {
+        **명령 송신**
+        |_ 데이터 처리
+    }
+    object PageDashboard {
+
+    }
+    object PageGroundTrack {
+
+    }
+    object PageScheduler {
+
+    }
+}
+
+package WindowSettings {
+
+}
+@enduml
