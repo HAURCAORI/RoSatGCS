@@ -23,6 +23,7 @@ namespace RoSatGCS
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     /// 
+    /*
     public partial class Parser
     {
         [LibraryImport("FIDLParser.dll")]
@@ -33,7 +34,7 @@ namespace RoSatGCS
         public static partial void Dispose(IntPtr instance);
         [LibraryImport("FIDLParser.dll")]
         public static partial IntPtr getExtension(IntPtr instance);
-    }
+    }*/
 
     public partial class MainWindow : AdonisWindow
     {
@@ -56,7 +57,7 @@ namespace RoSatGCS
             //TranslationSource.SetLanguage("ko-KR");
             
 
-
+            /*
             var p =  Parser.Create();
             System.Diagnostics.Debug.WriteLine("Test");
             IntPtr ret = Parser.getExtension(p);
@@ -64,7 +65,7 @@ namespace RoSatGCS
             Parser.Dispose(ret);
             System.Diagnostics.Debug.WriteLine(str);
             
-            Parser.Destroy(p);
+            Parser.Destroy(p);*/
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
