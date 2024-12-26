@@ -162,6 +162,8 @@
     <ClInclude Include="generic_parser.h" />
     <ClInclude Include="generic_parser_definition.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="zmq.hpp" />
+    <ClInclude Include="zmq_addon.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />

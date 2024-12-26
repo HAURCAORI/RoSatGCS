@@ -5,7 +5,7 @@
 // Version 09/2021
 //
 using System;
-using Zeptomoby.OrbitTools;
+using RoSatGCS.Utils.Satellites.Core;
 
 namespace RoSatGCS.Utils.Satellites
 {
@@ -675,7 +675,7 @@ namespace RoSatGCS.Utils.Satellites
       /// The algorithm uses NORAD's Simplified General Perturbation 4 deep space 
       /// orbit model.
       /// </remarks>
-      public override EciTime GetPosition(double tsince)
+      public override EciCoordinate GetPosition(double tsince)
       {
          // Update for secular gravity and atmospheric drag 
          double xmdf   = Orbit.Elements.MeanAnomalyRad + m_xmdot * tsince;

@@ -65,7 +65,7 @@ namespace RoSatGCS.Utils.Maps
             {
                 mBaseImage = new BitmapImage(new Uri(uri, UriKind.RelativeOrAbsolute));
             }
-            catch (Exception) { }
+            catch (System.Exception) { }
             return true;
         }
 

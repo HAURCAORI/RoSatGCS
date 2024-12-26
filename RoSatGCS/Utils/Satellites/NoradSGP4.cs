@@ -5,7 +5,7 @@
 // Version 09/2021
 //
 using System;
-using Zeptomoby.OrbitTools;
+using RoSatGCS.Utils.Satellites.Core;
 
 namespace RoSatGCS.Utils.Satellites
 {
@@ -43,7 +43,7 @@ namespace RoSatGCS.Utils.Satellites
       /// The algorithm uses NORAD's Simplified General Perturbation 4 near earth 
       /// orbit model.
       /// </remarks>
-      public override EciTime GetPosition(double tsince)
+      public override EciCoordinate GetPosition(double tsince)
       {
          // For m_perigee less than 220 kilometers, the isimp flag is set and
          // the equations are truncated to linear variation in square root of a

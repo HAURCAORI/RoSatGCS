@@ -249,8 +249,8 @@
                 <behaviors:FrameBehavior NavigationSource="{Binding NavigationSource, Mode=TwoWay}" />
             </b:Interaction.Behaviors>
         </Frame>
-        <Button Grid.Column="1" Content="Button" HorizontalAlignment="Left" Margin="268,24,0,0" Grid.Row="1" VerticalAlignment="Top" Click="Button_Click"/>
-        <Button Grid.Column="1" Content="Button" HorizontalAlignment="Center" Margin="0,24,0,0" Grid.Row="1" VerticalAlignment="Top" Click="Button_Click_1"/>
+        <Button Grid.Column="1" Visibility="Hidden" Content="Button" HorizontalAlignment="Left" Margin="268,24,0,0" Grid.Row="1" VerticalAlignment="Top" Click="Button_Click"/>
+        <Button Grid.Column="1" Visibility="Hidden" Content="Button" HorizontalAlignment="Center" Margin="0,24,0,0" Grid.Row="1" VerticalAlignment="Top" Click="Button_Click_1"/>
         <ctr:GroundTrackMap Visibility="Hidden" Grid.Column="1" Grid.Row="1" Width="800" Height="400" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
     </Grid>
 </adonisControls:AdonisWindow>

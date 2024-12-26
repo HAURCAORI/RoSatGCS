@@ -1,6 +1,8 @@
 ﻿using AdonisUI.Controls;
 using NLog;
 using RoSatGCS.Utils.Localization;
+using RoSatGCS.Utils.Satellites;
+using RoSatGCS.Utils.Satellites.Core;
 using RoSatGCS.ViewModels;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -45,10 +47,17 @@ namespace RoSatGCS
 
 
             // 아래 테스트용 코드들
-            Logger.Debug("Test");
-             //TranslationSource.SetLanguage("ko-KR");
+            string tle = "ISS (ZARYA)\r\n1 25544U 98067A   24328.29153615  .00029143  00000-0  51837-3 0  9997\r\n2 25544  51.6408 247.1413 0007321 258.8281 244.5643 15.49886778483225";
+            var satellite = new Satellite(new TLE(tle),"ISS");
 
-             var p =  Parser.Create();
+            var eciTime =  satellite.PositionEci(DateTime.Now);
+            var geoTime =  new GeoCoordinate(eciTime);
+            Logger.Trace(geoTime.ToString());
+            //TranslationSource.SetLanguage("ko-KR");
+            
+
+
+            var p =  Parser.Create();
             System.Diagnostics.Debug.WriteLine("Test");
             IntPtr ret = Parser.getExtension(p);
             var str = Marshal.PtrToStringUTF8(ret);

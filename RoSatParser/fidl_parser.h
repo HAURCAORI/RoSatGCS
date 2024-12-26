@@ -9,8 +9,6 @@
 #include "re2/re2.h"
 #include "fidl_parser_types.h"
 
-
-
 namespace RoSatParser::FIDL {
 	class FIDLParser : public GenericParser<true,false> {
 	public:

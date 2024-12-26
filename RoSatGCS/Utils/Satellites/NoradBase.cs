@@ -5,7 +5,8 @@
 // Version 09/2021
 //
 using System;
-using Zeptomoby.OrbitTools;
+using RoSatGCS.Utils.Exception;
+using RoSatGCS.Utils.Satellites.Core;
 
 namespace RoSatGCS.Utils.Satellites
 {
@@ -32,7 +33,7 @@ namespace RoSatGCS.Utils.Satellites
 
       protected Orbit Orbit { get; private set; }
 
-      public abstract EciTime GetPosition(double tsince);
+      public abstract EciCoordinate GetPosition(double tsince);
 
       #endregion
 
@@ -147,13 +148,13 @@ namespace RoSatGCS.Utils.Satellites
       }
 
       // /////////////////////////////////////////////////////////////////////
-      protected EciTime FinalPosition(double  incl, double omega,  double     e,   
+      protected EciCoordinate FinalPosition(double  incl, double omega,  double     e,   
                                       double     a, double    xl,  double xnode, 
                                       double    xn, double tsince)
       {
          if ((e * e) > 1.0)
          {
-            throw new PropagationException("Error in satellite data");
+            throw new SatellitesDataException("Error in satellite data");
          }
 
          double beta = Math.Sqrt(1.0 - e * e);
@@ -262,7 +263,7 @@ namespace RoSatGCS.Utils.Satellites
 
          if (altKm < Globals.Xkmper)
          {
-            throw new DecayException(gmt, Orbit.SatNameLong);
+            throw new SatellitesDecayException(gmt, Orbit.SatNameLong);
          }
    
          // Velocity
@@ -272,7 +273,7 @@ namespace RoSatGCS.Utils.Satellites
 
          Vector vecVel = new Vector(xdot, ydot, zdot);
 
-         return new EciTime(vecPos, vecVel, gmt);
+         return new EciCoordinate(vecPos, vecVel, gmt);
       }
    }
 }
