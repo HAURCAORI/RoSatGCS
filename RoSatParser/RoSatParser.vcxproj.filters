@@ -39,12 +39,6 @@
     <ClInclude Include="fidl_parser_exception.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="zmq.hpp">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="zmq_addon.hpp">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

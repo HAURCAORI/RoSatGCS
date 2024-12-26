@@ -10,6 +10,31 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Dependency\abseil_dll.dll" />
+    <None Remove="Dependency\gnuradio-pmt.dll" />
+    <None Remove="Dependency\gtest.pdb" />
+    <None Remove="Dependency\gtest_main.pdb" />
+    <None Remove="Dependency\libcrypto-3-x64.dll" />
+    <None Remove="Dependency\libcurl.dll" />
+    <None Remove="Dependency\librdkafka.dll" />
+    <None Remove="Dependency\librdkafkacpp.dll" />
+    <None Remove="Dependency\libssl-3-x64.dll" />
+    <None Remove="Dependency\libzmq-mt-4_3_5.dll" />
+    <None Remove="Dependency\msvcp140.dll" />
+    <None Remove="Dependency\re2.dll" />
+    <None Remove="Dependency\RoSatParser.dll" />
+    <None Remove="Dependency\RoSatParser.exp" />
+    <None Remove="Dependency\RoSatParser.lib" />
+    <None Remove="Dependency\RoSatParser.pdb" />
+    <None Remove="Dependency\RoSatProcessor.exe" />
+    <None Remove="Dependency\RoSatProcessor.pdb" />
+    <None Remove="Dependency\RoSatProcessorTest.exe" />
+    <None Remove="Dependency\RoSatProcessorTest.ilk" />
+    <None Remove="Dependency\RoSatProcessorTest.pdb" />
+    <None Remove="Dependency\vcruntime140.dll" />
+    <None Remove="Dependency\volk.dll" />
+    <None Remove="Dependency\zlib1.dll" />
+    <None Remove="Dependency\zstd.dll" />
     <None Remove="Images\icon_setting.png" />
     <None Remove="Images\map.png" />
     <None Remove="Fonts\KoPubWorld Dotum Bold.ttf" />
@@ -34,6 +59,84 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Content Include="Images\map.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Dependency\abseil_dll.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\gnuradio-pmt.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\gtest.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\gtest_main.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\libcrypto-3-x64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\libcurl.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\librdkafka.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\librdkafkacpp.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\libssl-3-x64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\libzmq-mt-4_3_5.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\msvcp140.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\re2.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatParser.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatParser.exp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatParser.lib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatParser.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatProcessor.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatProcessor.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatProcessorTest.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatProcessorTest.ilk">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatProcessorTest.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\vcruntime140.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\volk.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\zlib1.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\zstd.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

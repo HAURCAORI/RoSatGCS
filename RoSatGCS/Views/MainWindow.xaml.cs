@@ -23,16 +23,17 @@ namespace RoSatGCS
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     /// 
+    
     /*
     public partial class Parser
     {
-        [LibraryImport("FIDLParser.dll")]
+        [LibraryImport("RoSatParser.dll")]
         public static partial IntPtr Create();
-        [LibraryImport("FIDLParser.dll")]
+        [LibraryImport("RoSatParser.dll")]
         public static partial void Destroy(IntPtr instance);
-        [LibraryImport("FIDLParser.dll")]
+        [LibraryImport("RoSatParser.dll")]
         public static partial void Dispose(IntPtr instance);
-        [LibraryImport("FIDLParser.dll")]
+        [LibraryImport("RoSatParser.dll")]
         public static partial IntPtr getExtension(IntPtr instance);
     }*/
 
