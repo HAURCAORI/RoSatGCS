@@ -63,6 +63,10 @@ void RoSatProcessor::RoSatTask::run()
 			print(e.what());
 		}
 
+		if (m_stop) {
+			break;
+		}
+
 		if (m_loop) {
 			this->wait_for(std::chrono::milliseconds(m_interval));
 		}
@@ -76,7 +80,7 @@ void RoSatProcessor::RoSatTask::stop()
 	m_stop = true;
 	_cv.notify_one();
 	while (m_running) {
-		Sleep(10);
+		Sleep(50);
 	}
 }
 
@@ -99,6 +103,12 @@ DWORD RoSatProcessor::RoSatTask::getIsRunning() const
 {
 	return m_running;
 }
+
+void RoSatProcessor::RoSatTask::Enqueue(const DataFrame& value)
+{
+	
+}
+
 
 BOOL RoSatProcessor::RoSatTask::initialize()
 {

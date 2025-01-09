@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <condition_variable>
+#include "DataFrame.h"
 
 namespace RoSatProcessor {
 	class RoSatTask {
@@ -14,13 +15,16 @@ namespace RoSatProcessor {
 		virtual ~RoSatTask();
 
 		void run();
-		void stop();
+		virtual void stop();
 		PCWSTR getServiceName() const;
 		PCWSTR getTaskName() const;
 		DWORD getInterval() const;
 		DWORD getIsRunning() const;
 
+		virtual void Enqueue(const DataFrame& value);
+
 	protected:
+
 		virtual BOOL initialize();
 		virtual void task();
 		virtual void starting();
@@ -32,12 +36,14 @@ namespace RoSatProcessor {
 		void print(PCWSTR pszMessage, WORD wType = EVENTLOG_INFORMATION_TYPE);
 		PCWSTR	m_serviceName;
 		PCWSTR	m_taskName;
-	private:
-		BOOL	m_loop;
 		BOOL	m_stop = FALSE;
+
+	private:
+		DWORD	m_interval;
+		BOOL	m_loop;
 		BOOL	m_running = FALSE;
 		BOOL	m_initialized = FALSE;
-		DWORD	m_interval;
+		
 
 		std::condition_variable _cv;
 		std::mutex _m;

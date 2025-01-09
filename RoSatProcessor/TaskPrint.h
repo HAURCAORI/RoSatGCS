@@ -10,12 +10,11 @@ namespace RoSatProcessor {
 		virtual ~TaskPrint() = default;
 
 	protected:
-		virtual BOOL initialize();
-		virtual void task();
-		virtual void starting();
-		virtual void stopped();
+		virtual BOOL initialize() override;
+		virtual void task() override;
+		virtual void starting() override;
+		virtual void stopped() override;
 	private:
-		zmq::context_t m_context;
-		zmq::socket_t m_socket;
+		
 	};
 }

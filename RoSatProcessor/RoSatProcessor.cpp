@@ -1,4 +1,6 @@
-﻿#include "ServiceImpl.h"
+﻿#include <boost/asio.hpp>
+
+#include "ServiceImpl.h"
 #include <iostream>
 #include <string>
 #include <windows.h>
@@ -6,7 +8,12 @@
 #include <conio.h>
 #include "ServiceInstaller.h"
 #include "RoSatTaskManager.h"
-#include "TaskPrint.h"
+
+//#include "TaskPrint.h"
+#include "TaskPacketProcess.h"
+#include "TaskPacketReceiveQueue.h"
+#include "TaskPacketTransmitQueue.h"
+#include "TaskSerial.h"
 
 
 #define SERVICE_NAME            TEXT("RoSatProcessor")
@@ -18,8 +25,20 @@
 
 
 void TaskDefinition() {
-    auto task = RoSatProcessor::TaskPrint(SERVICE_NAME, TEXT("Print"));
-    RoSatProcessor::RoSatTaskManager::addTask(task);
+    //auto taskPacketReceiveQueue = RoSatProcessor::TaskPacketReceiveQueue(SERVICE_NAME, TEXT("PacketReceiveQueue"));
+    //RoSatProcessor::RoSatTaskManager::addTask(taskPacketReceiveQueue);
+
+    //auto taskPacketProcess = RoSatProcessor::TaskPacketProcess(SERVICE_NAME, TEXT("PacketProcess"));
+    //RoSatProcessor::RoSatTaskManager::addTask(taskPacketProcess);
+
+    //auto taskPacketTransmitQueue = RoSatProcessor::TaskPacketTransmitQueue(SERVICE_NAME, TEXT("PacketTransmitQueue"));
+    //RoSatProcessor::RoSatTaskManager::addTask(taskPacketTransmitQueue);
+
+    //auto taskPrint = RoSatProcessor::TaskPrint(SERVICE_NAME, TEXT("Print"));
+    //RoSatProcessor::RoSatTaskManager::addTask(taskPrint);
+
+    auto taskSerial = RoSatProcessor::TaskSerial(SERVICE_NAME, TEXT("Serial"));
+    RoSatProcessor::RoSatTaskManager::addTask(taskSerial);
 }
 
 int wmain(int argc, TCHAR* argv[])

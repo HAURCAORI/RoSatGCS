@@ -150,8 +150,12 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AsyncSerial.cpp" />
+    <ClCompile Include="Constants.h" />
     <ClCompile Include="crc16-ccitt.cpp" />
     <ClCompile Include="crc32.cpp" />
+    <ClCompile Include="DataFrame.cpp" />
+    <ClCompile Include="Helper.cpp" />
     <ClCompile Include="RoSatProcessor.cpp" />
     <ClCompile Include="RoSatTask.cpp" />
     <ClCompile Include="RoSatTask.h" />
@@ -159,7 +163,12 @@
     <ClCompile Include="ServiceBase.cpp" />
     <ClCompile Include="ServiceImpl.cpp" />
     <ClCompile Include="ServiceInstaller.cpp" />
+    <ClCompile Include="TaskPacketProcess.cpp" />
+    <ClCompile Include="TaskPacketTransmitQueue.cpp" />
     <ClCompile Include="TaskPrint.cpp" />
+    <ClCompile Include="TaskPacketReceiveQueue.cpp" />
+    <ClCompile Include="TaskSerial.cpp" />
+    <ClCompile Include="TaskTemplate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -170,13 +179,21 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AsyncSerial.h" />
     <ClInclude Include="crc16-ccitt.h" />
     <ClInclude Include="crc32.h" />
+    <ClInclude Include="DataFrame.h" />
+    <ClInclude Include="Helper.h" />
     <ClInclude Include="RoSatTaskManager.h" />
     <ClInclude Include="ServiceBase.h" />
     <ClInclude Include="ServiceImpl.h" />
     <ClInclude Include="ServiceInstaller.h" />
+    <ClInclude Include="TaskPacketProcess.h" />
+    <ClInclude Include="TaskPacketTransmitQueue.h" />
     <ClInclude Include="TaskPrint.h" />
+    <ClInclude Include="TaskPacketReceiveQueue.h" />
+    <ClInclude Include="TaskSerial.h" />
+    <ClInclude Include="TaskTemplate.h" />
     <ClInclude Include="ThreadPool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

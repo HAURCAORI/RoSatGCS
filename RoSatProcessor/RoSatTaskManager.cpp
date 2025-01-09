@@ -57,4 +57,17 @@ void RoSatProcessor::RoSatTaskManager::stop()
 	
 }
 
+RoSatProcessor::RoSatTask* RoSatProcessor::RoSatTaskManager::FindTask(PCWSTR pszTaskName)
+{
+	auto& e = instance();
+	auto it = std::find_if(e.m_tasks.begin(), e.m_tasks.end(),
+		[&pszTaskName](std::shared_ptr<RoSatTask> s)
+		{ return lstrcmpW(s.get()->getTaskName(), pszTaskName) == 0; });
+
+	if (it != e.m_tasks.end()) {
+		return it->get();
+	}
+	return nullptr;
+}
+
 

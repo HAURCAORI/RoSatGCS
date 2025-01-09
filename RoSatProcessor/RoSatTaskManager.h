@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include <any>
 #include <Windows.h>
 
 #include "TaskPrint.h"
@@ -28,9 +29,19 @@ namespace RoSatProcessor {
 			e.m_tasks.push_back(std::make_shared<T>(task));
 		}
 
+		static void message(PCWSTR pszTaskName, const DataFrame& msg) {
+			auto& e = instance();
+			auto ptr = e.FindTask(pszTaskName);
+			if (ptr != nullptr) {
+				ptr->Enqueue(msg);
+			}
+		}
+
 	private:
 		RoSatTaskManager() = default;
 		~RoSatTaskManager() = default;
+
+		RoSatTask* FindTask(PCWSTR pszTaskName);
 
 		BOOL isRunning = FALSE;
 		HANDLE m_hStoppedEvent = NULL;
