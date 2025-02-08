@@ -1,4 +1,5 @@
-﻿using RoSatGCS.Utils.Localization;
+﻿using RoSatGCS.Models;
+using RoSatGCS.Utils.Localization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,8 +8,10 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace RoSatGCS.Utils.Converter
 {
@@ -47,4 +50,67 @@ namespace RoSatGCS.Utils.Converter
             throw new NotImplementedException();
         }
     }
+
+    public class PaneCommandFileListBoxWidthConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is double listBoxWidth)
+            {
+                // Approximate scrollbar width (default is ~16px)
+                double scrollBarWidth = SystemParameters.VerticalScrollBarWidth;
+
+                // Ensure the width does not go negative
+                return Math.Max(0, listBoxWidth - scrollBarWidth);
+            }
+            return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
+        }
+    }
+
+    public class EnumConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is Enum enumValue)
+            {
+                return enumValue.ToString();
+            }
+            return Binding.DoNothing;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string strValue && targetType.IsEnum)
+            {
+                return Enum.Parse(targetType, strValue);
+            }
+            return Binding.DoNothing;
+        }
+    }
+
+    public class EnumStructSizeStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is SatelliteFunctionTypeModel.ArgumentType enumValue)
+            {
+                if (enumValue == SatelliteFunctionTypeModel.ArgumentType.Struct)
+                    return "Bytes";
+                else if (enumValue == SatelliteFunctionTypeModel.ArgumentType.Enum)
+                    return "Values";
+            }
+            return Binding.DoNothing;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
+        }
+    }
 }
+

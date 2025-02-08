@@ -195,4 +195,106 @@
   <data name="English" xml:space="preserve">
     <value>영어</value>
   </data>
+  <data name="zFileNotFound" xml:space="preserve">
+    <value>파일 찾기 오류</value>
+  </data>
+  <data name="zNoSuchFile" xml:space="preserve">
+    <value>파일을 찾을 수 없습니다.</value>
+  </data>
+  <data name="zExtensionJson" xml:space="preserve">
+    <value>확장자는 json이어야 합니다.</value>
+  </data>
+  <data name="zExtensionMismatch" xml:space="preserve">
+    <value>확장자 불일치</value>
+  </data>
+  <data name="zSameFileExists" xml:space="preserve">
+    <value>동일한 파일</value>
+  </data>
+  <data name="sWarning" xml:space="preserve">
+    <value>경고</value>
+  </data>
+  <data name="zReplaceIt" xml:space="preserve">
+    <value>파일을 변경하시겠습니까?</value>
+  </data>
+  <data name="zFailToLoad" xml:space="preserve">
+    <value>읽기 오류</value>
+  </data>
+  <data name="sRemove" xml:space="preserve">
+    <value>제거</value>
+  </data>
+  <data name="zAreYouSure" xml:space="preserve">
+    <value>확실합니까?</value>
+  </data>
+  <data name="sClear" xml:space="preserve">
+    <value>초기화</value>
+  </data>
+  <data name="sSearch" xml:space="preserve">
+    <value>검색</value>
+  </data>
+  <data name="sCommandFile" xml:space="preserve">
+    <value>명령 파일</value>
+  </data>
+  <data name="sTypeDictionary" xml:space="preserve">
+    <value>타입 사전</value>
+  </data>
+  <data name="sFunctions" xml:space="preserve">
+    <value>함수</value>
+  </data>
+  <data name="sCommandSet" xml:space="preserve">
+    <value>커맨드 집합</value>
+  </data>
+  <data name="sName" xml:space="preserve">
+    <value>이름</value>
+  </data>
+  <data name="sDescription" xml:space="preserve">
+    <value>설명</value>
+  </data>
+  <data name="sParameters" xml:space="preserve">
+    <value>값</value>
+  </data>
+  <data name="zParseError" xml:space="preserve">
+    <value>파싱 오류</value>
+  </data>
+  <data name="zStructEnumParseError" xml:space="preserve">
+    <value>구조체 Enum 파싱 오류</value>
+  </data>
+  <data name="zTypeNotFound" xml:space="preserve">
+    <value>비정의 타입 오류</value>
+  </data>
+  <data name="sError" xml:space="preserve">
+    <value>오류</value>
+  </data>
+  <data name="sFile" xml:space="preserve">
+    <value>파일</value>
+  </data>
+  <data name="sSize" xml:space="preserve">
+    <value>사이즈</value>
+  </data>
+  <data name="sType" xml:space="preserve">
+    <value>타입</value>
+  </data>
+  <data name="sShow" xml:space="preserve">
+    <value>보기</value>
+  </data>
+  <data name="sHide" xml:space="preserve">
+    <value>숨기기</value>
+  </data>
+  <data name="sCheckAll" xml:space="preserve">
+    <value>모두 선택</value>
+  </data>
+  <data name="sUncheckAll" xml:space="preserve">
+    <value>모두 선택 해제</value>
+  </data>
+  <data name="sAdd" xml:space="preserve">
+    <value>추가</value>
+  </data>
+  <data name="sClose" xml:space="preserve">
+    <value>닫기</value>
+  </data>
+  <data name="sExecute" xml:space="preserve">
+    <value>실행</value>
+  </data>
+  <data name="sSave" xml:space="preserve">
+    <value>저장</value>
+  </data>
 </root>

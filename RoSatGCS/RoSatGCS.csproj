@@ -35,6 +35,42 @@
     <None Remove="Dependency\volk.dll" />
     <None Remove="Dependency\zlib1.dll" />
     <None Remove="Dependency\zstd.dll" />
+    <None Remove="Images\Docker\DockAnchorableBottom.png" />
+    <None Remove="Images\Docker\DockAnchorableLeft.png" />
+    <None Remove="Images\Docker\DockAnchorableRight.png" />
+    <None Remove="Images\Docker\DockAnchorableTop.png" />
+    <None Remove="Images\Docker\DockDocumentAsAnchorableBottom.png" />
+    <None Remove="Images\Docker\DockDocumentAsAnchorableLeft.png" />
+    <None Remove="Images\Docker\DockDocumentAsAnchorableRight.png" />
+    <None Remove="Images\Docker\DockDocumentAsAnchorableTop.png" />
+    <None Remove="Images\Docker\DockDocumentBottom.png" />
+    <None Remove="Images\Docker\DockDocumentInside.png" />
+    <None Remove="Images\Docker\DockDocumentLeft.png" />
+    <None Remove="Images\Docker\DockDocumentRight.png" />
+    <None Remove="Images\Docker\DockDocumentTop.png" />
+    <None Remove="Images\Docker\DockPaneEmpty.png" />
+    <None Remove="Images\Docker\DockPaneLargeEmpty.png" />
+    <None Remove="Images\Docker\HTabGroup.png" />
+    <None Remove="Images\Docker\Locked.png" />
+    <None Remove="Images\Docker\PinAutoHide.png" />
+    <None Remove="Images\Docker\PinAutoHide_Black.png" />
+    <None Remove="Images\Docker\PinAutoHide_Dark.png" />
+    <None Remove="Images\Docker\PinClose.png" />
+    <None Remove="Images\Docker\PinClose_Black.png" />
+    <None Remove="Images\Docker\PinClose_Dark.png" />
+    <None Remove="Images\Docker\PinDocMenu.png" />
+    <None Remove="Images\Docker\PinDocMenu_Black.png" />
+    <None Remove="Images\Docker\PinDocMenu_Dark.png" />
+    <None Remove="Images\Docker\PinMaximize.png" />
+    <None Remove="Images\Docker\PinMaximize_Black.png" />
+    <None Remove="Images\Docker\PinMaximize_Dark.png" />
+    <None Remove="Images\Docker\PinMenu.png" />
+    <None Remove="Images\Docker\PinMenu_Black.png" />
+    <None Remove="Images\Docker\PinMenu_Dark.png" />
+    <None Remove="Images\Docker\PinRestore.png" />
+    <None Remove="Images\Docker\PinRestore_Black.png" />
+    <None Remove="Images\Docker\PinRestore_Dark.png" />
+    <None Remove="Images\Docker\VTabGroup.png" />
     <None Remove="Images\icon_setting.png" />
     <None Remove="Images\map.png" />
     <None Remove="Fonts\KoPubWorld Dotum Bold.ttf" />
@@ -51,6 +87,114 @@
     </Resource>
     <Resource Include="Fonts\KoPubWorld Dotum Medium.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockAnchorableBottom.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockAnchorableLeft.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockAnchorableRight.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockAnchorableTop.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentAsAnchorableBottom.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentAsAnchorableLeft.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentAsAnchorableRight.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentAsAnchorableTop.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentBottom.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentInside.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentLeft.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentRight.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentTop.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockPaneEmpty.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockPaneLargeEmpty.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\HTabGroup.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\Locked.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinAutoHide.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinAutoHide_Black.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinAutoHide_Dark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinClose.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinClose_Black.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinClose_Dark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinDocMenu.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinDocMenu_Black.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinDocMenu_Dark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinMaximize.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinMaximize_Black.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinMaximize_Dark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinMenu.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinMenu_Black.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinMenu_Dark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinRestore.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinRestore_Black.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinRestore_Dark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\VTabGroup.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
 
@@ -146,6 +290,7 @@
     <PackageReference Include="AdonisUI.ClassicTheme" Version="1.17.1" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="Dirkster.AvalonDock" Version="4.72.1" />
+    <PackageReference Include="Dirkster.AvalonDock.Themes.VS2013" Version="4.72.1" />
     <PackageReference Include="GMap.NET.Core" Version="2.1.7" />
     <PackageReference Include="GMap.NET.WinPresentation" Version="2.1.7" />
     <PackageReference Include="MessagePack" Version="3.1.1" />

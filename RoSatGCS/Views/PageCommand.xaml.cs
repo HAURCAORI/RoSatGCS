@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AvalonDock;
+using RoSatGCS.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +22,12 @@ namespace RoSatGCS.Views
     /// </summary>
     public partial class PageCommand : Page
     {
+        public static DockingManager DockingManager { get; private set; }
         public PageCommand()
         {
             InitializeComponent();
+            DockingManager = dockManager;
+            DataContext = App.Current.Services.GetService(typeof(PageCommandViewModel));
         }
     }
 }

@@ -1,14 +1,11 @@
 #pragma once
+#include "RoSatTask.h"
 #include <memory>
 #include <vector>
 #include <any>
 #include <Windows.h>
 
-#include "TaskPrint.h"
-
 namespace RoSatProcessor {
-	class RoSatTask;
-
 	class RoSatTaskManager {
 	public:
 		RoSatTaskManager(const RoSatTaskManager&) = delete;

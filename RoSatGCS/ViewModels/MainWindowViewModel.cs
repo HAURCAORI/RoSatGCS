@@ -33,15 +33,18 @@ namespace RoSatGCS.ViewModels
         }
         public ICommand NavigateCommand { get; set; }
         public ICommand OpenWindowCommand { get; set; }
+        public ICommand ClosingCommand { get; set; }
 
         public MainWindowViewModel()
         {
             Title = "Main View";
-            pageDashboard = new PageDashboard();
-            NavigationSource = pageDashboard;
+            //pageDashboard = new PageDashboard();
+            pageCommand = new PageCommand();
+            NavigationSource = pageCommand;
             NavigateCommand = new RelayCommand<string>(OnNavigate);
             WeakReferenceMessenger.Default.Register<NavigationMessage>(this, OnNavigationMessage);
             OpenWindowCommand = new RelayCommand<string>(OnWindowOpen);
+            ClosingCommand = new RelayCommand(OnClosing);
 
             _ = Update();
         }
@@ -111,6 +114,20 @@ namespace RoSatGCS.ViewModels
                     break;
                 default:
                     break;
+            }
+        }
+
+        private void OnClosing()
+        {
+            /*     private Page? pageArchive;
+             private Page? pageCommand;
+             private Page? pageDashboard;
+             private Page? pageGroundTrack;
+             private Page? pageScheduler;*/
+            if (pageCommand != null && pageCommand.DataContext is PageCommandViewModel vm)
+            {
+                vm.Closing.Execute(null);
+
             }
         }
 

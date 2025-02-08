@@ -1,5 +1,5 @@
+#include "pch.h"
 #include "AsyncSerial.h"
-
 #include <string>
 #include <algorithm>
 #include <thread>
@@ -7,7 +7,7 @@
 #include <boost/bind.hpp>
 #include <boost/shared_array.hpp>
 
-#include "DataFrame.h"
+
 
 using namespace std;
 using namespace boost;

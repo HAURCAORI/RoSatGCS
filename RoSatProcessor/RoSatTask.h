@@ -1,9 +1,10 @@
 #pragma once
+#include "pch.h"
 #include <Windows.h>
 #include <condition_variable>
-#include "DataFrame.h"
 
 namespace RoSatProcessor {
+	class DataFrame;
 	class RoSatTask {
 	public:
 		RoSatTask(PCWSTR pszServiceName, PCWSTR pszTaskName);

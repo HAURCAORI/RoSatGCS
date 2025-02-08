@@ -1,5 +1,9 @@
+#include "pch.h"
 #include "DataFrame.h"
 #include <sstream>
+#include "crc16-ccitt.h"
+#include "crc16-ccitt-false.h"
+#include "crc32.h"
 
 #pragma region DataFrameBuffer
 RoSatProcessor::DataFrameBuffer::DataFrameBuffer(char* buffer, std::streamsize size)
@@ -126,6 +130,42 @@ void RoSatProcessor::DataFrame::setEndian(Endian endian) {
 	endian_ = endian;
 }
 
+uint16_t RoSatProcessor::DataFrame::crc16(size_t start)
+{
+	return crc16(start, used_ - 1);
+}
+
+uint16_t RoSatProcessor::DataFrame::crc16_false(size_t start)
+{
+	return crc16_false(start, used_ - 1);
+}
+
+uint16_t RoSatProcessor::DataFrame::crc16(size_t start, size_t end)
+{
+	if (start > end || end >= used_) { return 0; }
+	size_t len = end - start + 1;
+	return crc16_ccitt_calc(buffer_ + start, len);
+}
+
+uint16_t RoSatProcessor::DataFrame::crc16_false(size_t start, size_t end)
+{
+	if (start > end || end >= used_) { return 0; }
+	size_t len = end - start + 1;
+	return crc16_ccitt_false_calc(buffer_ + start, len);
+}
+
+uint32_t RoSatProcessor::DataFrame::crc32(size_t start)
+{
+	return crc32(start, used_ - 1);
+}
+
+uint32_t RoSatProcessor::DataFrame::crc32(size_t start, size_t end)
+{
+	if (start > end || end >= used_) { return 0; }
+	size_t len = end - start + 1;
+	return MACCRC32_Calc32(buffer_ + start, len);
+}
+
 RoSatProcessor::DataFrame& RoSatProcessor::DataFrame::append(const char* data, std::size_t len, Endian endian) {
 	while (len > remain()) {
 		std::size_t copyLen = remain();
@@ -145,6 +185,52 @@ RoSatProcessor::DataFrame& RoSatProcessor::DataFrame::append(const char* data, s
 	return *this;
 }
 
+RoSatProcessor::DataFrame& RoSatProcessor::DataFrame::appendFromHex(const std::string_view& str)
+{
+	size_t bufferIndex = 0;
+	char highNibble = 0;
+	bool isHighNibble = true;
+
+	for (size_t i = 0; i < str.length(); ++i) {
+		char c = str[i];
+		if (std::isspace(c)) {
+			continue; // Ignore whitespace
+		}
+		if ((c == '0' && (i + 1 < str.length()) &&
+			(str[i + 1] == 'x' || str[i + 1] == 'X'))) {
+			++i; // Skip '0x' or '0X' prefix
+			continue;
+		}
+		if (!std::isxdigit(c)) {
+			throw std::invalid_argument("Invalid character in hex string.");
+		}
+
+		// Convert hex digit to its numeric value
+		char nibble = std::isdigit(c) ? (c - '0') : (std::tolower(c) - 'a' + 10);
+
+		if (isHighNibble) {
+			highNibble = nibble;
+			isHighNibble = false;
+		}
+		else {
+			this->put((highNibble << 4) | nibble);
+			isHighNibble = true;
+		}
+	}
+	return *this;
+}
+
+RoSatProcessor::DataFrame RoSatProcessor::DataFrame::slice(size_t start)
+{
+	return slice(start, used_ -1);
+}
+
+RoSatProcessor::DataFrame RoSatProcessor::DataFrame::slice(size_t start, size_t end)
+{
+	if (start > end || end >= used_) { throw std::invalid_argument("Invalid slice index"); }
+	return DataFrame(buffer_ + start, end - start + 1);
+}
+
 void RoSatProcessor::DataFrame::normalize()
 {
 	for (char* it = buffer_; it != buffer_ + used_; ++it) {
@@ -155,6 +241,11 @@ void RoSatProcessor::DataFrame::normalize()
 		}
 	}
 	setp(buffer_ + used_, buffer_ + used_);
+}
+
+char RoSatProcessor::DataFrame::getc(size_t pos)
+{
+	return (pos > (size_t)used_) ? 0 : buffer_[pos];
 }
 
 void RoSatProcessor::DataFrame::setPos(size_t pos) {
@@ -168,12 +259,13 @@ size_t RoSatProcessor::DataFrame::read(char* dest, size_t len)
 
 std::string RoSatProcessor::DataFrame::toString() const {
 	static constexpr char hexDigits[] = "0123456789ABCDEF";
-	std::string result(used_ * 2, '\0');
+	std::string result(used_ * 3, '\0');
 
 	for (size_t i = 0; i < (size_t)used_; ++i) {
 		unsigned char byte = static_cast<unsigned char>(buffer_[i]);
-		result[2 * i] = hexDigits[byte >> 4];
-		result[2 * i + 1] = hexDigits[byte & 0xF];
+		result[3 * i] = hexDigits[byte >> 4];
+		result[3 * i + 1] = hexDigits[byte & 0xF];
+		result[3 * i + 2] = ' ';
 	}
 	return result;
 }

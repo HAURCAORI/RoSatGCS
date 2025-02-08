@@ -363,3 +363,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+RoSatProcessor/Library/lib/cryptlib_d.lib

@@ -8,6 +8,6 @@ namespace RoSatGCS.ViewModels
 {
     public class PageSchedulerViewModel : ViewModelPageBase
     {
-        public PageSchedulerViewModel() { }
+        
     }
 }

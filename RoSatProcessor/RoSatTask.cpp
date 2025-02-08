@@ -1,3 +1,4 @@
+#include "pch.h"
 #include <algorithm>
 #include "RoSatTask.h"
 
@@ -46,10 +47,15 @@ RoSatProcessor::RoSatTask::~RoSatTask()
 
 void RoSatProcessor::RoSatTask::run()
 {
-	m_initialized = initialize();
-	if (!m_initialized) {
-		print("Initialize Fail\r\n");
-		return;
+	try {
+		m_initialized = initialize();
+		if (!m_initialized) {
+			print("Initialize Fail\r\n");
+			return;
+		}
+	}
+	catch(std::exception& e) {
+		print(e.what());
 	}
 
 	m_stop = FALSE;

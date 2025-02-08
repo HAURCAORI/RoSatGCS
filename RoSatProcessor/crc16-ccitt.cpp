@@ -13,7 +13,7 @@
   *
   * @}
   */
-
+#include "pch.h"
 #include <stdint.h>
 #include "crc16-ccitt.h"
 
@@ -167,6 +167,11 @@ uint16_t crc16_ccitt_calc(uint8_t const* pDataP, unsigned int iLenP)
 #endif // INVERTED
 
     return crc;
+}
+
+uint16_t crc16_ccitt_calc(char const* pDataP, unsigned int iLenP)
+{
+    return crc16_ccitt_calc(reinterpret_cast<uint8_t const*>(pDataP), iLenP);
 }
 
 uint16_t CRC16_8(uint8_t* fp_pu8Data, int fp_u16Count)

@@ -1,20 +1,18 @@
-﻿#include <boost/asio.hpp>
-
-#include "ServiceImpl.h"
+﻿#include "pch.h"
 #include <iostream>
 #include <string>
-#include <windows.h>
 #include <tchar.h>
 #include <conio.h>
-#include "ServiceInstaller.h"
-#include "RoSatTaskManager.h"
 
-//#include "TaskPrint.h"
+#include "TaskPrint.h"
 #include "TaskPacketProcess.h"
 #include "TaskPacketReceiveQueue.h"
 #include "TaskPacketTransmitQueue.h"
 #include "TaskSerial.h"
+#include "RoSatTaskManager.h"
 
+#include "ServiceImpl.h"
+#include "ServiceInstaller.h"
 
 #define SERVICE_NAME            TEXT("RoSatProcessor")
 #define SERVICE_DISPLAY_NAME    TEXT("RoSat Processor")
@@ -95,6 +93,9 @@ int wmain(int argc, TCHAR* argv[])
                     else if (ch == 's')
                     {
                         RoSatProcessor::RoSatTaskManager::stop();
+                    }
+                    else if (ch == 'c') {
+                        system("cls");
                     }
                 }
                 Sleep(500);

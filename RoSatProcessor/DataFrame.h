@@ -2,12 +2,11 @@
 #include <iostream>
 #include <streambuf>
 
+constexpr unsigned char operator"" _b(unsigned long long value) {
+	return static_cast<unsigned char>(value);
+}
+
 namespace RoSatProcessor {
-
-	constexpr unsigned char operator"" _b(unsigned long long value) {
-		return static_cast<unsigned char>(value);
-	}
-
 	enum class Endian {
 		None,
 		LittleEndian,
@@ -47,10 +46,20 @@ namespace RoSatProcessor {
 		const char* data() const;
 		std::unique_ptr<std::streambuf> get() const;
 		void setEndian(Endian endian);
+		uint16_t crc16(size_t start);
+		uint16_t crc16_false(size_t start);
+		uint16_t crc16(size_t start, size_t end);
+		uint16_t crc16_false(size_t start, size_t end);
+		uint32_t crc32(size_t start);
+		uint32_t crc32(size_t start, size_t end);
 
 
 		DataFrame& append(const char* data, std::size_t len, Endian endian = Endian::None);
+		DataFrame& appendFromHex(const std::string_view& str);
+		DataFrame slice(size_t start);
+		DataFrame slice(size_t start, size_t end);
 		void normalize();
+		char getc(size_t pos = 0);
 		void setPos(size_t pos = 0);
 		static Sett set(size_t pos = 0) { return Sett{ pos }; }
 		static Skpt skip(size_t pos = 0) { return Skpt{ pos }; }
@@ -173,6 +182,11 @@ namespace RoSatProcessor {
 	template <>
 	inline DataFrame& operator<<(DataFrame& out, const std::string& value) {
 		return out.append(value.c_str(), value.size());
+	}
+
+	template <>
+	inline DataFrame& operator<<(DataFrame& out, const DataFrame& value) {
+		return out.append(value.data(), value.size());
 	}
 
 	template <>

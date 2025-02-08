@@ -107,18 +107,20 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)Library\include\;$(SolutionDir)RoSatParser\;$(BOOST_ROOT)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard_C>Default</LanguageStandard_C>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)Library\lib\;$(BOOST_ROOT)\lib64-msvc-14.3</AdditionalLibraryDirectories>
-      <AdditionalDependencies>re2.lib;abseil_dll.lib;libzmq-mt-4_3_5.lib;gnuradio-pmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>re2.lib;abseil_dll.lib;libzmq-mt-4_3_5.lib;gnuradio-pmt.lib;cryptlib_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /Y "$(TargetDir)" "$(SolutionDir)RoSatGCS\Dependency"</Command>
@@ -130,12 +132,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(ProjectDir)Library\include\;$(SolutionDir)RoSatParser\;$(BOOST_ROOT)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,7 +147,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)Library\lib\;$(BOOST_ROOT)\lib64-msvc-14.3</AdditionalLibraryDirectories>
-      <AdditionalDependencies>re2.lib;abseil_dll.lib;libzmq-mt-4_3_5.lib;gnuradio-pmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>re2.lib;abseil_dll.lib;libzmq-mt-4_3_5.lib;gnuradio-pmt.lib;cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /Y "$(TargetDir)" "$(SolutionDir)RoSatGCS\Dependency"</Command>
@@ -152,10 +156,15 @@
   <ItemGroup>
     <ClCompile Include="AsyncSerial.cpp" />
     <ClCompile Include="Constants.h" />
+    <ClCompile Include="crc16-ccitt-false.cpp" />
     <ClCompile Include="crc16-ccitt.cpp" />
     <ClCompile Include="crc32.cpp" />
     <ClCompile Include="DataFrame.cpp" />
     <ClCompile Include="Helper.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="RoSatProcessor.cpp" />
     <ClCompile Include="RoSatTask.cpp" />
     <ClCompile Include="RoSatTask.h" />
@@ -180,10 +189,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AsyncSerial.h" />
+    <ClInclude Include="crc16-ccitt-false.h" />
     <ClInclude Include="crc16-ccitt.h" />
     <ClInclude Include="crc32.h" />
     <ClInclude Include="DataFrame.h" />
     <ClInclude Include="Helper.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="RoSatTaskManager.h" />
     <ClInclude Include="ServiceBase.h" />
     <ClInclude Include="ServiceImpl.h" />

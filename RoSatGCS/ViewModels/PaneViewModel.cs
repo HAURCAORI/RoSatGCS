@@ -9,7 +9,7 @@ namespace RoSatGCS.ViewModels
     public class PaneViewModel : ViewModelBase
     {
         #region fields
-        private string _id = string.Empty;
+        private int _id;
         private bool _isSelected = false;
         private bool _isActive = false;
         #endregion
@@ -20,7 +20,7 @@ namespace RoSatGCS.ViewModels
 
         #region properties
 
-        public string id
+        public int id
         {
             get => _id;
             set => SetProperty(ref _id, value);

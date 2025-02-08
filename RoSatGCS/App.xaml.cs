@@ -17,7 +17,7 @@ namespace RoSatGCS
         public App()
         {
             Services = ConfigureServices();
-            //this.InitializeComponent();
+            this.InitializeComponent();
         }
 
         /// <summary>
@@ -43,6 +43,8 @@ namespace RoSatGCS
             services.AddTransient(typeof(PageDashboardViewModel));
             services.AddTransient(typeof(PageGroundTrackViewModel));
             services.AddTransient(typeof(PageSchedulerViewModel));
+
+            services.AddTransient(typeof(PaneCommandFileViewModel));
             return services.BuildServiceProvider();
         }
     }

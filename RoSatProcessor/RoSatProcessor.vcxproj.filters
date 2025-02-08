@@ -37,6 +37,9 @@
     <Filter Include="헤더 파일\Serial">
       <UniqueIdentifier>{279f45e9-fa65-4270-a036-b4742e356e44}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PCH">
+      <UniqueIdentifier>{3ecc23ea-2298-48c1-9bad-5ba8e5be0955}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RoSatProcessor.cpp">
@@ -96,6 +99,12 @@
     <ClCompile Include="TaskSerial.cpp">
       <Filter>소스 파일\Task</Filter>
     </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>PCH</Filter>
+    </ClCompile>
+    <ClCompile Include="crc16-ccitt-false.cpp">
+      <Filter>소스 파일\CRC</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -148,6 +157,12 @@
     </ClInclude>
     <ClInclude Include="TaskSerial.h">
       <Filter>헤더 파일\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>PCH</Filter>
+    </ClInclude>
+    <ClInclude Include="crc16-ccitt-false.h">
+      <Filter>헤더 파일\CRC</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

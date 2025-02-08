@@ -1,6 +1,6 @@
+#include "pch.h"
 #include "TaskPacketReceiveQueue.h"
 #include "RoSatTaskManager.h"
-#include "DataFrame.h"
 
 RoSatProcessor::TaskPacketReceiveQueue::TaskPacketReceiveQueue(PCWSTR pszServiceName, PCWSTR pszTaskName) :
 	RoSatTask(pszServiceName, pszTaskName, TRUE, 50)
@@ -10,6 +10,16 @@ RoSatProcessor::TaskPacketReceiveQueue::TaskPacketReceiveQueue(PCWSTR pszService
 
 RoSatProcessor::TaskPacketReceiveQueue::TaskPacketReceiveQueue(const TaskPacketReceiveQueue& src)
 	: TaskPacketReceiveQueue(src.m_serviceName, src.m_taskName)
+{
+
+}
+
+void RoSatProcessor::TaskPacketReceiveQueue::stop()
+{
+	RoSatTask::stop();
+}
+
+void RoSatProcessor::TaskPacketReceiveQueue::Enqueue(const DataFrame& value)
 {
 
 }

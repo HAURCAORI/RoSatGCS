@@ -1,4 +1,5 @@
 #pragma once
+
 #include "RoSatTask.h"
 #include "zmq.hpp"
 
@@ -8,6 +9,9 @@ namespace RoSatProcessor {
 		TaskPacketReceiveQueue(PCWSTR pszServiceName, PCWSTR pszTaskName);
 		TaskPacketReceiveQueue(const TaskPacketReceiveQueue&);
 		virtual ~TaskPacketReceiveQueue() = default;
+
+		virtual void stop() override;
+		virtual void Enqueue(const DataFrame& value) override;
 
 	protected:
 		virtual BOOL initialize() override;

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "RoSatTask.h"
 
 namespace RoSatProcessor {
@@ -7,6 +8,9 @@ namespace RoSatProcessor {
 		TaskTemplate(PCWSTR pszServiceName, PCWSTR pszTaskName);
 		TaskTemplate(const TaskTemplate&);
 		virtual ~TaskTemplate() = default;
+
+		virtual void stop() override;
+		virtual void Enqueue(const DataFrame& value) override;
 
 	protected:
 		virtual BOOL initialize() override;

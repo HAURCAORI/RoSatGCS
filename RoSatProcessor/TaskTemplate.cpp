@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "TaskTemplate.h"
 
 
@@ -11,6 +12,15 @@ RoSatProcessor::TaskTemplate::TaskTemplate(const TaskTemplate& src)
 	: TaskTemplate(src.m_serviceName, src.m_taskName)
 {
 
+}
+
+void RoSatProcessor::TaskTemplate::stop()
+{
+	RoSatTask::stop();
+}
+
+void RoSatProcessor::TaskTemplate::Enqueue(const DataFrame& value)
+{
 }
 
 BOOL RoSatProcessor::TaskTemplate::initialize()

@@ -1,4 +1,5 @@
 #pragma region Includes
+#include "pch.h"
 #include "RoSatTask.h"
 #include "RoSatTaskManager.h"
 #include "ThreadPool.h"

@@ -26,4 +26,6 @@
   * @param nSeed: crc seed
   * @return the calculated crc
   */
-uint32_t MACCRC32_Calc32(const unsigned char* pBuff, uint32_t nSize, uint32_t nSeed);
+
+#define MSP_CRC32_POLY 0x04C11DB7
+uint32_t MACCRC32_Calc32(const char* pBuff, uint32_t nSize, uint32_t nSeed = 0xFFFFFFFFL);

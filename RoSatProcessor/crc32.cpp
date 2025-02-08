@@ -13,12 +13,14 @@
   *
   * @}
   */
+#include "pch.h"
 #include <stdint.h>
 #include <assert.h>
 #include "crc32.h"
 
   // 1110 1101 1011 1000 1000 0011 0010 0000
   //#define MSP_CRC32_POLY        0xEDB88320 - bits reversed
+
 
   // Use reversed poly, simplify calculations
 static const uint32_t g_pCRC32Table[256] =
@@ -41,14 +43,14 @@ static const uint32_t g_pCRC32Table[256] =
     0xBDBDF21C, 0xCABAC28A, 0x53B39330, 0x24B4A3A6, 0xBAD03605, 0xCDD70693, 0x54DE5729, 0x23D967BF, 0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94, 0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
 };
 
-uint32_t MACCRC32_Calc32(const unsigned char* pBuff, uint32_t nSize, uint32_t nSeed)
+uint32_t MACCRC32_Calc32(const char* pBuff, uint32_t nSize, uint32_t nSeed)
 {
     assert(pBuff);
 
     uint32_t nCrc = nSeed;
     for (size_t i = 0; i < nSize; i++)
         nCrc = (nCrc >> 8) ^ g_pCRC32Table[(nCrc ^ pBuff[i]) & 0xff];
-    nCrc = (nCrc & 0xFFFF0000) >> 16 | (nCrc & 0x0000FFFF) << 16;
+    //nCrc = (nCrc & 0xFFFF0000) >> 16 | (nCrc & 0x0000FFFF) << 16;
     //nCrc = (nCrc & 0x00FF00FF) << 8 | (nCrc & 0xFF00FF00) >> 8;
 
     return nCrc;

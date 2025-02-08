@@ -1,5 +1,6 @@
 ﻿using AdonisUI.Controls;
 using NLog;
+using RoSatGCS.Models;
 using RoSatGCS.Utils.Localization;
 using RoSatGCS.Utils.Satellites;
 using RoSatGCS.Utils.Satellites.Core;
@@ -46,8 +47,7 @@ namespace RoSatGCS
             InitializeComponent();
             DataContext = App.Current.Services.GetService(typeof(MainWindowViewModel));
 
-
-
+            
             // 아래 테스트용 코드들
             string tle = "ISS (ZARYA)\r\n1 25544U 98067A   24328.29153615  .00029143  00000-0  51837-3 0  9997\r\n2 25544  51.6408 247.1413 0007321 258.8281 244.5643 15.49886778483225";
             var satellite = new Satellite(new TLE(tle),"ISS");

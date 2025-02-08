@@ -48,6 +48,7 @@ uint16_t crc16_ccitt_table_ex(uint8_t const* pDataP, uint32_t iLenP, uint16_t se
 */
 uint16_t crc16_ccitt_calc(uint8_t const* pDataP, unsigned int iLenP);
 
+uint16_t crc16_ccitt_calc(char const* pDataP, unsigned int iLenP);
 /**
 * @brief Calculate CRC16 of a sequence of bytes
 * @param fp_pu8Data: pointer to the data
