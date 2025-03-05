@@ -141,6 +141,7 @@
         <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"/>
         <Setter Property="adonisExtensions:RippleExtension.BackgroundBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1HighlightBrush}}"/>
         <Setter Property="ToolTipService.InitialShowDelay" Value="500"/>
+        <Setter Property="Cursor" Value="Hand"/>
     </Style>
 
     <Style x:Key="ToolButtonVisibility" TargetType="Button" BasedOn="{StaticResource ToolButton}">
@@ -165,6 +166,7 @@
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="adonisExtensions:RippleExtension.BackgroundBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1HighlightBrush}}"/>
+        <Setter Property="Cursor" Value="Hand"/>
     </Style>
 
     <Style x:Key="SidebarButton" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
@@ -175,6 +177,7 @@
         <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="ToolTipService.InitialShowDelay" Value="300"/>
+        <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
@@ -195,7 +198,27 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-    
+
+    <Style x:Key="TipButton" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="Height" Value="12"/>
+        <Setter Property="Width" Value="12"/>
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="adonisExtensions:RippleExtension.BackgroundBrush" Value="Transparent"/>
+        <Setter Property="adonisExtensions:RippleExtension.BorderBrush" Value="Transparent"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="ToolTipService.InitialShowDelay" Value="500"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <!-- Icon Style -->
     <Style x:Key="Icon" TargetType="Rectangle">
         <Setter Property="Width" Value="10"/>

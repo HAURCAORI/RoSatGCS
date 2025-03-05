@@ -1,18 +1,48 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MessagePack;
+using Newtonsoft.Json.Linq;
+using RoSatGCS.Controls;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using static RoSatGCS.Models.SatelliteCommandModel;
 using static RoSatGCS.Models.SatelliteFunctionTypeModel;
 
 namespace RoSatGCS.Models
 {
+    // Satellite Function File Parameter
     [MessagePackObject(AllowPrivate = true)]
-    public partial class ParameterModel : ObservableObject, ICloneable
+    public partial class ParameterModel : ObservableObject, ICloneable, IDisposable
     {
+        [IgnoreMember]
+        public ICommand? PullValue { get; set; }
+
+        public event EventHandler? Received;
+
+        public void ReceivedEvent(object? o)
+        {
+            if(_value == null) { return; }
+            Received?.Invoke(o, new EventArgs());
+        }
+
+        public event EventHandler? ValueChanged;
+
+        public void ValueChangedEvent(object? o)
+        {
+            if(_init == true)
+                ValueChanged?.Invoke(o,new EventArgs());
+        }
+
+
+
         #region Fields
+        [IgnoreMember]
+        private WeakReference<SatelliteCommandModel>? _model;
         [Key("baseType")]
         private ArgumentType _baseType;
         [Key("name")]
@@ -33,12 +63,37 @@ namespace RoSatGCS.Models
         private SatelliteFunctionFileModel.DataType _dataType;
         [Key("isArray")]
         private bool _isArray = false;
+        [IgnoreMember]
+        private bool _isReadOnly = false;
+        [IgnoreMember]
+        private string _seuence = "";
+        [Key("value")]
+        private List<object>? _value = new();
+        [Key("hasError")]
+        private bool _hasError = true;
+        [IgnoreMember]
+        private bool _init = false;
         #endregion
-        
+
         #region Properties
+        [IgnoreMember]
+        public SatelliteCommandModel? CommandModel {
+            get
+            {
+                if (_model != null && _model.TryGetTarget(out var target))
+                    return target;
+                return null;
+            }
+            set
+            {
+                if(value != null)
+                    _model = new WeakReference<SatelliteCommandModel>(value);
+            }
+        }
+
         // General Properties
         [IgnoreMember]
-        public ArgumentType BaseType { get => _baseType; }
+        public ArgumentType BaseType { get => _baseType; internal set => _baseType = value; }
         [IgnoreMember]
         public string Name { get => _name; internal set => _name = value; }
         [IgnoreMember]
@@ -47,6 +102,19 @@ namespace RoSatGCS.Models
         public string Description { get => _description; internal set => _description = value; }
         [IgnoreMember]
         public int Id { get => _id; internal set => _id = value; }
+        [IgnoreMember]
+        public string Sequence {  get => _seuence; internal set => _seuence = value; }
+        [IgnoreMember]
+        public List<object>? Value { get => _value; internal set => _value = value; }
+        [IgnoreMember]
+        public bool HasError { get => _hasError; internal set => _hasError = value; }
+        [IgnoreMember]
+        public bool Init { get => _init; internal set => _init = value; }
+
+
+        // Enum Only Properties
+        [IgnoreMember]
+        public string EnumValue { get => Name + "(" + Id + ")"; }
 
         // Struct Only Properties
         [IgnoreMember]
@@ -62,23 +130,102 @@ namespace RoSatGCS.Models
         [IgnoreMember]
         public bool IsArray { get => _isArray; internal set => _isArray = value; }
         [IgnoreMember]
+        public bool IsReadOnly { get => _isReadOnly; internal set => _isReadOnly = value; }
+        [IgnoreMember]
         public string DataTypeString
         {
             get
             {
-                if (IsArray)
+                if (DataType == SatelliteFunctionFileModel.DataType.Enumeration)
+                    return UserDefinedType;
+                else if (IsArray)
                     if (IsUserDefined)
                         return UserDefinedType + "[ ]";
                     else
                         return DataType.ToString() + "[ ]";
-                else
-                    if (IsUserDefined)
+                else if (IsUserDefined)
                     return UserDefinedType;
                 else
                     return DataType.ToString();
             }
         }
         #endregion
+
+        public static List<object> ConvertValue(SatelliteFunctionFileModel.DataType dataType, List<byte> bytes, ArgumentType type = ArgumentType.None)
+        {
+            List<object> value = [];
+            switch (dataType)
+            {
+                case SatelliteFunctionFileModel.DataType.Boolean:
+                    for (int i = 0; i < bytes.Count; i += 1)
+                        value.Add(BitConverter.ToBoolean([.. bytes], i));
+                    break;
+                case SatelliteFunctionFileModel.DataType.Int8:
+                    for (int i = 0; i < bytes.Count; i += 1)
+                        value.Add(BitConverter.ToChar([.. bytes], i));
+                    break;
+                case SatelliteFunctionFileModel.DataType.Int16:
+                    for (int i = 0; i < bytes.Count; i += 2)
+                        value.Add(BitConverter.ToInt16([.. bytes], i));
+                    break;
+                case SatelliteFunctionFileModel.DataType.Int32:
+                    for (int i = 0; i < bytes.Count; i += 4)
+                        value.Add(BitConverter.ToInt32([.. bytes], i));
+                    break;
+                case SatelliteFunctionFileModel.DataType.Int64:
+                    for (int i = 0; i < bytes.Count; i += 8)
+                        value.Add(BitConverter.ToInt64([.. bytes], i));
+                    break;
+                case SatelliteFunctionFileModel.DataType.UInt8:
+                    for (int i = 0; i < bytes.Count; i += 1)
+                        value.Add(bytes[i]);
+                    break;
+                case SatelliteFunctionFileModel.DataType.UInt16:
+                    for (int i = 0; i < bytes.Count; i += 2)
+                        value.Add(BitConverter.ToUInt16([.. bytes], i));
+                    break;
+                case SatelliteFunctionFileModel.DataType.UInt32:
+                    for (int i = 0; i < bytes.Count; i += 4)
+                        value.Add(BitConverter.ToUInt32([.. bytes], i));
+                    break;
+                case SatelliteFunctionFileModel.DataType.UInt64:
+                    for (int i = 0; i < bytes.Count; i += 8)
+                        value.Add(BitConverter.ToUInt64([.. bytes], i));
+                    break;
+                case SatelliteFunctionFileModel.DataType.Integer:
+                    for (int i = 0; i < bytes.Count; i += 4)
+                        value.Add(BitConverter.ToInt32([.. bytes], i));
+                    break;
+                case SatelliteFunctionFileModel.DataType.Float:
+                    for (int i = 0; i < bytes.Count; i += 4)
+                        value.Add(BitConverter.ToSingle([.. bytes], i));
+                    break;
+                case SatelliteFunctionFileModel.DataType.Double:
+                    for (int i = 0; i < bytes.Count; i += 8)
+                        value.Add(BitConverter.ToDouble([.. bytes], i));
+                    break;
+                case SatelliteFunctionFileModel.DataType.String:
+                    value.Add(Encoding.ASCII.GetString(bytes.ToArray()));
+                    break;
+                case SatelliteFunctionFileModel.DataType.ByteBuffer:
+                    foreach (var item in bytes)
+                        value.Add(item);
+                    break;
+                case SatelliteFunctionFileModel.DataType.Enumeration:
+                    foreach (var item in bytes)
+                        value.Add(item);
+                    break;
+                case SatelliteFunctionFileModel.DataType.UserDefined:
+                    if (type != ArgumentType.Enum)
+                    {
+                        throw new NotImplementedException();
+                    }
+                    foreach (var item in bytes)
+                        value.Add(item);
+                    break;
+            }
+            return value;
+        }
 
         #region Constructors
         private ParameterModel() { }
@@ -89,9 +236,25 @@ namespace RoSatGCS.Models
             _file = file;
             _description = description;
         }
+        ~ParameterModel()
+        {
+            Dispose();
+        }
         #endregion
 
         #region ETC
+        public void Dispose()
+        {
+            if (Received != null)
+            {
+                foreach (Delegate d in Received.GetInvocationList())
+                {
+                    Received -= (EventHandler)d;
+                }
+            }
+            GC.SuppressFinalize(this); // Prevents finalizer from running
+        }
+
         public object Clone()
         {
             return new ParameterModel(this.BaseType, this.File, this.Name, this.Description)
@@ -101,7 +264,10 @@ namespace RoSatGCS.Models
                 ByteSize = this.ByteSize,
                 DataType = this.DataType,
                 UserDefinedType = this.UserDefinedType,
-                IsArray = this.IsArray
+                IsArray = this.IsArray,
+                CommandModel = this.CommandModel,
+                IsReadOnly = this.IsReadOnly,
+                Sequence = this.Sequence
             };
         }
         #endregion

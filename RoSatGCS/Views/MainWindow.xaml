@@ -11,12 +11,14 @@
         xmlns:loc="clr-namespace:RoSatGCS.Utils.Localization"
         xmlns:ctr="clr-namespace:RoSatGCS.Controls"
         xmlns:behaviors="clr-namespace:RoSatGCS.Utils.Navigation"
+        xmlns:cvt="clr-namespace:RoSatGCS.Utils.Converter"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="1000"
         ShrinkTitleBarWhenMaximized="False" TitleVisibility="Collapsed" TitleBarBackground="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"
                              FontFamily="{StaticResource KPDotum}">
     <adonisControls:AdonisWindow.Resources>
-        
+        <cvt:EnumConverter x:Key="EnumConverter"/>
+        <cvt:ServiceStatusConverter x:Key="ServiceStatusConverter"/>
     </adonisControls:AdonisWindow.Resources>
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Closing">
@@ -180,7 +182,15 @@
                         <ctr:StatusIndicator x:Name="DatabaseStatus" Margin="2,2,8,0"/>
                     </StackPanel>
                 </Border>
-                <Border BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BackgroundBrush}}" BorderThickness="0.5" Height="26" CornerRadius="2" Margin="0,0,2,0">
+                <Border BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BackgroundBrush}}"
+                        BorderThickness="0.5" Height="26" CornerRadius="2" Margin="0,0,2,0" ToolTip="{Binding ServiceManager.State, Converter={StaticResource EnumConverter}}">
+                    <Border.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="{loc:Localization sStart}" Command="{Binding StartService}"/>
+                            <MenuItem Header="{loc:Localization sStop}" Command="{Binding StopService}"/>
+                            <MenuItem Header="{loc:Localization sRestart}" Command="{Binding RestartService}"/>
+                        </ContextMenu>
+                    </Border.ContextMenu>
                     <StackPanel Orientation="Horizontal">
                         <Rectangle Style="{DynamicResource Icon}" Margin="10,3,2,0">
                             <Rectangle.OpacityMask>
@@ -188,7 +198,7 @@
                             </Rectangle.OpacityMask>
                         </Rectangle>
                         <Label Content="{loc:Localization sProcessor}"/>
-                        <ctr:StatusIndicator x:Name="ProcessorStatus" Margin="2,2,8,0"/>
+                        <ctr:StatusIndicator x:Name="ProcessorStatus" Margin="2,2,8,0" Status="{Binding ServiceManager.State, Converter={StaticResource ServiceStatusConverter}}"/>
                     </StackPanel>
                 </Border>
             </StackPanel>

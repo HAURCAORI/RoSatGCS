@@ -1,7 +1,9 @@
-﻿using RoSatGCS.Models;
+﻿using RoSatGCS.GCSTypes;
+using RoSatGCS.Models;
 using RoSatGCS.Utils.Localization;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -28,9 +30,8 @@ namespace RoSatGCS.Utils.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var temp = value as List<Models.WindowSettingsModel.LanguageOption>;
-            List<string> list = new List<string>();
-            if (temp != null)
+            List<string> list = [];
+            if (value is List<Models.WindowSettingsModel.LanguageOption> temp)
             {
                 foreach (var item in temp)
                 {
@@ -51,7 +52,7 @@ namespace RoSatGCS.Utils.Converter
         }
     }
 
-    public class PaneCommandFileListBoxWidthConverter : IValueConverter
+    public class ListBoxWidthConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -112,5 +113,72 @@ namespace RoSatGCS.Utils.Converter
             return Binding.DoNothing;
         }
     }
+
+    public class ByteStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if(value is int v)
+            {
+                if (v > 1)
+                    return v + " bytes";
+                else
+                    return v + " byte";
+            }
+            return Binding.DoNothing;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
+        }
+    }
+
+    public class InvertBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+                return !boolValue;
+            return value; // Return as is for safety
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+                return !boolValue;
+            return value;
+        }
+    }
+
+    public class ServiceStatusConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is ServiceManager.ServiceManager.ServiceState state)
+            {
+                switch (state)
+                {
+                    case ServiceManager.ServiceManager.ServiceState.Starting:
+                        return IndicatorStatus.Neutral;
+                    case ServiceManager.ServiceManager.ServiceState.Started:
+                        return IndicatorStatus.Ok;
+                    case ServiceManager.ServiceManager.ServiceState.Stopping:
+                        return IndicatorStatus.Neutral;
+                    case ServiceManager.ServiceManager.ServiceState.Stopped:
+                        return IndicatorStatus.Error;
+                    case ServiceManager.ServiceManager.ServiceState.Restart:
+                        return IndicatorStatus.Neutral;
+                }
+            }
+            return Binding.DoNothing;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
+        }
+    }
+
 }
 

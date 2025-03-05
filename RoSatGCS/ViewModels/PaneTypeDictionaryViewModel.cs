@@ -13,11 +13,22 @@ using System.Windows.Input;
 
 namespace RoSatGCS.ViewModels
 {
-    public  class PaneTypeDictionaryViewModel : PaneViewModel
+    public class PaneTypeDictionaryViewModel : PaneViewModel
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        private PageCommandViewModel _parent;
+        private WeakReference<PageCommandViewModel> _parent;
+        public PageCommandViewModel? Parent
+        {
+            get
+            {
+                if (_parent != null && _parent.TryGetTarget(out var target))
+                    return target;
+                return null;
+            }
+        }
+
+
         private string _searchString = "";
         private SatelliteFunctionTypeModel? _selectedItem;
 
@@ -41,7 +52,7 @@ namespace RoSatGCS.ViewModels
 
         public PaneTypeDictionaryViewModel(PageCommandViewModel viewModel)
         {
-            _parent = viewModel;
+            _parent = new WeakReference<PageCommandViewModel>(viewModel);
 
             ApplyFilter = new RelayCommand(OnApplyFilter);
             SearchClear = new RelayCommand(OnSearchClear);
@@ -50,10 +61,12 @@ namespace RoSatGCS.ViewModels
         }
         private void OnApplyFilter()
         {
-            _parent.SatelliteFunctionTypesView.Filter = new Predicate<object>(o => {
-                return ((SatelliteFunctionTypeModel)o).Name.StartsWith(SearchString, StringComparison.OrdinalIgnoreCase)
-                    && ((SatelliteFunctionTypeModel)o).Visibility == true;
-            });
+            if (Parent != null)
+                Parent.SatelliteFunctionTypesView.Filter = new Predicate<object>(o =>
+                {
+                    return ((SatelliteFunctionTypeModel)o).Name.StartsWith(SearchString, StringComparison.OrdinalIgnoreCase)
+                        && ((SatelliteFunctionTypeModel)o).Visibility == true;
+                });
         }
 
         private void OnSearchClear()
@@ -64,21 +77,22 @@ namespace RoSatGCS.ViewModels
         private void OnListItemDoubleClick()
         {
             if (SelectedItem == null) { return; }
+            if (Parent == null) { return; }
 
-            var pane = new PaneTypeSummaryViewModel(_parent);
+            var pane = new PaneTypeSummaryViewModel(Parent);
             pane.Title = SelectedItem.Name;
             pane.id = (SelectedItem.Name + SelectedItem.File).GetHashCode();
             pane.SatFuncType = SelectedItem;
 
-            var item = _parent.DocumentPane.FirstOrDefault(x => x.id == pane.id);
+            var item = Parent.DocumentPane.FirstOrDefault(x => x.id == pane.id);
 
             if (item == null)
             {
-                _parent.DocumentPane.Add(pane);
+                Parent.DocumentPane.Add(pane);
             }
             else
             {
-                _parent.ActiveDocument = item;
+                Parent.ActiveDocument = item;
             }
         }
 

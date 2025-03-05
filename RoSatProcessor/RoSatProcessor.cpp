@@ -9,10 +9,15 @@
 #include "TaskPacketReceiveQueue.h"
 #include "TaskPacketTransmitQueue.h"
 #include "TaskSerial.h"
+#include "TaskQueryRequestHandler.h"
+#include "TaskQueryResponseSender.h"
+#include "TaskWebSocketConnector.h"
 #include "RoSatTaskManager.h"
 
 #include "ServiceImpl.h"
 #include "ServiceInstaller.h"
+
+
 
 #define SERVICE_NAME            TEXT("RoSatProcessor")
 #define SERVICE_DISPLAY_NAME    TEXT("RoSat Processor")
@@ -35,12 +40,27 @@ void TaskDefinition() {
     //auto taskPrint = RoSatProcessor::TaskPrint(SERVICE_NAME, TEXT("Print"));
     //RoSatProcessor::RoSatTaskManager::addTask(taskPrint);
 
-    auto taskSerial = RoSatProcessor::TaskSerial(SERVICE_NAME, TEXT("Serial"));
-    RoSatProcessor::RoSatTaskManager::addTask(taskSerial);
+    //auto taskSerial = RoSatProcessor::TaskSerial(SERVICE_NAME, TEXT("Serial"));
+    //RoSatProcessor::RoSatTaskManager::addTask(taskSerial);
+
+    auto taskQueryRequest = RoSatProcessor::TaskQueryRequestHandler(SERVICE_NAME, TEXT("QueryRequest"));
+    RoSatProcessor::RoSatTaskManager::addTask(taskQueryRequest);
+
+	auto taskQueryResponse = RoSatProcessor::TaskQueryResponseSender(SERVICE_NAME, TEXT("QueryResponse"));
+	RoSatProcessor::RoSatTaskManager::addTask(taskQueryResponse);
+
+	auto taskWebSocketConnector = RoSatProcessor::TaskWebSocketConnector(SERVICE_NAME, TEXT("WebSocketConnector"));
+	RoSatProcessor::RoSatTaskManager::addTask(taskWebSocketConnector);
+
+
 }
 
 int wmain(int argc, TCHAR* argv[])
 {
+    RoSatProcessor::Config::Import();
+
+    RoSatProcessor::Config::SetWebSocketTLS(true);
+
     if ((argc > 1) && ((*argv[1] == L'-') || (*argv[1] == L'/')))
     {
         if (_tcsicmp(argv[1] + 1, TEXT("install")) == 0)

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using NLog;
+using RoSatGCS.Controls;
 using RoSatGCS.Models;
 using RoSatGCS.Utils.Localization;
 using RoSatGCS.Views;
@@ -19,10 +20,19 @@ namespace RoSatGCS.ViewModels
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
        
-        private PageCommandViewModel _parent;
+        private readonly WeakReference<PageCommandViewModel> _parent;
+        public PageCommandViewModel? Parent
+        {
+            get
+            {
+                if (_parent != null && _parent.TryGetTarget(out var target))
+                    return target;
+                return null;
+            }
+        }
+
         private SatelliteFunctionFileModel? _selectedItem;
 
-        private bool _visibility = true;
         public bool Visibility { get; set; }
 
         public SatelliteFunctionFileModel? SelectedItem { get { return _selectedItem; } set { SetProperty(ref _selectedItem, value); } }
@@ -34,8 +44,9 @@ namespace RoSatGCS.ViewModels
         public ICommand RefreshFile { get; }
 
 
+
         public PaneCommandFileViewModel(PageCommandViewModel viewModel) {
-            _parent = viewModel;
+            _parent = new WeakReference<PageCommandViewModel>(viewModel);
             AddFile = new RelayCommand(AddFileFunc);
             AddFileFromDrag = new RelayCommand<object>(AddFileFromDragFunc);
             RemoveFile = new RelayCommand<SatelliteFunctionFileModel>(RemoveFileFunc);
@@ -48,7 +59,7 @@ namespace RoSatGCS.ViewModels
             var dialogue = new WindowFileSearch();
             if (dialogue.ShowDialog() == true)
             {
-                AddFileHelper(new string[] { dialogue.Path });
+                AddFileHelper([dialogue.Path]);
             }
         }
 
@@ -62,16 +73,18 @@ namespace RoSatGCS.ViewModels
 
         private void AddFileHelper(string[] list)
         {
-            List<string> error = new List<string>();
+            if (Parent == null) { return; }
+            List<string> error = [];
+            
             foreach (string s in list)
             {
-                var item = _parent.SatFuncFile.Where(x => x.FilePath == s).FirstOrDefault();
+                var item = Parent.SatFuncFile.Where(x => x.FilePath == s).FirstOrDefault();
                 if (item != null)
                 {
                     var ret = System.Windows.MessageBox.Show(TranslationSource.Instance["zSameFileExists"] + ":\r\n  " + s + "\r\n" + TranslationSource.Instance["zReplaceIt"], TranslationSource.Instance["sWarning"], MessageBoxButton.YesNo, MessageBoxImage.Warning);
                     if (ret == MessageBoxResult.Yes)
                     {
-                        _parent.RemoveSatFuncFile.Execute(item);
+                        Parent.RemoveSatFuncFile.Execute(item);
                     }
                     else
                     {
@@ -83,7 +96,7 @@ namespace RoSatGCS.ViewModels
                 try
                 {
                     ffm.Initialize(s);
-                    _parent.AddSatFuncFile.Execute(ffm);
+                    Parent.AddSatFuncFile.Execute(ffm);
                     
                 }
                 catch (Exception ex)
@@ -101,12 +114,13 @@ namespace RoSatGCS.ViewModels
 
         private void RemoveFileFunc(object? o)
         {
+            if (Parent == null) { return; }
             if (o is SatelliteFunctionFileModel item)
             {
                 var ret = MessageBox.Show(TranslationSource.Instance["zAreYouSure"], TranslationSource.Instance["sRemove"], MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (ret == MessageBoxResult.Yes)
                 {
-                    _parent.RemoveSatFuncFile.Execute(item);
+                    Parent.RemoveSatFuncFile.Execute(item);
                 }
             }
         }
@@ -117,11 +131,12 @@ namespace RoSatGCS.ViewModels
 
         private void OnRefreshFile(object? o)
         {
+            if (Parent == null) { return; }
             if (o is SatelliteFunctionFileModel item)
             {
                 var path = item.FilePath;
-                _parent.RemoveSatFuncFile.Execute(item);
-                AddFileHelper(new string[] { path });
+                Parent.RemoveSatFuncFile.Execute(item);
+                AddFileHelper([path]);
             }
         }
     }

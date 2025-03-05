@@ -54,6 +54,14 @@ RoSatProcessor::DataFrame::DataFrame(const char* buffer, std::streamsize size)
 	setg(buffer_, buffer_, buffer_ + size);
 }
 
+RoSatProcessor::DataFrame::DataFrame(const std::vector<uint8_t>& buffer)
+	: std::ostream(this), size_(buffer.size()), used_(buffer.size()), endian_(Endian::LittleEndian), readPos_(0) {
+	buffer_ = new char[buffer.size()];
+	std::memcpy(buffer_, buffer.data(), buffer.size());
+	setp(buffer_, buffer_ + used_);
+	setg(buffer_, buffer_, buffer_ + used_);
+}
+
 RoSatProcessor::DataFrame::DataFrame(const DataFrame& rhs)
 	: std::ostream(this), size_(rhs.used_), used_(rhs.used_), endian_(rhs.endian_), readPos_(rhs.readPos_) {
 	buffer_ = new char[rhs.used_];
@@ -268,6 +276,11 @@ std::string RoSatProcessor::DataFrame::toString() const {
 		result[3 * i + 2] = ' ';
 	}
 	return result;
+}
+
+std::vector<uint8_t> RoSatProcessor::DataFrame::toVector() const
+{
+	return std::vector<uint8_t>(buffer_, buffer_ + used_);
 }
 
 char& RoSatProcessor::DataFrame::operator[](unsigned int i) {

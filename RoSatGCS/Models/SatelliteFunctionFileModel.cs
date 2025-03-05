@@ -23,6 +23,7 @@ namespace RoSatGCS.Models
     {
         public enum DataType
         {
+            None = 0,
             UInt8 = 1, Int8 = 2, UInt16 = 3, Int16 = 4,
             UInt32 = 5, Int32 = 6, UInt64 = 7, Int64 = 8,
             Integer = 9, Boolean = 10, Float = 11, Double = 12,
@@ -196,8 +197,7 @@ namespace RoSatGCS.Models
             _fileName = Path.GetFileNameWithoutExtension(path);
             _filePath = path;
 
-            string error;
-            if (!Load(out error))
+            if (!Load(out string error))
             {
                 throw new InvalidFunctionFileException(error);
             }
@@ -215,14 +215,14 @@ namespace RoSatGCS.Models
             }
         }
 
+        private readonly static JsonSerializerOptions jsonOptions = new() { PropertyNameCaseInsensitive = true };
         private bool Load(out string error)
         {
 
-            using (StreamReader r = new StreamReader(_filePath))
+            using (StreamReader r = new(_filePath))
             {
                 string json = r.ReadToEnd();
-                JsonSerializerOptions options = new JsonSerializerOptions{ PropertyNameCaseInsensitive = true  };
-                var data = JsonSerializer.Deserialize<FunctionFileStructure>(json, options);
+                var data = JsonSerializer.Deserialize<FunctionFileStructure>(json, jsonOptions);
 
                 // Validate Metadata    
                 if (string.IsNullOrEmpty(data.Package)) { error = "Package is missing or empty."; return false; }

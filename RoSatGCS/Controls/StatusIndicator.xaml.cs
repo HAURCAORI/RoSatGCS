@@ -37,23 +37,23 @@ namespace RoSatGCS.Controls
             set { SetValue(StatusIndicatorProperty, value); }
         }
 
-        private IndicatorStatus status;
-
         private static void OnChangedCallBack(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            StatusIndicator? o = sender as StatusIndicator;
-            if (o != null)
+            if (sender is StatusIndicator o)
             {
                 switch (e.NewValue)
                 {
                     case IndicatorStatus.None:
-                        o.Indicator.Background = Brushes.Gray;
+                        o.Indicator.Background = Brushes.LightGray;
                         break;
                     case IndicatorStatus.Ok:
                         o.Indicator.Background = new BrushConverter().ConvertFrom("#7BEB67") as Brush;
                         break;
                     case IndicatorStatus.Error:
                         o.Indicator.Background = new BrushConverter().ConvertFrom("#F24444") as Brush;
+                        break;
+                    case IndicatorStatus.Neutral:
+                        o.Indicator.Background = new BrushConverter().ConvertFrom("#F2CB05") as Brush;
                         break;
                 }
             }

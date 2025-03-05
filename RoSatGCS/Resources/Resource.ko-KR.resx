@@ -297,4 +297,85 @@
   <data name="sSave" xml:space="preserve">
     <value>저장</value>
   </data>
+  <data name="sResults" xml:space="preserve">
+    <value>결과</value>
+  </data>
+  <data name="sRun" xml:space="preserve">
+    <value>실행</value>
+  </data>
+  <data name="sRunAll" xml:space="preserve">
+    <value>모두 실행</value>
+  </data>
+  <data name="sEdit" xml:space="preserve">
+    <value>편집</value>
+  </data>
+  <data name="sRename" xml:space="preserve">
+    <value>이름 변경</value>
+  </data>
+  <data name="zSameCommandExists" xml:space="preserve">
+    <value>동일한 명령</value>
+  </data>
+  <data name="sDelete" xml:space="preserve">
+    <value>지우기</value>
+  </data>
+  <data name="sProperties" xml:space="preserve">
+    <value>속성</value>
+  </data>
+  <data name="sExecuteAll" xml:space="preserve">
+    <value>모두 실행</value>
+  </data>
+  <data name="sExecuteOnce" xml:space="preserve">
+    <value>한 번 실행</value>
+  </data>
+  <data name="zCommandAlreadyExists" xml:space="preserve">
+    <value>명령이 이미 존재합니다.</value>
+  </data>
+  <data name="sSelect" xml:space="preserve">
+    <value>선택</value>
+  </data>
+  <data name="sDeselect" xml:space="preserve">
+    <value>선택 해제</value>
+  </data>
+  <data name="sGroup" xml:space="preserve">
+    <value>그룹</value>
+  </data>
+  <data name="sDeleteAll" xml:space="preserve">
+    <value>모두 삭제</value>
+  </data>
+  <data name="zSerializeError" xml:space="preserve">
+    <value>직렬화 오류</value>
+  </data>
+  <data name="sInvalid" xml:space="preserve">
+    <value>값 오류</value>
+  </data>
+  <data name="zParametersInvalid" xml:space="preserve">
+    <value>잘못된 파라미터가 존재합니다.</value>
+  </data>
+  <data name="zExecuteAnyway" xml:space="preserve">
+    <value>제외하고 실행하겠습니까?</value>
+  </data>
+  <data name="zInvalidSize" xml:space="preserve">
+    <value>잘못된 사이즈입니다.</value>
+  </data>
+  <data name="zSaveAnyway" xml:space="preserve">
+    <value>무시하고 저장하시겠습니까?</value>
+  </data>
+  <data name="sStart" xml:space="preserve">
+    <value>시작</value>
+  </data>
+  <data name="sStop" xml:space="preserve">
+    <value>정지</value>
+  </data>
+  <data name="sRestart" xml:space="preserve">
+    <value>재시작</value>
+  </data>
+  <data name="zFailToExecute" xml:space="preserve">
+    <value>실행 실패</value>
+  </data>
+  <data name="zExecutionTimeout" xml:space="preserve">
+    <value>실행 시간 초과</value>
+  </data>
+  <data name="sPreview" xml:space="preserve">
+    <value>미리보기</value>
+  </data>
 </root>

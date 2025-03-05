@@ -31,14 +31,17 @@
     <Filter Include="헤더 파일\Packet">
       <UniqueIdentifier>{7f5ef0e2-aa93-491b-8103-bf05dd39ee49}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\Serial">
-      <UniqueIdentifier>{c0d2a454-54b3-40a5-a237-cf5006dbdc8f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Serial">
-      <UniqueIdentifier>{279f45e9-fa65-4270-a036-b4742e356e44}</UniqueIdentifier>
-    </Filter>
     <Filter Include="PCH">
       <UniqueIdentifier>{3ecc23ea-2298-48c1-9bad-5ba8e5be0955}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Configuration">
+      <UniqueIdentifier>{1c68ab9d-5a23-4531-8e1e-e215c701af14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Connection">
+      <UniqueIdentifier>{c0d2a454-54b3-40a5-a237-cf5006dbdc8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Connection">
+      <UniqueIdentifier>{279f45e9-fa65-4270-a036-b4742e356e44}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -94,7 +97,7 @@
       <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="AsyncSerial.cpp">
-      <Filter>소스 파일\Serial</Filter>
+      <Filter>소스 파일\Connection</Filter>
     </ClCompile>
     <ClCompile Include="TaskSerial.cpp">
       <Filter>소스 파일\Task</Filter>
@@ -105,9 +108,26 @@
     <ClCompile Include="crc16-ccitt-false.cpp">
       <Filter>소스 파일\CRC</Filter>
     </ClCompile>
+    <ClCompile Include="TaskQueryRequestHandler.cpp">
+      <Filter>소스 파일\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="WebSocketPacket.cpp">
+      <Filter>소스 파일\Packet</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskWebSocketConnector.cpp">
+      <Filter>소스 파일\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="AsyncWebSocket.cpp">
+      <Filter>소스 파일\Connection</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskQueryResponseSender.cpp">
+      <Filter>소스 파일\Task</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="vcpkg.json" />
+    <None Include="ReadMe" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ServiceBase.h">
@@ -153,7 +173,7 @@
       <Filter>헤더 파일\Task</Filter>
     </ClInclude>
     <ClInclude Include="AsyncSerial.h">
-      <Filter>헤더 파일\Serial</Filter>
+      <Filter>헤더 파일\Connection</Filter>
     </ClInclude>
     <ClInclude Include="TaskSerial.h">
       <Filter>헤더 파일\Task</Filter>
@@ -163,6 +183,27 @@
     </ClInclude>
     <ClInclude Include="crc16-ccitt-false.h">
       <Filter>헤더 파일\CRC</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskQueryRequestHandler.h">
+      <Filter>헤더 파일\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryPacket.h">
+      <Filter>헤더 파일\Packet</Filter>
+    </ClInclude>
+    <ClInclude Include="WebSocketPacket.h">
+      <Filter>헤더 파일\Packet</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>헤더 파일\Configuration</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskWebSocketConnector.h">
+      <Filter>헤더 파일\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="AsyncWebSocket.h">
+      <Filter>헤더 파일\Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskQueryResponseSender.h">
+      <Filter>헤더 파일\Task</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

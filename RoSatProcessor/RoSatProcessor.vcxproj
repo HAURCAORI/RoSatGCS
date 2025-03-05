@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -73,6 +73,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -115,12 +118,13 @@
       <LanguageStandard_C>Default</LanguageStandard_C>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalOptions>/bigobj /utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)Library\lib\;$(BOOST_ROOT)\lib64-msvc-14.3</AdditionalLibraryDirectories>
-      <AdditionalDependencies>re2.lib;abseil_dll.lib;libzmq-mt-4_3_5.lib;gnuradio-pmt.lib;cryptlib_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libzmq-mt-4_3_5.lib;gnuradio-pmt.lib;cryptlib_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /Y "$(TargetDir)" "$(SolutionDir)RoSatGCS\Dependency"</Command>
@@ -140,6 +144,7 @@
       <LanguageStandard_C>Default</LanguageStandard_C>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalOptions>/bigobj /utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -147,7 +152,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)Library\lib\;$(BOOST_ROOT)\lib64-msvc-14.3</AdditionalLibraryDirectories>
-      <AdditionalDependencies>re2.lib;abseil_dll.lib;libzmq-mt-4_3_5.lib;gnuradio-pmt.lib;cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libzmq-mt-4_3_5.lib;gnuradio-pmt.lib;cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /Y "$(TargetDir)" "$(SolutionDir)RoSatGCS\Dependency"</Command>
@@ -155,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AsyncSerial.cpp" />
+    <ClCompile Include="AsyncWebSocket.cpp" />
     <ClCompile Include="Constants.h" />
     <ClCompile Include="crc16-ccitt-false.cpp" />
     <ClCompile Include="crc16-ccitt.cpp" />
@@ -176,11 +182,17 @@
     <ClCompile Include="TaskPacketTransmitQueue.cpp" />
     <ClCompile Include="TaskPrint.cpp" />
     <ClCompile Include="TaskPacketReceiveQueue.cpp" />
+    <ClCompile Include="TaskQueryRequestHandler.cpp" />
+    <ClCompile Include="TaskQueryResponseSender.cpp" />
     <ClCompile Include="TaskSerial.cpp" />
     <ClCompile Include="TaskTemplate.cpp" />
+    <ClCompile Include="TaskWebSocketConnector.cpp" />
+    <ClCompile Include="WebSocketPacket.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="ReadMe" />
+    <None Include="vcpkg.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RoSatParser\RoSatParser.vcxproj">
@@ -189,12 +201,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AsyncSerial.h" />
+    <ClInclude Include="AsyncWebSocket.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="crc16-ccitt-false.h" />
     <ClInclude Include="crc16-ccitt.h" />
     <ClInclude Include="crc32.h" />
     <ClInclude Include="DataFrame.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="QueryPacket.h" />
     <ClInclude Include="RoSatTaskManager.h" />
     <ClInclude Include="ServiceBase.h" />
     <ClInclude Include="ServiceImpl.h" />
@@ -203,9 +218,13 @@
     <ClInclude Include="TaskPacketTransmitQueue.h" />
     <ClInclude Include="TaskPrint.h" />
     <ClInclude Include="TaskPacketReceiveQueue.h" />
+    <ClInclude Include="TaskQueryRequestHandler.h" />
+    <ClInclude Include="TaskQueryResponseSender.h" />
     <ClInclude Include="TaskSerial.h" />
     <ClInclude Include="TaskTemplate.h" />
+    <ClInclude Include="TaskWebSocketConnector.h" />
     <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="WebSocketPacket.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

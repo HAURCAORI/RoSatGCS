@@ -12,7 +12,8 @@ namespace RoSatGCS
         {
             None,
             Ok,
-            Error
+            Error,
+            Neutral
         }
     }
 }

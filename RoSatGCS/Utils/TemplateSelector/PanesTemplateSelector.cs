@@ -21,6 +21,7 @@ namespace RoSatGCS.Views
         public DataTemplate FunctionPropertyPaneTemplate { get; set; }
         public DataTemplate CommandSetPaneTemplate { get; set; }
         public DataTemplate TypeSummaryPaneTemplate { get; set; }
+        public DataTemplate PropertyPreviewPaneTemplate { get; set; }
 
 
         public override System.Windows.DataTemplate SelectTemplate(object item, System.Windows.DependencyObject container)
@@ -39,6 +40,8 @@ namespace RoSatGCS.Views
                 return CommandSetPaneTemplate;
             else if (item is PaneTypeSummaryViewModel)
                 return TypeSummaryPaneTemplate;
+            else if (item is PanePropertyPreviewViewModel)
+                return PropertyPreviewPaneTemplate;
 
             return base.SelectTemplate(item, container);
         }

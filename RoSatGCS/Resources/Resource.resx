@@ -297,4 +297,85 @@
   <data name="sSave" xml:space="preserve">
     <value>Save</value>
   </data>
+  <data name="sResults" xml:space="preserve">
+    <value>Results</value>
+  </data>
+  <data name="sRun" xml:space="preserve">
+    <value>Run</value>
+  </data>
+  <data name="sRunAll" xml:space="preserve">
+    <value>Run All</value>
+  </data>
+  <data name="sEdit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="sRename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="zSameCommandExists" xml:space="preserve">
+    <value>Same command exists</value>
+  </data>
+  <data name="sDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="sProperties" xml:space="preserve">
+    <value>Properties</value>
+  </data>
+  <data name="sExecuteAll" xml:space="preserve">
+    <value>Execute All</value>
+  </data>
+  <data name="sExecuteOnce" xml:space="preserve">
+    <value>Execute Once</value>
+  </data>
+  <data name="zCommandAlreadyExists" xml:space="preserve">
+    <value>Command already exists in the list.</value>
+  </data>
+  <data name="sSelect" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="sDeselect" xml:space="preserve">
+    <value>Deselect</value>
+  </data>
+  <data name="sGroup" xml:space="preserve">
+    <value>Group</value>
+  </data>
+  <data name="sDeleteAll" xml:space="preserve">
+    <value>Delete All</value>
+  </data>
+  <data name="zSerializeError" xml:space="preserve">
+    <value>Serialize Error</value>
+  </data>
+  <data name="sInvalid" xml:space="preserve">
+    <value>Invalid</value>
+  </data>
+  <data name="zParametersInvalid" xml:space="preserve">
+    <value>Invalid parameter exists.</value>
+  </data>
+  <data name="zExecuteAnyway" xml:space="preserve">
+    <value>Do you want to execute anyway?</value>
+  </data>
+  <data name="zInvalidSize" xml:space="preserve">
+    <value>Invalid size.</value>
+  </data>
+  <data name="zSaveAnyway" xml:space="preserve">
+    <value>Do you want to save anyway?</value>
+  </data>
+  <data name="sStart" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="sStop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="sRestart" xml:space="preserve">
+    <value>Restart</value>
+  </data>
+  <data name="zFailToExecute" xml:space="preserve">
+    <value>Fail to execute.</value>
+  </data>
+  <data name="zExecutionTimeout" xml:space="preserve">
+    <value>Execution timeout.</value>
+  </data>
+  <data name="sPreview" xml:space="preserve">
+    <value>Preview</value>
+  </data>
 </root>

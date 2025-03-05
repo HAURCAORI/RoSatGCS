@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <streambuf>
+#include <utility>
 
 constexpr unsigned char operator"" _b(unsigned long long value) {
 	return static_cast<unsigned char>(value);
@@ -35,6 +36,7 @@ namespace RoSatProcessor {
 	public:
 		DataFrame();
 		DataFrame(const char* buffer, std::streamsize size);
+		DataFrame(const std::vector<uint8_t>& buffer);
 		DataFrame(const DataFrame& rhs);
 		DataFrame& operator=(const DataFrame& rhs);
 		DataFrame(DataFrame&& rhs) noexcept;
@@ -66,6 +68,7 @@ namespace RoSatProcessor {
 		size_t read(char* dest, size_t len);
 
 		std::string toString() const;
+		std::vector<uint8_t> toVector() const;
 
 
 
@@ -84,6 +87,15 @@ namespace RoSatProcessor {
 
 		template <typename T>
 		friend DataFrame& operator>>(DataFrame&, const T&);
+
+		template <typename T>
+		friend const DataFrame& operator>>(const DataFrame&, T&);
+
+		template <typename T>
+		friend const DataFrame& operator>>(const DataFrame&, const T&);
+
+		friend void operator>>(DataFrame&, std::string&);
+		friend void operator>>(const DataFrame&, std::string&);
 		//friend DataFrame& operator>>(DataFrame&, const Endt&);
 		//friend DataFrame& operator>>(DataFrame&, const Sett&);
 
@@ -195,8 +207,9 @@ namespace RoSatProcessor {
 		return out;
 	}
 
-	inline DataFrame& operator<<(DataFrame& out, const char* value) {
-		return out.append(value, strlen(value));
+	template <>
+	inline DataFrame& operator<<(DataFrame& out, const std::array<uint8_t, 16>& value) {
+		return out.append(reinterpret_cast<const char*>(value.data()), 16);
 	}
 
 	inline std::ostream& operator<<(std::ostream& os, const DataFrame& a) {
@@ -208,6 +221,8 @@ namespace RoSatProcessor {
 	template<typename T>
 	inline DataFrame&
 		operator>>(DataFrame& df, T& value) {
+		static_assert(std::is_trivially_copyable_v<T>, "operator>> only supports trivially copyable types.");
+
 		constexpr size_t sz = sizeof(T);
 		char temp[sz] = { 0 };
 
@@ -224,10 +239,32 @@ namespace RoSatProcessor {
 	}
 
 	template<typename T>
+	inline const DataFrame&
+		operator>>(const DataFrame& df, T& value) {
+		return const_cast<DataFrame&>(df) >> value;
+	}
+
+	inline void operator>>(DataFrame& df, std::string& str) {
+		size_t len = df.used_ - df.readPos_;
+		str.assign(df.buffer_ + df.readPos_, len);
+		df.readPos_ += len;
+	}
+
+	inline void operator>>(const DataFrame& df, std::string& str) {
+		return const_cast<DataFrame&>(df) >> str;
+	}
+
+	template<typename T>
 	inline DataFrame&
 		operator>>(DataFrame& df, const T& value) {
 		static_assert(false, "Not implemented for const type T");
 		return df;
+	}
+
+	template<typename T>
+	inline const DataFrame&
+		operator>>(const DataFrame& df, const T& value) {
+		return const_cast<DataFrame&>(df) >> value;
 	}
 
 	template<>

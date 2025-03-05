@@ -55,7 +55,7 @@ void RoSatProcessor::RoSatTaskManager::stop()
 	}
 
 	e.isRunning = FALSE;
-	
+	RoSatProcessor::Config::Export();
 }
 
 RoSatProcessor::RoSatTask* RoSatProcessor::RoSatTaskManager::FindTask(PCWSTR pszTaskName)

@@ -1,0 +1,68 @@
+Package: vcpkg-cmake-config
+Version: 2024-05-23
+Architecture: x64-windows
+Multi-Arch: same
+Abi: ae30fbc09d93376919a3d9914985732b741ef14610ee8d5994892f022f48c647
+Status: install ok installed
+
+Package: vcpkg-cmake
+Version: 2024-04-23
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 9d56f332bfb71f766b34a74c8a3fccdb3aab4ac43d78ac691ed8ba5c8830e7b6
+Status: install ok installed
+
+Package: libuv
+Version: 1.50.0
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 792e27352dcce8df484679f4f846c94bb42d1263290269da02f44aba4059c90a
+Description: libuv is a multi-platform support library with a focus on asynchronous I/O.
+Status: purge ok not-installed
+
+Package: usockets
+Version: 0.8.8
+Port-Version: 2
+Depends: libuv, vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 98d89866ac9141b1634b60ba6bfffda0f5f40cf2964743fa0dc3f23484b3eb98
+Description: Miniscule cross-platform eventing, networking & crypto for async applications
+Status: purge ok not-installed
+
+Package: uwebsockets
+Version: 20.74.0
+Depends: usockets
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 69b5c9d3fc8d60c54ce294d8c8bb42ad704aac4e1a4ca8a281cf6f2970f8d1a1
+Description: Simple, secure & standards compliant web I/O for the most demanding of applications
+Status: purge ok not-installed
+
+Package: zlib
+Version: 1.3.1
+Depends: vcpkg-cmake
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 6bedd2065abdf454c601cf8c2bd19a0315db67efe75d0dede734c8b587036434
+Description: A compression library
+Status: purge ok not-installed
+
+Package: vcpkg-cmake-get-vars
+Version: 2024-09-22
+Depends: vcpkg-cmake
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 07cfb9c8a034a8e253fefadd2c2b8f61550a9bfb2e6f7004e4028f793fb5c3a5
+Status: install ok installed
+
+Package: openssl
+Version: 3.4.1
+Depends: vcpkg-cmake, vcpkg-cmake-config, vcpkg-cmake-get-vars
+Architecture: x64-windows
+Multi-Arch: same
+Abi: ff8003770de334b2edd9c5837785f67a7c351c76170252f9a7ee8aa207348eb9
+Description: OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols. It is also a general-purpose cryptography library.
+Status: install ok installed
+

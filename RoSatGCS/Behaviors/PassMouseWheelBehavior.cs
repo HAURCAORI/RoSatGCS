@@ -12,6 +12,7 @@ namespace RoSatGCS.Behaviors
 {
     public static class PassMouseWheelBehavior
     {
+
         public static bool GetEnableMouseWheelPass(DependencyObject obj) => (bool)obj.GetValue(EnableMouseWheelPassProperty);
         public static void SetEnableMouseWheelPass(DependencyObject obj, bool value) => obj.SetValue(EnableMouseWheelPassProperty, value);
 
@@ -35,15 +36,22 @@ namespace RoSatGCS.Behaviors
 
         private static void OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            var scrollViewer = FindVisualParent<ScrollViewer>(sender as DependencyObject);
-            if (scrollViewer != null)
-            {
-                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta / 3);
-                e.Handled = true;
-            }
+            var sen = sender as DependencyObject;
+            var src = e.OriginalSource as DependencyObject;
+            if (sen == null || src == null) return;
+            
+            var ctrl = FindVisualParent<UserControl>(src);
+            var menu = FindVisualParent<ComboBoxItem>(src);
+            var scrollViewer = FindVisualParent<ScrollViewer>(sen);
+            if(scrollViewer == null) return;
+
+            if (ctrl != null || menu != null) return;
+
+            scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta / 3);
+            e.Handled = true;
         }
 
-        private static T FindVisualParent<T>(DependencyObject child) where T : DependencyObject
+        private static T FindVisualParent<T>(DependencyObject? child) where T : DependencyObject
         {
             while (child != null)
             {

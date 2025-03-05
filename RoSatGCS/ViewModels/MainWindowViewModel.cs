@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using RoSatGCS.Utils.Navigation;
+using RoSatGCS.Utils.ServiceManager;
 using RoSatGCS.Views;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace RoSatGCS.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         private WindowSettings? windowSettings;
+        private ServiceManager? _serviceManager;
 
         private Page? pageArchive;
         private Page? pageCommand;
@@ -31,9 +33,16 @@ namespace RoSatGCS.ViewModels
             get => _navigationSource;
             set => SetProperty(ref _navigationSource, value);
         }
-        public ICommand NavigateCommand { get; set; }
-        public ICommand OpenWindowCommand { get; set; }
-        public ICommand ClosingCommand { get; set; }
+
+        public ServiceManager? ServiceManager => _serviceManager;
+
+
+        public ICommand NavigateCommand { get; }
+        public ICommand OpenWindowCommand { get; }
+        public ICommand ClosingCommand { get; }
+        public ICommand StartService { get; }
+        public ICommand StopService { get; }
+        public ICommand RestartService { get; }
 
         public MainWindowViewModel()
         {
@@ -45,6 +54,12 @@ namespace RoSatGCS.ViewModels
             WeakReferenceMessenger.Default.Register<NavigationMessage>(this, OnNavigationMessage);
             OpenWindowCommand = new RelayCommand<string>(OnWindowOpen);
             ClosingCommand = new RelayCommand(OnClosing);
+            StartService = new RelayCommand(OnStartService);
+            StopService = new RelayCommand(OnStopService);
+            RestartService = new RelayCommand(OnRestartService);
+
+            _serviceManager = ServiceManager.Instance;
+            _serviceManager.Start();
 
             _ = Update();
         }
@@ -129,6 +144,21 @@ namespace RoSatGCS.ViewModels
                 vm.Closing.Execute(null);
 
             }
+        }
+
+        private void OnStartService()
+        {
+            ServiceManager?.Start();
+        }
+
+        private void OnStopService()
+        {
+            ServiceManager?.Stop();
+        }
+
+        private void OnRestartService()
+        {
+            ServiceManager?.Restart();
         }
 
         public DateTime CurrentTime

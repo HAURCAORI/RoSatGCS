@@ -18,8 +18,6 @@ namespace RoSatGCS.Behaviors
 {
     internal class FunctionFileListBehavior : Behavior<ListBox>
     {
-        private ListBoxItem? _draggedItem;
-
         public static readonly DependencyProperty DropCommandProperty =
         DependencyProperty.Register(
             "DropCommand",

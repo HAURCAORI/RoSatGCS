@@ -17,8 +17,18 @@ namespace RoSatGCS.ViewModels
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
+        private WeakReference<PageCommandViewModel> _parent;
+        public PageCommandViewModel? Parent
+        {
+            get
+            {
+                if (_parent != null && _parent.TryGetTarget(out var target))
+                    return target;
+                return null;
+            }
+        }
+
         private int _column = 2;
-        private PageCommandViewModel _parent;
         private SatelliteFunctionTypeModel? _satFuncType;
 
         public SatelliteFunctionTypeModel? SatFuncType
@@ -34,7 +44,7 @@ namespace RoSatGCS.ViewModels
 
         public PaneTypeSummaryViewModel(PageCommandViewModel viewModel)
         {
-            _parent = viewModel;
+            _parent = new WeakReference<PageCommandViewModel>(viewModel);
 
             Close = new RelayCommand(OnClose);
             SizeChanged = new RelayCommand<object>(OnSizeChanged);
@@ -43,7 +53,8 @@ namespace RoSatGCS.ViewModels
 
         private void OnClose()
         {
-            _parent.CloseDocument(this);
+            if(Parent != null)
+                Parent.CloseDocument(this);
         }
         private void OnSizeChanged(object? sender)
         {

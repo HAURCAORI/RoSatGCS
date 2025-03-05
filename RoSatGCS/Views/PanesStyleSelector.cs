@@ -14,6 +14,7 @@ namespace RoSatGCS.Views
         public Style FunctionPropertyPaneStyle { get; set; }
         public Style CommandSetPaneStyle { get; set; }
         public Style TypeSummaryPaneStyle { get; set; }
+        public Style PropertyPreviewPaneStyle { get; set; }
 
 
         public override Style SelectStyle(object item, DependencyObject container)
@@ -30,6 +31,8 @@ namespace RoSatGCS.Views
                 return CommandSetPaneStyle;
             else if (item is PaneTypeSummaryViewModel)
                 return TypeSummaryPaneStyle;
+            else if (item is PanePropertyPreviewViewModel)
+                return PropertyPreviewPaneStyle;
 
             return base.SelectStyle(item, container);
         }

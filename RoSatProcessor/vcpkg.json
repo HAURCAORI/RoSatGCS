@@ -1,0 +1,7 @@
+{
+  "name": "rosatprocessor",
+  "version": "1.0.1",
+  "dependencies": [
+    "openssl"
+  ]
+}

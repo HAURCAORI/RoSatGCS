@@ -50,6 +50,25 @@ namespace RoSatGCS.Views
                     layout.ActiveContent = anchorableShown;
                 }));
             }
+
+            if (anchorableShown.Content is PanePropertyPreviewViewModel)
+            {
+                
+                double screenWidth = SystemParameters.PrimaryScreenWidth;
+                double screenHeight = SystemParameters.PrimaryScreenHeight;
+                anchorableShown.FloatingWidth = 600;
+                anchorableShown.FloatingHeight = 300;
+                anchorableShown.FloatingLeft = (screenWidth - anchorableShown.FloatingWidth) / 2;
+                anchorableShown.FloatingTop = (screenHeight - anchorableShown.FloatingHeight) / 2;
+                anchorableShown.Float();
+
+
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                {
+                    layout.ActiveContent = anchorableShown;
+                }));
+                
+            }
         }
 
         public bool BeforeInsertAnchorable(LayoutRoot layout, LayoutAnchorable anchorableToShow, ILayoutContainer destinationContainer)
@@ -132,7 +151,6 @@ namespace RoSatGCS.Views
             if (anchorableToShow.Content is PaneTypeSummaryViewModel)
             {
                 var pane = layout.Descendents().OfType<LayoutDocumentFloatingWindow>().FirstOrDefault();
-
                 if (pane != null)
                 {
                     var existingPane = pane.RootPanel.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
@@ -200,6 +218,24 @@ namespace RoSatGCS.Views
 
                 return true;
             }
+
+            if (anchorableToShow.Content is PanePropertyPreviewViewModel)
+            {
+                var existingPane = layout.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
+                if (existingPane == null)
+                {
+                    var mainPane = new LayoutDocumentPane();
+                    mainPane.Children.Add(anchorableToShow);
+                    layout.RootPanel.Children.Add(mainPane);
+                }
+                else
+                {
+                    existingPane.Children.Add(anchorableToShow);
+                }
+
+                return true;
+            }
+
 
             return false;
         }
