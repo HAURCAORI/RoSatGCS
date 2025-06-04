@@ -527,7 +527,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>s0UL0V3AlUiMO5EAYQ5k15/DetDxUSKgiqZ6MFpaf2s=</dsig:DigestValue>
+      <dsig:DigestValue>paFrjT4hHdwA7VCjqZqknqywj5l9KmhlUiQRtWWne7w=</dsig:DigestValue>
     </hash>
   </file>
   <file name="MessagePack.Annotations.dll" size="18432">
@@ -701,22 +701,22 @@
       <dsig:DigestValue>Q9IPbsdaz6v+rXPQRHk9OhJSDQgfk3YZTObI5SED4HI=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="RoSatGCS.dll" size="16039936">
+  <file name="RoSatGCS.dll" size="16039424">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>KwYL/0bBg/phlbLg+AL8ha/nGFypEt7xZ6G6CZPhHrI=</dsig:DigestValue>
+      <dsig:DigestValue>xY27FkubQjeCAXWoCWq2Vq6SDHVb8ve6aLkeTMUfR98=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="RoSatGCS.exe" size="139264">
+  <file name="RoSatGCS.exe" size="138752">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>/fS/nKyn6buOcYTS3LvgcBL4yidkX7Oo1WhzuXZXWgA=</dsig:DigestValue>
+      <dsig:DigestValue>W+aLnMWupzL7PSMmXgL/ne0k50yKMwygfOhdh809GT0=</dsig:DigestValue>
     </hash>
   </file>
   <file name="RoSatGCS.runtimeconfig.json" size="515">

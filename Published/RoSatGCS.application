@@ -8,7 +8,7 @@
         <beforeApplicationStartup />
       </update>
     </subscription>
-    <deploymentProvider codebase="https://sourceforge.net/p/rosatgcs/code/ci/master/tree/Published/RoSatGCS.application" />
+    <deploymentProvider codebase="https://raw.githubusercontent.com/HAURCAORI/RoSatGCS/refs/heads/master/Published/RoSatGCS.application" />
   </deployment>
   <compatibleFrameworks xmlns="urn:schemas-microsoft-com:clickonce.v2">
     <framework targetVersion="4.5" profile="Full" supportedRuntime="4.0.30319" />
@@ -21,7 +21,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>9OWbw4/ODP4qp128fXz0HyAd9DMrrrhrypsgCeG7JW8=</dsig:DigestValue>
+        <dsig:DigestValue>gR5Z/MtaZLi0e6rzYWFcjnunx+XCEjQ9h4KIBaCifrU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
