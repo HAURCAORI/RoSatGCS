@@ -47,10 +47,18 @@ RoSatProcessor::RoSatTask::~RoSatTask()
 
 void RoSatProcessor::RoSatTask::run()
 {
+#ifdef _DEBUG
+	wprintf(TEXT("===Task Started[%s]\r\n"), getTaskName());
+#endif
 	try {
 		m_initialized = initialize();
 		if (!m_initialized) {
 			print("Initialize Fail\r\n");
+			return;
+		}
+
+		if (m_running) {
+			print("Already Running\r\n");
 			return;
 		}
 	}
@@ -88,6 +96,9 @@ void RoSatProcessor::RoSatTask::stop()
 	while (m_running) {
 		Sleep(50);
 	}
+#ifdef _DEBUG
+	wprintf(TEXT("\n===Task Stopped[%s]\n"), getTaskName());
+#endif
 }
 
 PCWSTR RoSatProcessor::RoSatTask::getServiceName() const

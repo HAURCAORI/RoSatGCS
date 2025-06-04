@@ -34,6 +34,8 @@ namespace RoSatGCS.Models
         protected List<ParameterModel> _methodOut = [];
         [Key("associatedType")]
         protected Dictionary<string, SatelliteFunctionTypeModel> _associatedType = [];
+        [Key("fidl")]
+        protected int _fidlId = 0;
         #endregion
 
         #region Properties
@@ -63,18 +65,21 @@ namespace RoSatGCS.Models
         public int InSize { get { return MethodIn.Sum(o => o.ByteSize); } }
         [IgnoreMember]
         public int OutSize { get { return MethodOut.Sum(o => o.ByteSize); } }
+        [IgnoreMember]
+        public int FIDLId { get => _fidlId; set => _fidlId = value; }
 
         #endregion
 
         #region Constructors
         protected SatelliteMethodModel() { }
-        public SatelliteMethodModel(int id, bool visibility, string file, string name, string description)
+        public SatelliteMethodModel(int id, bool visibility, string file, string name, string description, int fidl)
         {
             _id = id;
             _visibility = visibility;
             _name = name;
             _file = file;
             _description = description;
+            _fidlId = fidl;
         }
         ~SatelliteMethodModel()
         {
@@ -92,7 +97,7 @@ namespace RoSatGCS.Models
 
         public object Clone()
         {
-            return new SatelliteMethodModel(this.Id, this.Visibility, this.File, this.Name, this.Description)
+            return new SatelliteMethodModel(this.Id, this.Visibility, this.File, this.Name, this.Description, this.FIDLId)
             {
                 _methodIn = this._methodIn.Select(p => (ParameterModel) p.Clone()).ToList(),
                 _methodOut = this._methodOut.Select(p => (ParameterModel)p.Clone()).ToList(),

@@ -53,9 +53,13 @@ void AsyncWebSocket::connect(const std::string& host, const std::string& port, b
         }
 
         wsTLS_->next_layer().set_verify_callback(ssl::host_name_verification(host));
+		wsTLS_->auto_fragment(true);
+		wsTLS_->write_buffer_bytes(kChunkSize);
     }
     else {
         ws_ = std::make_unique<websocket::stream<tcp::socket>>(boost::asio::make_strand(ioContext_));
+        ws_->auto_fragment(true);
+        ws_->write_buffer_bytes(kChunkSize);
     }
 
 
@@ -162,10 +166,21 @@ void AsyncWebSocket::onHandshake(const beast::error_code& ec) {
 
 void AsyncWebSocket::write(const std::string& message) {
     if (connected_) {
+        auto buffer = asio::buffer(message);
         if (useTLS_) {
-            wsTLS_->async_write(asio::buffer(message), beast::bind_front_handler(&AsyncWebSocket::onWrite, shared_from_this()));
-        } else {
-            ws_->async_write(asio::buffer(message), beast::bind_front_handler(&AsyncWebSocket::onWrite, shared_from_this()));
+            if (buffer.size() > kChunkSize) {
+                wsTLS_->write(buffer);
+            } else {
+                wsTLS_->async_write(buffer, beast::bind_front_handler(&AsyncWebSocket::onWrite, shared_from_this()));
+            }
+
+        }
+        else {
+            if (buffer.size() > kChunkSize) {
+                ws_->write(buffer);
+            } else {
+                ws_->async_write(buffer, beast::bind_front_handler(&AsyncWebSocket::onWrite, shared_from_this()));
+            }
         }
     }
 }

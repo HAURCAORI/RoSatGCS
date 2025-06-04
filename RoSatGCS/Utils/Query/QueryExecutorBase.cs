@@ -4,6 +4,7 @@ using RoSatGCS.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,7 +46,6 @@ namespace RoSatGCS.Utils.Query
                     else if (value is string st)
                     {
                         bytes.AddRange(Encoding.Default.GetBytes(st));
-                        bytes.Add(0x00);
                     }
                     else
                         throw new NotSupportedException($"Type is not supported.");
@@ -106,19 +106,84 @@ namespace RoSatGCS.Utils.Query
                     DispatcherType = dispatcher
                 };
 
+                Random rnd = new Random();
+
                 var commandPacket = new CommandCpPacket
                 {
-                    ModuleMac = 0,
-                    Gateway = 0,
-                    CommandId = (ulong)c.Id,
-                    SatelliteId = "",
-                    NoProgressTimeout = "",
-                    ReadTimeout = "",
-                    WriteTimeout = "",
+                    ModuleMac = c.Module,
+                    Gateway = c.Gateway,
+                    CommandId = (ulong)(c.Id + rnd.Next(0, 5000)),
+                    SatelliteId = "2",
+                    NoProgressTimeout = "5s",
+                    ReadTimeout = "999s",
+                    WriteTimeout = "999s",
                     Payload = [.. QueryExecutorBase.Serializer(c.InputParameters)]
                 };
 
+
+                if (commandPacket.Gateway == 1212 || commandPacket.Gateway == 1300)
+                {
+                    commandPacket.Payload = BitConverter.GetBytes((ushort)c.FIDLId)
+                        .Concat(BitConverter.GetBytes((uint)c.Id))
+                        .Concat(new byte[] { 0, 0, 0 })
+                        .Concat(commandPacket.Payload)
+                        .ToArray();
+                    commandPacket.Payload = new byte[] { (byte)commandPacket.Payload.Length }.Concat(commandPacket.Payload).ToArray();
+                }
+                else if(commandPacket.Gateway == 1450)
+                {
+                    commandPacket.Payload = new byte[] { 0, 0, 0, 0 }.Concat(commandPacket.Payload).ToArray();
+                }
+
                 packet.Payload = CommandCpPacket.SerializePacket(commandPacket);
+            }
+            else if (data is CommandRadioPacket cr)
+            {
+                packet = new QueryPacket
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Radio",
+                    Type = QueryType.Radio,
+                    DispatcherType = dispatcher
+                };
+                packet.Payload = CommandRadioPacket.SerializePacket(cr);
+            }
+            else if (data is ProcessorConfigPacket cp)
+            {
+                packet = new QueryPacket
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "ProcessorConfig",
+                    Type = QueryType.Config,
+                    DispatcherType = dispatcher
+                };
+
+                packet.Payload = ProcessorConfigPacket.SerializePacket(cp);
+            }
+            else if (data is ProcessorDebugPacket dp)
+            {
+                packet = new QueryPacket
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "ProcessorDebug",
+                    Type = QueryType.Debug,
+                    DispatcherType = dispatcher
+                };
+                packet.Payload = ProcessorDebugPacket.SerializePacket(dp);
+            }
+            else if (data is FirmwareUpdatePacket fwupd)
+            {
+                packet = new QueryPacket
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "FirmwareUpdate",
+                    Type = QueryType.FwUpdate,
+                    DispatcherType = dispatcher
+                };
+
+                fwupd.CommandId = (ulong)(new Random().Next(0, 5000));
+
+                packet.Payload = FirmwareUpdatePacket.SerializePacket(fwupd);
             }
 
             return packet;

@@ -378,4 +378,97 @@
   <data name="sPreview" xml:space="preserve">
     <value>미리보기</value>
   </data>
+  <data name="sDisplay" xml:space="preserve">
+    <value>보기</value>
+  </data>
+  <data name="sRadio" xml:space="preserve">
+    <value>라디오</value>
+  </data>
+  <data name="sGeneral" xml:space="preserve">
+    <value>일반</value>
+  </data>
+  <data name="sEncryption" xml:space="preserve">
+    <value>암호</value>
+  </data>
+  <data name="sEnable" xml:space="preserve">
+    <value>사용</value>
+  </data>
+  <data name="sCommit" xml:space="preserve">
+    <value>제출</value>
+  </data>
+  <data name="sCancel" xml:space="preserve">
+    <value>취소</value>
+  </data>
+  <data name="sOk" xml:space="preserve">
+    <value>확인</value>
+  </data>
+  <data name="sPush" xml:space="preserve">
+    <value>푸시</value>
+  </data>
+  <data name="sPull" xml:space="preserve">
+    <value>풀</value>
+  </data>
+  <data name="sRoSatProcessor" xml:space="preserve">
+    <value>RoSatProcessor</value>
+  </data>
+  <data name="sAdvanced" xml:space="preserve">
+    <value>고급</value>
+  </data>
+  <data name="sDebug" xml:space="preserve">
+    <value>디버그</value>
+  </data>
+  <data name="sFileShare" xml:space="preserve">
+    <value>파일 공유</value>
+  </data>
+  <data name="sModuleMac" xml:space="preserve">
+    <value>모듈 주소</value>
+  </data>
+  <data name="sSatID" xml:space="preserve">
+    <value>위성 ID</value>
+  </data>
+  <data name="sConfiguration" xml:space="preserve">
+    <value>설정</value>
+  </data>
+  <data name="sBoardRevision" xml:space="preserve">
+    <value>개정</value>
+  </data>
+  <data name="sCPUType" xml:space="preserve">
+    <value>CPU 종류</value>
+  </data>
+  <data name="sFlags" xml:space="preserve">
+    <value>플래그</value>
+  </data>
+  <data name="sFwType" xml:space="preserve">
+    <value>펌웨어 종류</value>
+  </data>
+  <data name="sFwVersionMajor" xml:space="preserve">
+    <value>펌웨어 버전 Major</value>
+  </data>
+  <data name="sFwVersionMinor" xml:space="preserve">
+    <value>펌웨어 버전 Minor</value>
+  </data>
+  <data name="sGeneralConfig" xml:space="preserve">
+    <value>일반 설정</value>
+  </data>
+  <data name="sFWConfig" xml:space="preserve">
+    <value>펌웨어 설정</value>
+  </data>
+  <data name="sModuleType" xml:space="preserve">
+    <value>모듈 타입</value>
+  </data>
+  <data name="sModuleConfig" xml:space="preserve">
+    <value>모듈 구성</value>
+  </data>
+  <data name="sSubModule" xml:space="preserve">
+    <value>하위 모듈</value>
+  </data>
+  <data name="zNullArgument" xml:space="preserve">
+    <value>입력값 없음</value>
+  </data>
+  <data name="sOrbitalElements" xml:space="preserve">
+    <value>궤도 요소</value>
+  </data>
+  <data name="sSatelliteInfo" xml:space="preserve">
+    <value>위성 정보</value>
+  </data>
 </root>

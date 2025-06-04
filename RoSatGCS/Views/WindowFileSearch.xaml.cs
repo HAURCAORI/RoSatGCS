@@ -27,6 +27,8 @@ namespace RoSatGCS.Views
     public partial class WindowFileSearch : AdonisWindow, INotifyPropertyChanged
     {
         private string? path;
+        private readonly List<string> allowedExtensions;
+        private readonly string filterDescription;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -36,13 +38,20 @@ namespace RoSatGCS.Views
         public ICommand Cancel { get; private set; }
         public ICommand OpenDialogue { get; private set; }
 
-        public WindowFileSearch()
+        public WindowFileSearch(IEnumerable<string> extensions, string filterDescription = "Supported files")
         {
             InitializeComponent();
             DataContext = this;
+
+            allowedExtensions = extensions
+            .Select(ext => ext.StartsWith(".") ? ext.ToLower() : "." + ext.ToLower())
+            .ToList();
+
+            this.filterDescription = filterDescription;
+
             Ok = new RelayCommand(OkButton_Click);
             Cancel = new RelayCommand(CancelButton_Click);
-            OpenDialogue = new RelayCommand(OpenButton_Clock);
+            OpenDialogue = new RelayCommand(OpenButton_Click);
         }
 
         public void OkButton_Click()
@@ -53,15 +62,23 @@ namespace RoSatGCS.Views
                 System.Windows.MessageBox.Show(TranslationSource.Instance["zNoSuchFile"], TranslationSource.Instance["zFileNotFound"], System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
                 return;
             }
-            
-            if (System.IO.Path.GetExtension(Path) != ".json")
+            string ext = System.IO.Path.GetExtension(Path)?.ToLower() ?? "";
+
+            if (allowedExtensions.FirstOrDefault() != ".*" && !allowedExtensions.Contains(ext))
             {
-                System.Windows.MessageBox.Show(TranslationSource.Instance["zExtensionJson"], TranslationSource.Instance["zExtensionMismatch"], System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                if (allowedExtensions.FirstOrDefault() == ".json")
+                {
+                    System.Windows.MessageBox.Show(TranslationSource.Instance["zExtensionJson"], TranslationSource.Instance["zExtensionMismatch"], System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show(TranslationSource.Instance["zExtensionMismatch"] + ":\r\n" + string.Join(", ", allowedExtensions), TranslationSource.Instance["zExtensionMismatch"], System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                }
                 return;
             }
 
-            DialogResult = Path != String.Empty;
-            
+            DialogResult = !string.IsNullOrEmpty(Path);
+
             Close();
         }
 
@@ -72,12 +89,13 @@ namespace RoSatGCS.Views
             Close();
         }
 
-        public void OpenButton_Clock()
+        public void OpenButton_Click()
         {
-            var dialog = new Microsoft.Win32.OpenFileDialog();
-            dialog.FileName = "File"; // Default file name
-            dialog.DefaultExt = ".json"; // Default file extension
-            dialog.Filter = "Json file (.json)|*.json"; // Filter files by extension
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                FileName = "File",
+                Filter = BuildFilterString()
+            };
 
             bool? result = dialog.ShowDialog();
 
@@ -85,6 +103,11 @@ namespace RoSatGCS.Views
             {
                 Path = dialog.FileName;
             }
+        }
+        private string BuildFilterString()
+        {
+            string extFilter = string.Join(";", allowedExtensions.Select(ext => "*" + ext));
+            return $"{filterDescription} ({extFilter})|{extFilter}";
         }
 
         internal void NotifyPropertyChanged(String propertyName)

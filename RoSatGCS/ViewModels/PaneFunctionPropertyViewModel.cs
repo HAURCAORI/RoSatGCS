@@ -126,7 +126,29 @@ namespace RoSatGCS.ViewModels
                 if (input.DataType == SatelliteFunctionFileModel.DataType.None)
                     continue;
                 input.PullValue?.Execute(null);
-                Command.InputParameters.Add(input.Value ?? []);
+                if (input.DataType == SatelliteFunctionFileModel.DataType.String)
+                {
+                    var val = input.Value ?? [];
+                    if (val.Count == 1)
+                    {
+                        if(val.First() is string sval)
+                        {
+                            Command.InputParameters.Add([ToFixedSizeCString(sval, input.ByteSize)]);
+                        }
+                        else
+                        {
+                            Command.InputParameters.Add(val);
+                        }
+                    }
+                    else
+                    {
+                        Command.InputParameters.Add(val);
+                    }
+                }
+                else
+                {
+                    Command.InputParameters.Add(input.Value ?? []);
+                }
             }
             IsModified = false;
             _save?.NotifyCanExecuteChanged();
@@ -183,7 +205,7 @@ namespace RoSatGCS.ViewModels
             {
                 if (i.DataType == SatelliteFunctionFileModel.DataType.None)
                     continue;
-                if (i.HasError)
+                if (i.BaseType != SatelliteFunctionTypeModel.ArgumentType.Enum && i.DataType != SatelliteFunctionFileModel.DataType.Boolean && i.HasError)
                     return false;
             }
             return true;
@@ -205,9 +227,24 @@ namespace RoSatGCS.ViewModels
                     return;
                 List<object> values = [];
 
+
                 foreach (var value in list)
                 {
-                    values.Add(value);
+                    if (input.DataType == SatelliteFunctionFileModel.DataType.String)
+                    {
+                        if (value is string sval)
+                        {
+                            values.Add(ToFixedSizeCString(sval, input.ByteSize));
+                        }
+                        else
+                        {
+                            values.Add(value);
+                        }
+                    }
+                    else
+                    {
+                        values.Add(value);
+                    }
                 }
 
                 parameters.Add(values);
@@ -274,7 +311,8 @@ namespace RoSatGCS.ViewModels
                 param.IsReadOnly = false;
                 param.Sequence = (sequence++).ToString();
 
-                foreach (var t in GetType(param))
+                
+                foreach (var t in ParameterModel.GetType(param))
                 {
                     t.ValueChanged += (sender, e) => _execute?.NotifyCanExecuteChanged();
                     t.ValueChanged += (sender, e) => IsModified = true;
@@ -290,91 +328,33 @@ namespace RoSatGCS.ViewModels
                 param.IsReadOnly = true;
                 param.Sequence = (sequence++).ToString();
 
-                foreach (var t in GetType(param))
+                foreach (var t in ParameterModel.GetType(param))
                 {
                     t.ValueChanged += (sender, e) => IsModified = true;
                     t.ValueChanged += (sender, e) => _save?.NotifyCanExecuteChanged();
                     OutputParameters.Add(t);
                 }
             }
-
         }
 
-
-        private static List<ParameterModel> GetType(ParameterModel pm)
-        {
-            var list = new List<ParameterModel>();
-
-            var param = (ParameterModel)pm.Clone();
-
-            if (param.CommandModel == null || !param.IsUserDefined)
-            {
-                list.Add(param);
-                return list;
-            }
-
-            if (param.CommandModel.AssociatedType.TryGetValue(param.UserDefinedType, out SatelliteFunctionTypeModel? tmp))
-            {
-                var type = (SatelliteFunctionTypeModel)tmp.Clone();
-                if (type.Type == SatelliteFunctionTypeModel.ArgumentType.Struct)
-                {
-                    // Add Header
-                    var header = new ParameterModel(SatelliteFunctionTypeModel.ArgumentType.Struct, type.File, type.Name, type.Description)
-                    {
-                        CommandModel = param.CommandModel,
-                        ByteSize = param.ByteSize,
-                        DataType = SatelliteFunctionFileModel.DataType.None,
-                        Sequence = param.Sequence
-                    };
-                    list.Add(header);
-
-                    var len = 1;
-                    if (param.BaseType == SatelliteFunctionTypeModel.ArgumentType.Struct && param.IsArray)
-                    {
-                        len = param.ByteSize / type.Size;
-                    }
-
-                    for (int i = 0; i < len; i++)
-                    {
-
-                        var index = 1;
-                        foreach (var p in type.Parameters)
-                        {
-                            var p_copy = (ParameterModel)p.Clone();
-                            p_copy.CommandModel = param.CommandModel;
-                            p_copy.IsReadOnly = param.IsReadOnly;
-                            p_copy.Sequence = param.Sequence + "." + (index++).ToString();
-
-                            if (p_copy.IsUserDefined)
-                            {
-                                list.AddRange(GetType(p_copy));
-                            }
-                            else
-                            {
-                                list.Add(p_copy);
-                            }
-                        }
-                    }
-                }
-                else if (type.Type == SatelliteFunctionTypeModel.ArgumentType.Enum)
-                {
-                    param.DataType = SatelliteFunctionFileModel.DataType.Enumeration;
-                    list.Add(param);
-                }
-            }
-            else
-            {
-                list.Add(param);
-            }
-
-            return list;
-        }
 
         public void UpdateTitle()
         {
             if(Command == null) { return; }
             string name = Command.Name + ((Command.GroupName != null && Command.GroupName != string.Empty) ? $"[{Command.GroupName}]" : "");
             Title = IsModified ? $"{name} *" : name;
+        }
+
+        static string ToFixedSizeCString(string input, int size)
+        {
+            byte[] strBytes = Encoding.ASCII.GetBytes(input);
+            byte[] buffer = new byte[size];
+
+            int copyLen = Math.Min(strBytes.Length, size - 1); // reserve room for null
+            Array.Copy(strBytes, 0, buffer, 0, copyLen);
+            buffer[copyLen] = 0x00; // null-terminator
+
+            return Encoding.ASCII.GetString(buffer);
         }
 
         #endregion
@@ -399,7 +379,7 @@ namespace RoSatGCS.ViewModels
                 {
                     foreach (var param in Command.MethodIn)
                     {
-                        foreach (var t in GetType(param))
+                        foreach (var t in ParameterModel.GetType(param))
                         {
                             t.ValueChanged -= (sender, e) => _execute?.NotifyCanExecuteChanged();
                             t.ValueChanged -= (sender, e) => IsModified = true;
@@ -409,7 +389,7 @@ namespace RoSatGCS.ViewModels
                     }
                     foreach (var param in Command.MethodOut)
                     {
-                        foreach (var t in GetType(param))
+                        foreach (var t in ParameterModel.GetType(param))
                         {
                             t.ValueChanged -= (sender, e) => IsModified = true;
                             t.ValueChanged -= (sender, e) => _save?.NotifyCanExecuteChanged();

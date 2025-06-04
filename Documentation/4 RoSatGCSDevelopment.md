@@ -63,3 +63,50 @@ class Class{
     private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 }
 ```
+### Resource Dictionary
+
+#### Image
+/Images/Icons.xaml 파일에 아이콘 벡터 관련 정보 정의하고 데이터는 SVG 데이터 형태로 저장장
+#### Font 
+폰트 추가 방법 x:Key에 Font Key를 지정하고, 폰트 이름은 #을 붙인 형태로 설정
+``` <FontFamily x:Key="KPDotum">applicaton:,,,/RoSatGCS;component/Fonts/#KoPubWorldDotum</FontFamily> ``` 
+
+### Frame 구현
+
+
+### MVVM Pattern
+Microsoft.Toolkit.Mvvm을 이용해 구현됨
+1. App.xaml.cs파일의 ConfigureServices에 다음 문장 추가
+```services.AddTransient(typeof(_ViewModel));```
+2. /Views에 View.cs 파일을 추가하고 ```InitializeComponent();``` 아래에 다음 문장 추가
+```DataContext = App.Current.Services.GetService(typeof(_ViewModel));```
+1. /ViewModels에 ViewModel.cs 파일을 추가하고, ViewModelBase 클래스를 상속
+
+Command 추가
+```public ICommand _Command { get; set; }```
+
+Getter/Setter 추가
+public Type? Name 
+{
+    get => _name;
+    set => SetProperty(ref _name, value);
+}
+
+
+Behavior 추가
+Behavior<_Control> 상속
+OnAttached() 및 OnDetaching() 구현
+AssociatedObject._Event로 _Control의 Event 추가
+기능 구현시 Dispatcher.BeginInvoke()을 이용하여 접근
+ICommand 및 Dependency Property 추가
+
+
+Converter
+public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is bool boolValue)
+        {
+            return boolValue ? TrueVisibility : FalseVisibility;
+        }
+        return Binding.DoNothing;
+    }

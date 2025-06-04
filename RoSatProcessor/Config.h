@@ -143,6 +143,7 @@ namespace RoSatProcessor {
         DEFINE_PROPERTY(WebSocketHost, std::string, "127.0.0.1");
 		DEFINE_PROPERTY(WebSocketPort, std::string, "6660");
         DEFINE_PROPERTY(WebSocketTLS, bool, false);
+		DEFINE_PROPERTY(DebugMode, bool, false);
 
         MSGPACK_DEFINE(UplinkFrequency, DownlinkFrequency, WebSocketHost, WebSocketPort)
 

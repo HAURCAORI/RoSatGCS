@@ -47,7 +47,8 @@ void RoSatProcessor::TaskWebSocketConnector::Enqueue(const DataFrame& value)
 
 BOOL RoSatProcessor::TaskWebSocketConnector::initialize()
 {
-	_socket->connect();
+	m_interrupt = false;
+	_socket->connect(Config::GetWebSocketHost(),Config::GetWebSocketPort(), Config::GetWebSocketTLS());
 	_socket->setCallback(std::bind(&TaskWebSocketConnector::onReceived, this, std::placeholders::_1));
 
 	ioContext_.restart();
@@ -57,10 +58,13 @@ BOOL RoSatProcessor::TaskWebSocketConnector::initialize()
 	return TRUE;
 }
 
+
 void RoSatProcessor::TaskWebSocketConnector::task()
 {
+	if (m_interrupt) return;
+
 	if (!_socket->isConnected()) {
-		_socket->connect();
+		_socket->connect(Config::GetWebSocketHost(), Config::GetWebSocketPort(), Config::GetWebSocketTLS());
 		return;
 	}
 	
@@ -70,9 +74,15 @@ void RoSatProcessor::TaskWebSocketConnector::task()
 	if (m_interrupt && m_jobs.empty()) { return; }
 
 	WebSocketPacket packet = m_jobs.top();
+	
 	_socket->write(packet.Get());
 
-	auto timer = std::make_shared<boost::asio::steady_timer>(boost::asio::make_strand(ioContext_), std::chrono::milliseconds(3000));
+
+#ifdef _DEBUG
+	std::cout << "Send: " << packet.Get() << std::endl;
+#endif
+
+	auto timer = std::make_shared<boost::asio::steady_timer>(boost::asio::make_strand(ioContext_), std::chrono::milliseconds(200000));
 	timer->async_wait(boost::bind(&TaskWebSocketConnector::onTimeout, this, packet.Id()));
 
 	m_executed[packet] = timer;
@@ -110,11 +120,20 @@ void RoSatProcessor::TaskWebSocketConnector::onReceived(const std::string& str)
 	uint64_t id;
 	std::string type;
 	{
+#ifdef _DEBUG
+		std::cout <<"Recv: " << str << std::endl;
+#endif
+
 		std::lock_guard<std::mutex> l(_m_e);
 
 		try {
-			id = WebSocketPacket::GetRequestId(str);
 			type = WebSocketPacket::GetType(str);
+			if (type == "Notify") {
+				auto stateResult = WebSocketPacket::ParseStateResult(str);
+				spdlog::info("Notify: {}", stateResult.Notifier);
+				return;
+			}
+			id = WebSocketPacket::GetRequestId(str);
 		}
 		catch (std::exception e)
 		{
@@ -124,7 +143,7 @@ void RoSatProcessor::TaskWebSocketConnector::onReceived(const std::string& str)
 		
 		auto it = std::find_if(m_executed.begin(), m_executed.end(), [id](const auto& t) { return t.first.Id() == id; });
 
-		if (it != m_executed.end()) {
+		if (it != m_executed.end() && type != "CPCommandPartResult") {
 			queryId = it->first.QueryId();
 			m_executed.erase(it);
 		}
@@ -138,43 +157,47 @@ void RoSatProcessor::TaskWebSocketConnector::onReceived(const std::string& str)
 	try {
 		QueryPacket queryPacket = { queryId, type, QueryType::Command, DispatcherType::NoResponse };
 
-
-#ifdef _DEBUG
-		static int val = 0;
-		std::string tmp = R"({
-  "cmdId": 1,
-  "payload": [255,255,1,0,0,0,)";
-		tmp += std::to_string(val++);
-		tmp += R"(, 0, 0, 0],
-  "requestId": 0,
-  "type": "CPCommandResult"
-})";
-
-		std::cout << tmp << std::endl;
-		auto cpResultPacket = WebSocketPacket::ParseCpResult(tmp);
-		queryPacket.Type = QueryType::Command;
-		queryPacket.Payload = CommandCpResultPacket::SerializePacket(cpResultPacket).toVector();
-#else
 		if (type == "Error") {
 			auto statePacket = WebSocketPacket::ParseStateResult(str);
 			queryPacket.Type = QueryType::Error;
 			queryPacket.Payload = CommandStatePacket::SerializePacket(statePacket).toVector();
 		}
-		else if(type == "CPCommandResult")
+		else if (type == "CPCommandPartResult") {
+			// Not implemented
+			return;
+		}
+		else if (type == "CPCommandResult")
 		{
 			auto cpResultPacket = WebSocketPacket::ParseCpResult(str);
 			queryPacket.Type = QueryType::Command;
 			queryPacket.Payload = CommandCpResultPacket::SerializePacket(cpResultPacket).toVector();
 		}
+		else if (type == "RadioConnResult" || type == "RadioResult") {
+			auto radioConnResult = WebSocketPacket::ParseRadioResult(str);
+			queryPacket.Type = QueryType::Radio;
+			queryPacket.Payload = CommandRadioResultPacket::SerializePacket(radioConnResult).toVector();
+		}
+		else if (type == "UploadPartResult") {
+			return;
+		}
+		else if (type == "UploadResult") {
+			auto fwUpdateResult = WebSocketPacket::ParseFwUpdateResult(str);
+			queryPacket.Type = QueryType::FwUpdate;
+			queryPacket.Payload = FirmwareUpdateResultPacket::SerializePacket(fwUpdateResult).toVector();
+		}
 		else {
+			queryPacket.Type = QueryType::Error;
+			queryPacket.Payload = ErrorPacket::SerializePacket(ErrorPacket{ 0, "Unknown type" }).toVector();
 			spdlog::warn("Unknown type: {}", type);
 		}
-#endif
 
 		RoSatTaskManager::message(TEXT("QueryResponse"), std::move(QueryPacket::SerializePacket(queryPacket)));
 	}
 	catch (std::exception e)
 	{
+		QueryPacket errorPacket = { queryId, "Error", QueryType::Error, DispatcherType::NoResponse };
+		errorPacket.Payload = ErrorPacket::SerializePacket(ErrorPacket{ 0, e.what() }).toVector();
+		RoSatTaskManager::message(TEXT("QueryResponse"), std::move(QueryPacket::SerializePacket(errorPacket)));
 		spdlog::error("Parsing error: {}", e.what());
 	}
 }

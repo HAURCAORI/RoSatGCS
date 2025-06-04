@@ -1,0 +1,11 @@
+@startuml Settings
+object General {
+    --Interface--
+    |_ Language
+    |_ Theme
+    --GroundStation--
+    |_ input
+    |_ date
+    |_ value
+}
+@enduml

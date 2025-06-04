@@ -51,7 +51,7 @@ namespace RoSatGCS.Behaviors
         private void OnMouseLeftUp(object sender, MouseButtonEventArgs e)
         {
             if (AssociatedObject.SelectedItem is SatelliteCommandModel s)
-                Parent.OpenPropertyPreviewPane(s);
+                Parent.OpenFunctionPropertyPane(s);
             else if (AssociatedObject.SelectedItem is SatelliteMethodModel m)
                 Parent.OpenFunctionPropertyPane(m);
             AssociatedObject.PreviewMouseLeftButtonUp -= OnMouseLeftUp;

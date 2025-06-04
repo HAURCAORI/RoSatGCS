@@ -496,6 +496,13 @@ namespace RoSatGCS.Models
                 {
                     list.Add(str);
                 }
+                else if (item is bool bo)
+                {
+                    if (bo)
+                        list.Add(TrueValue);
+                    else
+                        list.Add(FalseValue);
+                }
                 else
                 {
                     return "";

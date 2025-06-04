@@ -38,11 +38,13 @@ namespace RoSatGCS
             var services = new ServiceCollection();
             services.AddTransient(typeof(MainWindowViewModel)); // 종료까지 유지
             services.AddTransient(typeof(WindowSettingsViewModel));
+            services.AddTransient(typeof(WindowTLEViewModel));
             services.AddTransient(typeof(PageArchiveViewModel));
             services.AddTransient(typeof(PageCommandViewModel));
             services.AddTransient(typeof(PageDashboardViewModel));
             services.AddTransient(typeof(PageGroundTrackViewModel));
             services.AddTransient(typeof(PageSchedulerViewModel));
+            services.AddTransient(typeof(PageFileShareViewModel));
 
             services.AddTransient(typeof(PaneCommandFileViewModel));
             return services.BuildServiceProvider();

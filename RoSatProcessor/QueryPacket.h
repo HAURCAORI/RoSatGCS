@@ -10,9 +10,13 @@ enum class QueryType {
     ACK,
     Error,
     Command,
+    Radio,
     Data,
     Schedule,
-    Service
+    Service,
+    Config,
+    Debug,
+    FwUpdate
 };
 MSGPACK_ADD_ENUM(QueryType);
 
@@ -62,6 +66,7 @@ namespace RoSatProcessor {
         MSGPACK_DEFINE(Id, Name, Type, Dispatcher, Payload);
     };
 
+    // Error Packet
     struct ErrorPacket : PacketBase<ErrorPacket> {
         std::array<uint8_t, 16> QueryId = {};
         std::uint32_t Code = 0;
@@ -73,6 +78,26 @@ namespace RoSatProcessor {
         MSGPACK_DEFINE(Code, Error);
     };
 
+	struct ProcessorConfigPacket : PacketBase<ProcessorConfigPacket> {
+        std::array<uint8_t, 16> QueryId = {};
+		std::string IP = "";
+		int Port = 0;
+		bool TLS = false;
+
+		ProcessorConfigPacket() = default;
+		ProcessorConfigPacket(const std::string& ip, int port, bool tls) : IP(ip), Port(port), TLS(tls) {}
+		MSGPACK_DEFINE(IP, Port, TLS);
+	};
+
+    struct ProcessorDebugPacket : PacketBase<ProcessorDebugPacket> {
+		std::array<uint8_t, 16> QueryId = {};
+		bool Debug = false;
+		ProcessorDebugPacket() = default;
+		ProcessorDebugPacket(bool debug) : Debug(debug) {}
+		MSGPACK_DEFINE(Debug);
+    };
+
+#pragma region Command Packet
     struct CommandCpPacket : PacketBase<CommandCpPacket> {
         std::array<uint8_t, 16> QueryId = {};
         uint8_t ModuleMac = 0;
@@ -176,44 +201,6 @@ namespace RoSatProcessor {
 		MSGPACK_DEFINE(Azimuth, Elevation);
     };
 
-
-    struct CommandFwUpdatePacket : PacketBase<CommandFwUpdatePacket> {
-        std::array<uint8_t, 16> QueryId = {};
-        CommandCpPacket Command = {};
-        CommandAesPacket AES = {};
-        uint16_t BoardRevision = 0;
-        uint16_t CpuType = 0;
-        std::string FileName = "";
-        uint64_t Flags = 0;
-        uint16_t FWType = 0;
-        uint16_t FWVersionMajor = 0;
-		uint16_t FWVersionMinor = 0;
-        uint16_t ModuleConfig = 0;
-		uint16_t ModuleType = 0;
-        uint16_t Submodule = 0;
-
-        CommandFwUpdatePacket() = default;
-        CommandFwUpdatePacket(const CommandCpPacket& command, const CommandAesPacket& aes, uint16_t boardRevision, uint16_t cpuType, const std::string& fileName,
-            uint64_t flags, uint16_t fwType, uint16_t fwVersionMajor, uint16_t fwVersionMinor,
-            uint16_t moduleConfig, uint16_t moduleType, uint16_t submodule)
-            : Command(command), AES(aes), BoardRevision(boardRevision), CpuType(cpuType), FileName(fileName),
-            Flags(flags), FWType(fwType), FWVersionMajor(fwVersionMajor), FWVersionMinor(fwVersionMinor),
-            ModuleConfig(moduleConfig), ModuleType(moduleType), Submodule(submodule) {}
-
-		MSGPACK_DEFINE(Command, AES, BoardRevision, CpuType, FileName, Flags, FWType, FWVersionMajor, FWVersionMinor, ModuleConfig, ModuleType, Submodule);
-    };
-
-    struct CommandFwUpdateResultPacket : PacketBase<CommandFwUpdateResultPacket> {
-        std::array<uint8_t, 16> QueryId = {};
-        uint64_t CommandId = 0;
-
-        CommandFwUpdateResultPacket() = default;
-        CommandFwUpdateResultPacket(uint64_t commandId)
-            : CommandId(commandId) {}
-
-        MSGPACK_DEFINE(CommandId);
-    };
-
 	struct CommandBeaconPacket : PacketBase<CommandBeaconPacket> {
         std::array<uint8_t, 16> QueryId = {};
         std::string Duration = "";
@@ -240,5 +227,53 @@ namespace RoSatProcessor {
 
 		MSGPACK_DEFINE(Error, Data, Info, Notifier);
 	};
+#pragma endregion
+#pragma region File & Firmware update
+    struct FirmwareUpdatePacket : PacketBase<FirmwareUpdatePacket> {
+        std::array<uint8_t, 16> QueryId = {};
+		std::string FilePath = "";
+		std::string SatelliteId = "";
+		uint8_t ModuleMac = 0;
+		uint16_t BoardRevision = 0;
+		uint16_t CpuType = 0;
+		uint16_t Submodule = 0;
+		uint16_t FWType = 0;
+		uint16_t FWVerMaj = 0;
+		uint16_t FWVerMin = 0;
+        uint16_t ModuleType = 0;
+		uint16_t ModuleConfig = 0;
+		uint64_t Flags = 0;
+		uint64_t CommandId = 0;
+		bool IsBundle = false;
+		bool IsFile = false;
 
+        FirmwareUpdatePacket() = default;
+        FirmwareUpdatePacket(const std::string& filePath, const std::string& satelliteId, uint8_t moduleMac,
+            uint16_t boardRevision, uint16_t cpuType, uint16_t submodule, uint16_t fwType,
+            uint16_t fwVerMaj, uint16_t fwVerMin, uint16_t moduleType, uint16_t moduleConfig,
+			uint64_t flags, uint64_t commandId, bool isbundle) : FilePath(filePath), SatelliteId(satelliteId), ModuleMac(moduleMac), BoardRevision(boardRevision),
+			CpuType(cpuType), Submodule(submodule), FWType(fwType), FWVerMaj(fwVerMaj), FWVerMin(fwVerMin),
+			ModuleType(moduleType), ModuleConfig(moduleConfig), Flags(flags), CommandId(commandId), IsBundle(isbundle) {
+		}
+
+		MSGPACK_DEFINE(FilePath, SatelliteId, ModuleMac, BoardRevision, CpuType, Submodule,
+			FWType, FWVerMaj, FWVerMin, ModuleType, ModuleConfig, Flags, CommandId, IsBundle);
+    };
+
+
+    struct FirmwareUpdateResultPacket : PacketBase<FirmwareUpdateResultPacket> {
+        std::array<uint8_t, 16> QueryId = {};
+        uint64_t CommandId = 0;
+
+        FirmwareUpdateResultPacket() = default;
+        FirmwareUpdateResultPacket(uint64_t commandId)
+            : CommandId(commandId) {
+        }
+
+        MSGPACK_DEFINE(CommandId);
+    };
+#pragma endregion
+#pragma region Service
+
+#pragma endregion
 }

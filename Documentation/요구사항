@@ -46,4 +46,3 @@ Ballistic/Mass
  -> 공기 저항 데이터에 적용할 스케일링 계수 기본값 1
  SPAD Drag Interpolation Method
 ->  공기 저항 데이터를 읽을 때 보간 방법 선택 ex) Biline(2차원 보간)
-

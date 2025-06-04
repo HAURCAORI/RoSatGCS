@@ -68,7 +68,7 @@ namespace RoSatGCS.Models
         [IgnoreMember]
         private RelayCommand? _openProperty;
         [IgnoreMember]
-        private RelayCommand? _openPreview;
+        private RelayCommand<bool>? _openPreview;
         [IgnoreMember]
         private RelayCommand? _executeOnce;
         [IgnoreMember]
@@ -139,7 +139,7 @@ namespace RoSatGCS.Models
         [IgnoreMember]
         public ICommand OpenProperty { get => _openProperty ??= new RelayCommand(OnOpenProperty); }
         [IgnoreMember]
-        public ICommand OpenPreview { get => _openPreview ??= new RelayCommand(OnOpenPreview); }
+        public ICommand OpenPreview { get => _openPreview ??= new RelayCommand<bool>(OnOpenPreview); }
         [IgnoreMember]
         public ICommand ExecuteOnce { get => _executeOnce ??= new RelayCommand(OnExecuteOnce); }
         [IgnoreMember]
@@ -285,6 +285,7 @@ namespace RoSatGCS.Models
                     SelectedItems.Add(c);
                 }
                 OnPropertyChanged(nameof(IsSingleSelection));
+                OpenPreview.Execute(true);
             }
         }
 
@@ -297,12 +298,12 @@ namespace RoSatGCS.Models
             }
         }
 
-        private void OnOpenPreview()
+        private void OnOpenPreview(bool value)
         {
             if (SelectedItems == null) { return; }
             if (IsSingleSelection)
             {
-                Parent?.OpenPropertyPreviewPane(SelectedItems.First());
+                Parent?.OpenPropertyPreviewPane(SelectedItems.First(), value);
             }
         }
 
@@ -377,6 +378,14 @@ namespace RoSatGCS.Models
         {
             var elapsed = DateTime.UtcNow - _lastUpdatedTime;
             ElapsedTime = TimeUpdateManager.FormatElapsedTime(elapsed);
+        }
+
+        public void Init()
+        {
+            foreach (var item in Commands)
+            {
+                item.Init();
+            }
         }
 
         #region Dispose

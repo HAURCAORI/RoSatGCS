@@ -26,13 +26,15 @@ namespace RoSatProcessor {
 			e.m_tasks.push_back(std::make_shared<T>(task));
 		}
 
-		static void message(PCWSTR pszTaskName, const DataFrame& msg) {
+		static void message(PCWSTR pszTaskName, const DataFrame& msg) noexcept {
 			auto& e = instance();
 			auto ptr = e.FindTask(pszTaskName);
 			if (ptr != nullptr) {
 				ptr->Enqueue(msg);
 			}
 		}
+
+		static void restart(PCWSTR pszTaskName);
 
 	private:
 		RoSatTaskManager() = default;
@@ -43,5 +45,6 @@ namespace RoSatProcessor {
 		BOOL isRunning = FALSE;
 		HANDLE m_hStoppedEvent = NULL;
 		std::vector<std::shared_ptr<RoSatTask>> m_tasks;
+		std::mutex _m;
 	};
 }

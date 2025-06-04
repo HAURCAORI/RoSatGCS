@@ -1,16 +1,22 @@
 ﻿using AdonisUI.Controls;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using MessagePack;
+using NLog;
+using RoSatGCS.Models;
 using RoSatGCS.Utils.Navigation;
 using RoSatGCS.Utils.ServiceManager;
 using RoSatGCS.Views;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Navigation;
 
@@ -18,6 +24,9 @@ namespace RoSatGCS.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly string PathCacheSetting = "Cache/setting";
+
         private WindowSettings? windowSettings;
         private ServiceManager? _serviceManager;
 
@@ -26,6 +35,7 @@ namespace RoSatGCS.ViewModels
         private Page? pageDashboard;
         private Page? pageGroundTrack;
         private Page? pageScheduler;
+        private Page? pageFileShare;
 
         private Page? _navigationSource;
         public Page? NavigationSource
@@ -36,10 +46,13 @@ namespace RoSatGCS.ViewModels
 
         public ServiceManager? ServiceManager => _serviceManager;
 
+        public SettingsModel SettingsModel => SettingsModel.Instance;
 
+        
         public ICommand NavigateCommand { get; }
         public ICommand OpenWindowCommand { get; }
         public ICommand ClosingCommand { get; }
+        public ICommand ClosedCommand { get; }
         public ICommand StartService { get; }
         public ICommand StopService { get; }
         public ICommand RestartService { get; }
@@ -47,13 +60,17 @@ namespace RoSatGCS.ViewModels
         public MainWindowViewModel()
         {
             Title = "Main View";
+
             //pageDashboard = new PageDashboard();
             pageCommand = new PageCommand();
+            pageFileShare = new PageFileShare();
             NavigationSource = pageCommand;
             NavigateCommand = new RelayCommand<string>(OnNavigate);
             WeakReferenceMessenger.Default.Register<NavigationMessage>(this, OnNavigationMessage);
+
             OpenWindowCommand = new RelayCommand<string>(OnWindowOpen);
             ClosingCommand = new RelayCommand(OnClosing);
+            ClosedCommand = new RelayCommand(OnClosed);
             StartService = new RelayCommand(OnStartService);
             StopService = new RelayCommand(OnStopService);
             RestartService = new RelayCommand(OnRestartService);
@@ -62,6 +79,23 @@ namespace RoSatGCS.ViewModels
             _serviceManager.Start();
 
             _ = Update();
+
+            if (File.Exists(PathCacheSetting))
+            {
+                using (var fileStream = File.OpenRead(PathCacheSetting))
+                {
+                    try
+                    {
+                        var temp = MessagePackSerializer.Deserialize<SettingsModel>(fileStream);
+
+                        SettingsModel.Load(temp);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn(ex);
+                    }
+                }
+            }
         }
 
         private void OnNavigationMessage(object recipient, NavigationMessage message)
@@ -108,6 +142,13 @@ namespace RoSatGCS.ViewModels
                     }
                     NavigationSource = pageScheduler;
                     break;
+                case "fileshare":
+                    if (pageFileShare == null)
+                    {
+                        pageFileShare = new PageFileShare();
+                    }
+                    NavigationSource = pageFileShare;
+                    break;
                 default:
                     break;
             }
@@ -142,8 +183,12 @@ namespace RoSatGCS.ViewModels
             if (pageCommand != null && pageCommand.DataContext is PageCommandViewModel vm)
             {
                 vm.Closing.Execute(null);
-
             }
+        }
+
+        private void OnClosed()
+        {
+            Application.Current.Shutdown();
         }
 
         private void OnStartService()

@@ -23,9 +23,13 @@ namespace RoSatGCS.Utils.Query
         ACK,
         Error,
         Command,
+        Radio,
         Data,
         Schedule,
-        Service
+        Service,
+        Config,
+        Debug,
+        FwUpdate
     }
 
     public class PacketBase<T>
@@ -77,6 +81,21 @@ namespace RoSatGCS.Utils.Query
         [Key(1)] public string Error = "";
     }
 
+    [MessagePackObject]
+    public class ProcessorConfigPacket : PacketBase<ProcessorConfigPacket>
+    {
+        [Key(0)] public string IP = "";
+        [Key(1)] public int Port = 0;
+        [Key(2)] public bool TLS = false;
+    }
+
+    [MessagePackObject]
+    public class ProcessorDebugPacket : PacketBase<ProcessorDebugPacket>
+    {
+        [Key(0)] public bool Debug = false;
+    }
+
+    #region Command
     [MessagePackObject]
     public class CommandCpPacket : PacketBase<CommandCpPacket>
     {
@@ -140,28 +159,6 @@ namespace RoSatGCS.Utils.Query
         [Key(1)] public uint Elevation;
     }
 
-    [MessagePackObject]
-    public class CommandFwUpdatePacket : PacketBase<CommandFwUpdatePacket>
-    {
-        [Key(0)] public CommandCpPacket Command = new();
-        [Key(1)] public CommandAesPacket AES = new();
-        [Key(2)] public ushort BoardRevision;
-        [Key(3)] public ushort CpuType;
-        [Key(4)] public string FileName = "";
-        [Key(5)] public ulong Flags;
-        [Key(6)] public ushort FWType;
-        [Key(7)] public ushort FWVersionMajor;
-        [Key(8)] public ushort FWVersionMinor;
-        [Key(9)] public ushort ModuleConfig;
-        [Key(10)] public ushort ModuleType;
-        [Key(11)] public ushort Submodule;
-    }
-
-    [MessagePackObject]
-    public class CommandFwUpdateResultPacket : PacketBase<CommandFwUpdateResultPacket>
-    {
-        [Key(0)] public ulong CommandId;
-    }
 
     [MessagePackObject]
     public class CommandBeaconPacket : PacketBase<CommandBeaconPacket>
@@ -178,4 +175,34 @@ namespace RoSatGCS.Utils.Query
         [Key(2)] public string Info = "";
         [Key(3)] public string Notifier = "";
     }
+    #endregion
+
+    #region File and Firmware
+    [MessagePackObject]
+    public class FirmwareUpdatePacket : PacketBase<FirmwareUpdatePacket>
+    {
+        [Key(0)] public string FilePath = "";
+        [Key(1)] public string SatelliteId = "";
+        [Key(2)] public byte ModuleMac = 0;
+        [Key(3)] public ushort BoardRevision = 0;
+        [Key(4)] public ushort CpuType = 0;
+        [Key(5)] public ushort SubModule = 0;
+        [Key(6)] public ushort FWType = 0;
+        [Key(7)] public ushort FWVerMaj = 0;
+        [Key(8)] public ushort FWVerMin = 0;
+        [Key(9)] public ushort ModuleType = 0;
+        [Key(10)] public ushort ModuleConfig = 0;
+        [Key(11)] public ulong Flags = 0;
+        [Key(12)] public ulong CommandId = 0;
+        [Key(13)] public bool IsBundle = false;
+        [Key(14)] public bool IsFile = false;
+    }
+
+    [MessagePackObject]
+    public class FirmwareUpdateResultPacket : PacketBase<FirmwareUpdateResultPacket>
+    {
+        [Key(0)] public ulong CommandId;
+    }
+
+    #endregion
 }

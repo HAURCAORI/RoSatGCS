@@ -28,6 +28,7 @@ namespace RoSatGCS.ViewModels
             }
         }
 
+        
         private int _column = 2;
         private SatelliteFunctionTypeModel? _satFuncType;
 

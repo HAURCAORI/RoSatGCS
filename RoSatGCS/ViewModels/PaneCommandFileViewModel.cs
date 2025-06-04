@@ -56,7 +56,7 @@ namespace RoSatGCS.ViewModels
 
         private void AddFileFunc()
         {
-            var dialogue = new WindowFileSearch();
+            var dialogue = new WindowFileSearch(["json"]);
             if (dialogue.ShowDialog() == true)
             {
                 AddFileHelper([dialogue.Path]);

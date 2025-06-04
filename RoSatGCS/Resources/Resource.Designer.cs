@@ -133,6 +133,15 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Advanced과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sAdvanced {
+            get {
+                return ResourceManager.GetString("sAdvanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Apply과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sApply {
@@ -147,6 +156,24 @@ namespace RoSatGCS.Resources {
         public static string sArchive {
             get {
                 return ResourceManager.GetString("sArchive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Board Revision과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sBoardRevision {
+            get {
+                return ResourceManager.GetString("sBoardRevision", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cancel과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sCancel {
+            get {
+                return ResourceManager.GetString("sCancel", resourceCulture);
             }
         }
         
@@ -205,11 +232,38 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Commit과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sCommit {
+            get {
+                return ResourceManager.GetString("sCommit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Configuration과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sConfiguration {
+            get {
+                return ResourceManager.GetString("sConfiguration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Connect과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sConnect {
             get {
                 return ResourceManager.GetString("sConnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   CPU Type과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sCPUType {
+            get {
+                return ResourceManager.GetString("sCPUType", resourceCulture);
             }
         }
         
@@ -228,6 +282,15 @@ namespace RoSatGCS.Resources {
         public static string sDatabase {
             get {
                 return ResourceManager.GetString("sDatabase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Debug과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sDebug {
+            get {
+                return ResourceManager.GetString("sDebug", resourceCulture);
             }
         }
         
@@ -268,6 +331,15 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Display과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sDisplay {
+            get {
+                return ResourceManager.GetString("sDisplay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Downlink과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sDownlink {
@@ -282,6 +354,24 @@ namespace RoSatGCS.Resources {
         public static string sEdit {
             get {
                 return ResourceManager.GetString("sEdit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Enable과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sEnable {
+            get {
+                return ResourceManager.GetString("sEnable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Encryption과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sEncryption {
+            get {
+                return ResourceManager.GetString("sEncryption", resourceCulture);
             }
         }
         
@@ -331,11 +421,83 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   File Share과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sFileShare {
+            get {
+                return ResourceManager.GetString("sFileShare", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Flags과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sFlags {
+            get {
+                return ResourceManager.GetString("sFlags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Functions과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sFunctions {
             get {
                 return ResourceManager.GetString("sFunctions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Firmware Configuration과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sFWConfig {
+            get {
+                return ResourceManager.GetString("sFWConfig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   FW Type과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sFwType {
+            get {
+                return ResourceManager.GetString("sFwType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   FW Version Major과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sFwVersionMajor {
+            get {
+                return ResourceManager.GetString("sFwVersionMajor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   FW Version Minor과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sFwVersionMinor {
+            get {
+                return ResourceManager.GetString("sFwVersionMinor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   General과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sGeneral {
+            get {
+                return ResourceManager.GetString("sGeneral", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   General Configuration과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sGeneralConfig {
+            get {
+                return ResourceManager.GetString("sGeneralConfig", resourceCulture);
             }
         }
         
@@ -376,11 +538,56 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   ModuleConfig과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sModuleConfig {
+            get {
+                return ResourceManager.GetString("sModuleConfig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Module Mac과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sModuleMac {
+            get {
+                return ResourceManager.GetString("sModuleMac", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ModuleType과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sModuleType {
+            get {
+                return ResourceManager.GetString("sModuleType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Name과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sName {
             get {
                 return ResourceManager.GetString("sName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ok과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sOk {
+            get {
+                return ResourceManager.GetString("sOk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Orbital Elements과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sOrbitalElements {
+            get {
+                return ResourceManager.GetString("sOrbitalElements", resourceCulture);
             }
         }
         
@@ -417,6 +624,33 @@ namespace RoSatGCS.Resources {
         public static string sProperties {
             get {
                 return ResourceManager.GetString("sProperties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Pull과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sPull {
+            get {
+                return ResourceManager.GetString("sPull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Push과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sPush {
+            get {
+                return ResourceManager.GetString("sPush", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Radio과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sRadio {
+            get {
+                return ResourceManager.GetString("sRadio", resourceCulture);
             }
         }
         
@@ -466,6 +700,15 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   RoSatProcessor과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sRoSatProcessor {
+            get {
+                return ResourceManager.GetString("sRoSatProcessor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Run과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sRun {
@@ -480,6 +723,24 @@ namespace RoSatGCS.Resources {
         public static string sRunAll {
             get {
                 return ResourceManager.GetString("sRunAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Satellite Information과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sSatelliteInfo {
+            get {
+                return ResourceManager.GetString("sSatelliteInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Satellite ID과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sSatID {
+            get {
+                return ResourceManager.GetString("sSatID", resourceCulture);
             }
         }
         
@@ -570,6 +831,15 @@ namespace RoSatGCS.Resources {
         public static string sStop {
             get {
                 return ResourceManager.GetString("sStop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sub Module과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sSubModule {
+            get {
+                return ResourceManager.GetString("sSubModule", resourceCulture);
             }
         }
         
@@ -759,6 +1029,15 @@ namespace RoSatGCS.Resources {
         public static string zNoSuchFile {
             get {
                 return ResourceManager.GetString("zNoSuchFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Null Argument과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string zNullArgument {
+            get {
+                return ResourceManager.GetString("zNullArgument", resourceCulture);
             }
         }
         

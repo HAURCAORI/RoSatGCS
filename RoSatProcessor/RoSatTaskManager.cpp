@@ -16,22 +16,21 @@ RoSatProcessor::RoSatTaskManager& RoSatProcessor::RoSatTaskManager::instance()
 void RoSatProcessor::RoSatTaskManager::run(HANDLE hStoppedEvent)
 {
 	auto& e = instance();
-	
+
 	if (e.isRunning) {
 		return;
 	}
+	{
+		std::unique_lock<std::mutex> l(e._m);
+		e.m_hStoppedEvent = NULL;
+		if (hStoppedEvent) {
+			e.m_hStoppedEvent = hStoppedEvent;
+		}
 
-	e.m_hStoppedEvent = NULL;
-	if (hStoppedEvent) {
-		e.m_hStoppedEvent = hStoppedEvent;
-	}
-
-	e.isRunning = TRUE;
-	for (auto& iter : e.m_tasks) {
-#ifdef _DEBUG
-		wprintf(TEXT("===Task Started[%s]\r\n"), iter->getTaskName());
-#endif
-		CThreadPool::QueueUserWorkItem(&RoSatProcessor::RoSatTask::run, (iter.get()));
+		e.isRunning = TRUE;
+		for (auto& iter : e.m_tasks) {
+			CThreadPool::QueueUserWorkItem(&RoSatProcessor::RoSatTask::run, (iter.get()));
+		}
 	}
 }
 
@@ -43,19 +42,30 @@ void RoSatProcessor::RoSatTaskManager::stop()
 		return;
 	}
 
-	for (auto& iter : e.m_tasks) {
-		iter.get()->stop();
-#ifdef _DEBUG
-		wprintf(TEXT("\n===Task Stopped[%s]\n"),iter->getTaskName());
-#endif
-	}
+	{
+		std::unique_lock<std::mutex> l(e._m);
 
-	if (e.m_hStoppedEvent) {
-		SetEvent(e.m_hStoppedEvent);
-	}
+		for (auto& iter : e.m_tasks) {
+			iter.get()->stop();
+		}
 
-	e.isRunning = FALSE;
+		if (e.m_hStoppedEvent) {
+			SetEvent(e.m_hStoppedEvent);
+		}
+
+		e.isRunning = FALSE;
+	}
 	RoSatProcessor::Config::Export();
+}
+
+void RoSatProcessor::RoSatTaskManager::restart(PCWSTR pszTaskName)
+{
+	auto& e = instance();
+	auto ptr = e.FindTask(pszTaskName);
+	if (ptr != nullptr) {
+		ptr->stop();
+	}
+	CThreadPool::QueueUserWorkItem(&RoSatProcessor::RoSatTask::run, ptr);
 }
 
 RoSatProcessor::RoSatTask* RoSatProcessor::RoSatTaskManager::FindTask(PCWSTR pszTaskName)

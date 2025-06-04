@@ -14,7 +14,7 @@ namespace RoSatGCS.Utils.Satellites.Core
         private string intlDesignatorStr = "";
         private Julian epoch = new();
 
-        public double InclinationDeg { get; protected set; }
+        public double InclinationDeg { get; protected set; }        
         public double InclinationRad { get; protected set; }
         public double Eccentricity { get; protected set; }
         public double RAANodeDeg { get; protected set; }
@@ -26,6 +26,7 @@ namespace RoSatGCS.Utils.Satellites.Core
         public double BStar { get; protected set; }
         public double MeanMotion { get; protected set; }
         public double MeanMotionDt { get; protected set; }
+        public double MeanMotionDt2 { get; protected set; }
 
         public int RevAtEpoch { get; protected set; }
         public int SetNumber { get; protected set; }

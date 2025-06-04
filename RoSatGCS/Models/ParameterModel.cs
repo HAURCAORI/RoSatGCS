@@ -103,9 +103,9 @@ namespace RoSatGCS.Models
         [IgnoreMember]
         public int Id { get => _id; internal set => _id = value; }
         [IgnoreMember]
-        public string Sequence {  get => _seuence; internal set => _seuence = value; }
+        public string Sequence {  get => _seuence; internal set => _seuence = value; } // Used for function property view model
         [IgnoreMember]
-        public List<object>? Value { get => _value; internal set => _value = value; }
+        public List<object>? Value { get => _value; internal set => _value = value;  }
         [IgnoreMember]
         public bool HasError { get => _hasError; internal set => _hasError = value; }
         [IgnoreMember]
@@ -162,7 +162,7 @@ namespace RoSatGCS.Models
                     break;
                 case SatelliteFunctionFileModel.DataType.Int8:
                     for (int i = 0; i < bytes.Count; i += 1)
-                        value.Add(BitConverter.ToChar([.. bytes], i));
+                        value.Add(bytes[i]);
                     break;
                 case SatelliteFunctionFileModel.DataType.Int16:
                     for (int i = 0; i < bytes.Count; i += 2)
@@ -205,7 +205,7 @@ namespace RoSatGCS.Models
                         value.Add(BitConverter.ToDouble([.. bytes], i));
                     break;
                 case SatelliteFunctionFileModel.DataType.String:
-                    value.Add(Encoding.ASCII.GetString(bytes.ToArray()));
+                    value.Add(Encoding.ASCII.GetString(bytes.ToArray()).Trim('\0'));
                     break;
                 case SatelliteFunctionFileModel.DataType.ByteBuffer:
                     foreach (var item in bytes)
@@ -225,6 +225,75 @@ namespace RoSatGCS.Models
                     break;
             }
             return value;
+        }
+
+        public static List<ParameterModel> GetType(ParameterModel pm)
+        {
+            var list = new List<ParameterModel>();
+
+            var param = (ParameterModel)pm.Clone();
+
+            if (param.CommandModel == null || !param.IsUserDefined)
+            {
+                list.Add(param);
+                return list;
+            }
+
+            if (param.CommandModel.AssociatedType.TryGetValue(param.UserDefinedType, out SatelliteFunctionTypeModel? tmp))
+            {
+                var type = (SatelliteFunctionTypeModel)tmp.Clone();
+                if (type.Type == SatelliteFunctionTypeModel.ArgumentType.Struct)
+                {
+                    // Add Header
+                    var header = new ParameterModel(SatelliteFunctionTypeModel.ArgumentType.Struct, type.File, type.Name, type.Description)
+                    {
+                        CommandModel = param.CommandModel,
+                        ByteSize = param.ByteSize,
+                        DataType = SatelliteFunctionFileModel.DataType.None,
+                        Sequence = param.Sequence
+                    };
+                    list.Add(header);
+
+                    var len = 1;
+                    if (param.BaseType == SatelliteFunctionTypeModel.ArgumentType.Struct && param.IsArray)
+                    {
+                        len = param.ByteSize / type.Size;
+                    }
+
+                    for (int i = 0; i < len; i++)
+                    {
+
+                        var index = 1;
+                        foreach (var p in type.Parameters)
+                        {
+                            var p_copy = (ParameterModel)p.Clone();
+                            p_copy.CommandModel = param.CommandModel;
+                            p_copy.IsReadOnly = param.IsReadOnly;
+                            p_copy.Sequence = param.Sequence + "." + (index++).ToString();
+
+                            if (p_copy.IsUserDefined)
+                            {
+                                list.AddRange(GetType(p_copy));
+                            }
+                            else
+                            {
+                                list.Add(p_copy);
+                            }
+                        }
+                    }
+                }
+                else if (type.Type == SatelliteFunctionTypeModel.ArgumentType.Enum)
+                {
+                    param.DataType = SatelliteFunctionFileModel.DataType.Enumeration;
+                    list.Add(param);
+                }
+            }
+            else
+            {
+                list.Add(param);
+            }
+
+            return list;
         }
 
         #region Constructors

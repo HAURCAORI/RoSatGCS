@@ -51,7 +51,6 @@ namespace RoSatGCS.ViewModels
         public ObservableCollection<PaneViewModel> DocumentPane { get => _document; }
 
 
-
         public PaneCommandFileViewModel? PaneCommandFile { get => _paneCommandFile?.TryGetTarget(out var target) == true ? target : null; }
         public PaneTypeDictionaryViewModel? PaneTypeDictionary { get => _paneTypeDictionary?.TryGetTarget(out var target) == true ? target : null; }
         public PaneFunctionListViewModel? PaneFunctionList { get => _paneFunctionList?.TryGetTarget(out var target) == true ? target : null; }
@@ -167,7 +166,7 @@ namespace RoSatGCS.ViewModels
         private void OnLoaded()
         {
             if(initialized) { return; }
-
+     
             if (File.Exists(PathCacheFuncFile))
             {
                 using (var fileStream = File.OpenRead(PathCacheFuncFile))
@@ -195,11 +194,13 @@ namespace RoSatGCS.ViewModels
                         var temp = MessagePackSerializer.Deserialize<ObservableCollection<SatelliteCommandGroupModel>>(fileStream);
                         foreach (var item in temp)
                         {
+                            item.Init();
                             _satCommandGroup.Add(new SatelliteCommandGroupModel(this, item));
                         }
                         
                         SatelliteCommandGroup = new ReadOnlyObservableCollection<SatelliteCommandGroupModel>(_satCommandGroup);
                         _satCommandGroupView = new ListCollectionView(_satCommandGroup);
+
                     }
                     catch (Exception ex)
                     {
@@ -215,6 +216,7 @@ namespace RoSatGCS.ViewModels
 
         private void OnClosing()
         {
+            if (!initialized) { return; }
             Directory.CreateDirectory("Cache");
             using var fileStream = new FileStream(PathCacheFuncFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             MessagePackSerializer.Serialize(fileStream, _satFuncFile);
@@ -346,8 +348,7 @@ namespace RoSatGCS.ViewModels
             // Initialize the method
             foreach (var el in st.Method)
             {
-                var ret = new SatelliteMethodModel(el.Id, file.Visibility, file.Name, el.Name, el.Description);
-
+                var ret = new SatelliteMethodModel(el.Id, file.Visibility, file.Name, el.Name, el.Description, st.Id);
                 int index = 0;
 
                 ParameterModel CreateParameterModel(SatelliteFunctionFileModel.MethodValue e)
@@ -629,12 +630,16 @@ namespace RoSatGCS.ViewModels
                 ActiveDocument = item;
             }
         }
-        public void OpenPropertyPreviewPane(SatelliteCommandModel model)
+        public void OpenPropertyPreviewPane(SatelliteCommandModel model, bool changed)
         {
             var item = DocumentPane.FirstOrDefault(x => x is PanePropertyPreviewViewModel);
+            PanePropertyPreview.CommandModel = model;
             if (item == null)
             {
-                DocumentPane.Add(PanePropertyPreview);
+                if(!changed)
+                    DocumentPane.Add(PanePropertyPreview);
+                else
+                    ActiveDocument = item;
             }
             else
             {

@@ -17,6 +17,7 @@
 #include "ServiceImpl.h"
 #include "ServiceInstaller.h"
 
+#include "base64.h"
 
 
 #define SERVICE_NAME            TEXT("RoSatProcessor")
@@ -58,9 +59,6 @@ void TaskDefinition() {
 int wmain(int argc, TCHAR* argv[])
 {
     RoSatProcessor::Config::Import();
-
-    RoSatProcessor::Config::SetWebSocketTLS(true);
-
     if ((argc > 1) && ((*argv[1] == L'-') || (*argv[1] == L'/')))
     {
         if (_tcsicmp(argv[1] + 1, TEXT("install")) == 0)

@@ -12,6 +12,8 @@
       xmlns:cvt="clr-namespace:RoSatGCS.Utils.Converter"
       xmlns:ap="clr-namespace:RoSatGCS.Utils.AttachedProperties"
       xmlns:controls="clr-namespace:RoSatGCS.Controls"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
+
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="PageCommand">
@@ -34,7 +36,6 @@
                 </TextDecoration.Pen>
             </TextDecoration>
         </TextDecorationCollection>
-        
     </Page.Resources>
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Loaded">
@@ -688,7 +689,11 @@
                                                                     <ListBox.ContextMenu>
                                                                         <ContextMenu>
                                                                             <MenuItem Header="{loc:Localization sExecuteOnce}" Command="{Binding ExecuteOnce}"/>
-                                                                            <MenuItem Header="{loc:Localization sPreview}" Command="{Binding OpenPreview}"/>
+                                                                            <MenuItem Header="{loc:Localization sPreview}" Command="{Binding OpenPreview}">
+                                                                                <MenuItem.CommandParameter>
+                                                                                    <sys:Boolean>false</sys:Boolean>
+                                                                                </MenuItem.CommandParameter>
+                                                                            </MenuItem>
                                                                             <Separator/>
                                                                             <MenuItem Header="{loc:Localization sDelete}" Command="{Binding DeleteItem}"/>
                                                                             <Separator Visibility="{Binding IsSingleSelection, Converter={StaticResource cvtBoolVisibility}}"/>
@@ -1014,8 +1019,61 @@
                     </local:PanesTemplateSelector.TypeSummaryPaneTemplate>
                     <local:PanesTemplateSelector.PropertyPreviewPaneTemplate>
                         <DataTemplate>
-                            <Grid>
-                                <Label>Test</Label>
+                            <Grid x:Name="propertyPreviewGrid">
+                                <b:Interaction.Triggers>
+                                    <b:EventTrigger EventName="Loaded">
+                                        <b:InvokeCommandAction Command="{Binding SizeChanged}">
+                                            <b:InvokeCommandAction.CommandParameter>
+                                                <Binding ElementName="propertyPreviewGrid"/>
+                                            </b:InvokeCommandAction.CommandParameter>
+                                        </b:InvokeCommandAction>
+                                    </b:EventTrigger>
+                                    <b:EventTrigger EventName="SizeChanged">
+                                        <b:InvokeCommandAction Command="{Binding SizeChanged}">
+                                            <b:InvokeCommandAction.CommandParameter>
+                                                <Binding ElementName="propertyPreviewGrid"/>
+                                            </b:InvokeCommandAction.CommandParameter>
+                                        </b:InvokeCommandAction>
+                                    </b:EventTrigger>
+                                </b:Interaction.Triggers>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Text="{Binding CommandModel.Name}" FontWeight="Bold" Margin="10,5,10,0"/>
+                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                    <ListBox ItemsSource="{Binding CommandModel.ResultParameters}" ScrollViewer.CanContentScroll="False" bv:PassMouseWheelBehavior.EnableMouseWheelPass="True"
+                                        ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"  >
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Height="40">
+                                                    <controls:ParameterView Parameter="{Binding}"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+
+                                        <ListBox.ItemContainerStyle>
+                                            <Style TargetType="ListBoxItem">
+                                                <Setter Property="Focusable" Value="False"/>
+                                                <!--<Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                                                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                -->
+                                            </Style>
+                                        </ListBox.ItemContainerStyle>
+                                        <ListBox.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid HorizontalAlignment="Stretch" VerticalAlignment="Top" Columns="{Binding GridColumn}"/>
+                                            </ItemsPanelTemplate>
+                                        </ListBox.ItemsPanel>
+                                    </ListBox>
+                                </ScrollViewer>
                             </Grid>
                         </DataTemplate>
                     </local:PanesTemplateSelector.PropertyPreviewPaneTemplate>

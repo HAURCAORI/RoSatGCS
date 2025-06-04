@@ -161,6 +161,7 @@
   <ItemGroup>
     <ClCompile Include="AsyncSerial.cpp" />
     <ClCompile Include="AsyncWebSocket.cpp" />
+    <ClCompile Include="base64.cpp" />
     <ClCompile Include="Constants.h" />
     <ClCompile Include="crc16-ccitt-false.cpp" />
     <ClCompile Include="crc16-ccitt.cpp" />
@@ -202,6 +203,7 @@
   <ItemGroup>
     <ClInclude Include="AsyncSerial.h" />
     <ClInclude Include="AsyncWebSocket.h" />
+    <ClInclude Include="base64.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="crc16-ccitt-false.h" />
     <ClInclude Include="crc16-ccitt.h" />

@@ -84,7 +84,12 @@ namespace RoSatGCS.Utils.Query
                 {
                     socket.SendFrame(QueryPacket.SerializePacket(packet));
 
-                    if (socket.TryReceiveFrameBytes(TimeSpan.FromSeconds(_timeout), out byte[]? respond))
+                    int timeout = _timeout;
+                    if(packet.Type == QueryType.Command)
+                    {
+                        timeout = 120;
+                    }
+                    if (socket.TryReceiveFrameBytes(TimeSpan.FromSeconds(timeout), out byte[]? respond))
                     {
                         // Success to receive response
                         if (packet.DispatcherType == DispatcherType.NoResponse) { return null; }
@@ -124,6 +129,7 @@ namespace RoSatGCS.Utils.Query
 
                         Logger.Error("No ACK received from server.");
                         throw new TimeoutException("No ACK received from server.");
+                        
                     }
                 }
             });

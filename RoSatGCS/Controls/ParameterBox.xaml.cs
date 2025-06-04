@@ -418,6 +418,12 @@ namespace RoSatGCS.Controls
                 case DataType.Int64:
                     ret = Convert.ToString(Convert.ToInt64(str, prevBase), currentBase);
                     break;
+                case DataType.Boolean:
+                    ret = str;
+                    return ret;
+                case DataType.String:
+                    ret = str;
+                    return ret;
                 default:
                     break;
             }

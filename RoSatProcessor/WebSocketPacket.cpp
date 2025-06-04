@@ -2,11 +2,14 @@
 #include "WebSocketPacket.h"
 #include "QueryPacket.h"
 #include <type_traits>
+#include <filesystem>
 
 #define RAPIDJSON_NOMEMBERITERATORCLASS 
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
+
+#include "base64.h"
 
 #pragma region CreatePacket
 
@@ -160,12 +163,13 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateCPCommand
 	AddMember(d, "id", id, allocator);									// required
 	AddMember(d, "moduleMac", packet.ModuleMac, allocator);					// required
 	AddMember(d, "noProgressTimeout", packet.NoProgressTimeout, allocator);	// nullable
-	AddMember(d, "payload", packet.Payload, allocator); 					// nullable
 	AddMember(d, "readTimeout", packet.ReadTimeout, allocator);				// nullable
 	AddMember(d, "satId", packet.SatelliteId, allocator);					// required
-	AddMember(d, "tripType", 0, allocator);									// required
+	AddMember(d, "tripType", 1, allocator);									// required
 	AddMember(d, "type", "CPCommand", allocator);							// required
 	AddMember(d, "writeTimeout", packet.WriteTimeout, allocator);			// nullable
+
+	AddMember(d, "payload", packet.Payload, allocator); 					// nullable
 
 	ret.m_query_id = packet.QueryId;
 	ret.m_id = id++;
@@ -193,7 +197,7 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateCPCommand
 	AddMember(d, "noProgressTimeout", packet.NoProgressTimeout, allocator); // nullable
 	AddMember(d, "payload", packet.Payload, allocator); 					// nullable
 	AddMember(d, "satId", packet.SatelliteId, allocator);					// required
-	AddMember(d, "tripType", 0, allocator);									// required
+	AddMember(d, "tripType", 1, allocator);									// required
 	AddMember(d, "type", "CPCommandOneWay", allocator);						// required
 	AddMember(d, "writeTimeout", packet.WriteTimeout, allocator);			// nullable	
 
@@ -208,35 +212,51 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateCPCommand
 	return ret;
 }
 
-RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateFWUpd(const CommandFwUpdatePacket& packet)
+RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateFWUpd(const FirmwareUpdatePacket& packet)
 {
+	
 	WebSocketPacket ret;
 	rapidjson::Document d;
 	d.SetObject();
 
 	rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
 
-	AddMember(d, "aesIV", packet.AES.IV, allocator);						// nullable
-	AddMember(d, "aesKey", packet.AES.Key, allocator);						// nullable
+	std::string path = packet.FilePath;
+	std::string filename = std::filesystem::path(path).filename().string();
+
 	AddMember(d, "boardRevision", packet.BoardRevision, allocator);			// ########
-	AddMember(d, "cmdId", packet.Command.CommandId, allocator);				// required
+	AddMember(d, "cmdId", packet.CommandId, allocator);						// required
 	AddMember(d, "cpuType", packet.CpuType, allocator);						// ########
-	AddMember(d, "fileName", packet.FileName, allocator);					// ########
+	AddMember(d, "fileName", filename, allocator);							// ########
 	AddMember(d, "flags", packet.Flags, allocator);							// ########
 	AddMember(d, "fwType", packet.FWType, allocator);						// ########
-	AddMember(d, "fwVerMaj", packet.FWVersionMajor, allocator);				// ########	
-	AddMember(d, "fwVerMin", packet.FWVersionMinor, allocator);				// ########
-	AddMember(d, "id", id, allocator);									// required
+	AddMember(d, "fwVerMaj", packet.FWVerMaj, allocator);					// ########	
+	AddMember(d, "fwVerMin", packet.FWVerMin, allocator);					// ########
+	AddMember(d, "id", id, allocator);										// required
 	AddMember(d, "moduleConfig", packet.ModuleConfig, allocator);			// ########
-	AddMember(d, "moduleMac", packet.Command.ModuleMac, allocator);		    // required
+	AddMember(d, "moduleMac", packet.ModuleMac, allocator);					// required
 	AddMember(d, "moduleType", packet.ModuleType, allocator);				// required
-	AddMember(d, "noProgressTimeout", packet.Command.NoProgressTimeout, allocator); // ########
-	AddMember(d, "payload", packet.Command.Payload, allocator);				// required
-	AddMember(d, "readTimeout", packet.Command.ReadTimeout, allocator);		// nullable
-	AddMember(d, "satId", packet.Command.SatelliteId, allocator);			// required
+	AddMember(d, "noProgressTimeout", "5s", allocator);						// ########
+	AddMember(d, "readTimeout", "999s", allocator);							// nullable
+	AddMember(d, "satId", packet.SatelliteId, allocator);					// required
 	AddMember(d, "subModule", packet.Submodule, allocator);					// required
 	AddMember(d, "type", "FWUpd", allocator);								// required
-	AddMember(d, "writeTimeout", packet.Command.WriteTimeout, allocator);	// nullable
+	AddMember(d, "writeTimeout", "999s", allocator);						// nullable
+	
+	std::ifstream file(path, std::ios::binary);
+	if (!file)
+	{
+		AddMember(d, "payload", "", allocator);
+	}
+	else
+	{
+		std::string file_contents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+		std::string encoded = base64_encode(file_contents, false);
+
+		rapidjson::Value k("payload", allocator);
+		rapidjson::Value v(encoded.c_str(), static_cast<rapidjson::SizeType>(encoded.length()), allocator);
+		d.AddMember(k, v, allocator);
+	}
 
 	ret.m_query_id = packet.QueryId;
 	ret.m_id = id++;
@@ -249,7 +269,7 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateFWUpd(con
 	return ret;
 }
 
-RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateFWUpdBundle(const CommandFwUpdatePacket& packet)
+RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateFWUpdBundle(const FirmwareUpdatePacket& packet)
 {
 	WebSocketPacket ret;
 	rapidjson::Document d;
@@ -257,16 +277,33 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateFWUpdBund
 
 	rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
 
-	AddMember(d, "cmdId", packet.Command.CommandId, allocator);				// required
-	AddMember(d, "fileName", packet.FileName, allocator);					// ########	
-	AddMember(d, "id", id, allocator);									// required
-	AddMember(d, "moduleMac", packet.Command.ModuleMac, allocator);			// required
-	AddMember(d, "noProgressTimeout", packet.Command.NoProgressTimeout, allocator); // ########
-	AddMember(d, "payload", packet.Command.Payload, allocator);				// required
-	AddMember(d, "readTimeout", packet.Command.ReadTimeout, allocator);		// nullable
-	AddMember(d, "satId", packet.Command.SatelliteId, allocator);			// required
-	AddMember(d, "type", "FWUpdBundle", allocator);							// required
-	AddMember(d, "writeTimeout", packet.Command.WriteTimeout, allocator);	// nullable
+	std::string path = packet.FilePath;
+	std::string filename = std::filesystem::path(path).filename().string();
+	
+	AddMember(d, "cmdId", packet.CommandId, allocator);				// required
+	AddMember(d, "fileName", filename, allocator);					// ########	
+	AddMember(d, "id", id, allocator);								// required
+	AddMember(d, "moduleMac", packet.ModuleMac, allocator);			// required
+	AddMember(d, "noProgressTimeout", "5s", allocator);				// ########
+	AddMember(d, "readTimeout", "999s", allocator);					// nullable
+	AddMember(d, "satId", packet.SatelliteId, allocator);			// required
+	AddMember(d, "type", "FWUpdBundle", allocator);					// required
+	AddMember(d, "writeTimeout", "999s", allocator);				// nullable
+
+	std::ifstream file(path, std::ios::binary);
+	if (!file)
+	{
+		AddMember(d, "payload", "", allocator);
+	}
+	else
+	{
+		std::string file_contents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+		std::string encoded = base64_encode(file_contents, false);
+
+		rapidjson::Value k("payload", allocator);
+		rapidjson::Value v(encoded.c_str(), static_cast<rapidjson::SizeType>(encoded.length()), allocator);
+		d.AddMember(k, v, allocator);
+	}
 
 	ret.m_query_id = packet.QueryId;
 	ret.m_id = id++;
@@ -279,7 +316,7 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateFWUpdBund
 	return ret;
 }
 
-RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateFile(const CommandFwUpdatePacket& packet)
+RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateFilePacket(const FirmwareUpdatePacket& packet)
 {
 	WebSocketPacket ret;
 	rapidjson::Document d;
@@ -287,26 +324,43 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateFile(cons
 
 	rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
 
+	std::string path = packet.FilePath;
+	std::string filename = std::filesystem::path(path).filename().string();
+
 	AddMember(d, "boardRevision", packet.BoardRevision, allocator);			// ########
-	AddMember(d, "cmdId", packet.Command.CommandId, allocator);				// required
+	AddMember(d, "cmdId", packet.CommandId, allocator);						// required
 	AddMember(d, "cpuType", packet.CpuType, allocator);						// ########
-	AddMember(d, "fileName", packet.FileName, allocator);					// ########
+	AddMember(d, "fileName", filename, allocator);							// ########
 	AddMember(d, "flags", packet.Flags, allocator);							// ########
 	AddMember(d, "fwType", packet.FWType, allocator);						// ########
-	AddMember(d, "fwVerMaj", packet.FWVersionMajor, allocator);				// ########
-	AddMember(d, "fwVerMin", packet.FWVersionMinor, allocator);				// ########
-	AddMember(d, "id", id, allocator);									// required
+	AddMember(d, "fwVerMaj", packet.FWVerMaj, allocator);					// ########
+	AddMember(d, "fwVerMin", packet.FWVerMin, allocator);					// ########
+	AddMember(d, "id", id, allocator);										// required
 	AddMember(d, "moduleConfig", packet.ModuleConfig, allocator);			// ########
-	AddMember(d, "moduleMac", packet.Command.ModuleMac, allocator);			// required
+	AddMember(d, "moduleMac", packet.ModuleMac, allocator);					// required
 	AddMember(d, "moduleType", packet.ModuleType, allocator);				// required
-	AddMember(d, "noProgressTimeout", packet.Command.NoProgressTimeout, allocator); // ########
-	AddMember(d, "payload", packet.Command.Payload, allocator);				// required
-	AddMember(d, "readTimeout", packet.Command.ReadTimeout, allocator);		// nullable
-	AddMember(d, "satId", packet.Command.SatelliteId, allocator);			// required
+	AddMember(d, "noProgressTimeout", "5s", allocator);						// ########
+	AddMember(d, "readTimeout", "999s", allocator);							// nullable
+	AddMember(d, "satId", packet.SatelliteId, allocator);					// required
 	AddMember(d, "subModule", packet.Submodule, allocator);					// required
-	AddMember(d, "type", "FWUpd", allocator);								// required
-	AddMember(d, "writeTimeout", packet.Command.WriteTimeout, allocator);	// nullable
+	AddMember(d, "type", "File", allocator);								// required
+	AddMember(d, "writeTimeout", "999s", allocator);						// nullable
 
+	std::ifstream file(path, std::ios::binary);
+	if (!file)
+	{
+		AddMember(d, "payload", "", allocator);
+	}
+	else
+	{
+		std::string file_contents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+		std::string encoded = base64_encode(file_contents, false);
+
+		rapidjson::Value k("payload", allocator);
+		rapidjson::Value v(encoded.c_str(), static_cast<rapidjson::SizeType>(encoded.length()), allocator);
+		d.AddMember(k, v, allocator);
+	}
+	
 	ret.m_query_id = packet.QueryId;
 	ret.m_id = id++;
 
@@ -326,11 +380,14 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateInitRadio
 
 	rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
 
-	AddMember(d, "aesIV", packet.AES.IV, allocator);						// nullable
-	AddMember(d, "aesKey", packet.AES.Key, allocator);						// nullable
+	auto aesIV = base64_encode(packet.AES.IV.data(), 16, false);
+	auto aesKey = base64_encode(packet.AES.Key.data(), 32, false);
+
+	AddMember(d, "aesIV", aesIV, allocator);								// nullable
+	AddMember(d, "aesKey", aesKey, allocator);								// nullable
 	AddMember(d, "downlinkFrequency", packet.DownlinkFrequency, allocator); // ########
 	AddMember(d, "encrypted", packet.Encrypted, allocator);					// ########
-	AddMember(d, "id", id, allocator);									// required
+	AddMember(d, "id", id, allocator);										// required
 	AddMember(d, "rfConfig", packet.RFConfig, allocator);					// ########
 	AddMember(d, "type", "InitRadio", allocator);							// required
 	AddMember(d, "uplinkFrequency", packet.UplinkFrequency, allocator);		// ########
@@ -354,11 +411,11 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateUpdateRad
 
 	rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
 
-	AddMember(d, "aesIV", packet.AES.IV, allocator);						// nullable
-	AddMember(d, "aesKey", packet.AES.Key, allocator);						// nullable
+	//AddMember(d, "aesIV", packet.AES.IV, allocator);						// nullable
+	//AddMember(d, "aesKey", packet.AES.Key, allocator);					// nullable
 	AddMember(d, "downlinkFrequency", packet.DownlinkFrequency, allocator); // ########
-	AddMember(d, "encrypted", packet.Encrypted, allocator);					// ########
-	AddMember(d, "id", id, allocator);									// required
+	//AddMember(d, "encrypted", packet.Encrypted, allocator);				// ########
+	AddMember(d, "id", id, allocator);										// required
 	AddMember(d, "rfConfig", packet.RFConfig, allocator);					// ########
 	AddMember(d, "type", "UpdateRadio", allocator);							// required
 	AddMember(d, "uplinkFrequency", packet.UplinkFrequency, allocator);		// ########
@@ -381,15 +438,17 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateUpdateAES
 	d.SetObject();
 
 	rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
+	auto aesIV = base64_encode(packet.AES.IV.data(), 16, false);
+	auto aesKey = base64_encode(packet.AES.Key.data(), 32, false);
 
-	AddMember(d, "aesIV", packet.AES.IV, allocator);						// nullable
-	AddMember(d, "aesKey", packet.AES.Key, allocator);						// nullable
-	AddMember(d, "downlinkFrequency", packet.DownlinkFrequency, allocator); // ########
+	AddMember(d, "aesIV", aesIV, allocator);								// nullable
+	AddMember(d, "aesKey", aesKey, allocator);								// nullable
+	//AddMember(d, "downlinkFrequency", packet.DownlinkFrequency, allocator); // ########
 	AddMember(d, "encrypted", packet.Encrypted, allocator);					// ########
-	AddMember(d, "id", id, allocator);									// required
-	AddMember(d, "rfConfig", packet.RFConfig, allocator);					// ########
+	AddMember(d, "id", id, allocator);										// required
+	//AddMember(d, "rfConfig", packet.RFConfig, allocator);					// ########
 	AddMember(d, "type", "UpdateAESKey", allocator);						// required
-	AddMember(d, "uplinkFrequency", packet.UplinkFrequency, allocator);		// ########
+	//AddMember(d, "uplinkFrequency", packet.UplinkFrequency, allocator);	// ########
 
 	ret.m_query_id = packet.QueryId;
 	ret.m_id = id++;
@@ -410,7 +469,7 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateRadioConn
 
 	rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
 
-	AddMember(d, "id", id, allocator);									// required
+	AddMember(d, "id", id, allocator);										// required
 	AddMember(d, "remoteRadioMac", packet.RemoteRadioMac, allocator);		// required
 	AddMember(d, "type", "RadioConn", allocator);							// required
 
@@ -436,7 +495,7 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateRotatorSe
 
 	AddMember(d, "azimuth", packet.Azimuth, allocator);						// required
 	AddMember(d, "elevation", packet.Elevation, allocator);					// required
-	AddMember(d, "id", id, allocator);									// required
+	AddMember(d, "id", id, allocator);										// required
 	AddMember(d, "type", "RotatorSetPosition", allocator);					// required
 
 	ret.m_query_id = packet.QueryId;
@@ -459,7 +518,7 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateBeaconLis
 	rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
 
 	AddMember(d, "duration", packet.Duration, allocator);					// ########
-	AddMember(d, "id", id, allocator);									// required
+	AddMember(d, "id", id, allocator);										// required
 	AddMember(d, "type", "BeaconListen", allocator);						// required
 	
 	ret.m_query_id = packet.QueryId;
@@ -481,7 +540,7 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateCancel(co
 
 	rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
 
-	AddMember(d, "id", id, allocator);									// required
+	AddMember(d, "id", id, allocator);										// required
 	AddMember(d, "type", "Cancel", allocator);								// required
 
 	ret.m_query_id = packet.QueryId;
@@ -538,14 +597,18 @@ RoSatProcessor::CommandCpResultPacket RoSatProcessor::WebSocketPacket::ParseCpRe
 	}
 
 	if (d.HasMember("payload")) {
-		if (d["payload"].IsArray()) {
+		if (d["payload"].IsString()) {
+			auto str = d["payload"].GetString();
+			p.Payload = base64_decode_vector(str);
+
+			/*
 			for (const auto& i : d["payload"].GetArray()) {
 				if (i.IsInt()) {
 					p.Payload.push_back(i.GetInt());
 				} else {
 					throw std::exception("Invalid payload element");
 				}
-			}
+			}*/
 		} else if (d["payload"].IsNull()) {
 			
 		} else {
@@ -556,17 +619,56 @@ RoSatProcessor::CommandCpResultPacket RoSatProcessor::WebSocketPacket::ParseCpRe
 	return p;
 }
 
-RoSatProcessor::CommandFwUpdateResultPacket RoSatProcessor::WebSocketPacket::ParseFwUpdateResult(std::string_view packet)
+RoSatProcessor::FirmwareUpdateResultPacket RoSatProcessor::WebSocketPacket::ParseFwUpdateResult(std::string_view packet)
 {
-	CommandFwUpdateResultPacket ret;
+	FirmwareUpdateResultPacket ret;
+	rapidjson::Document d;
+	rapidjson::ParseResult r = d.Parse(packet.data());
+	if (!r) { throw std::exception("Invalid json packet"); }
+
+	if (d.HasMember("cmdId") && d["cmdId"].IsInt()) {
+		ret.CommandId = d["cmdId"].GetInt();
+	}
+	else {
+		throw std::exception("Invalid cmdId");
+	}
+
 	return ret;
 }
 
 RoSatProcessor::CommandRadioResultPacket RoSatProcessor::WebSocketPacket::ParseRadioResult(std::string_view packet)
 {
-	CommandRadioResultPacket ret;
-	return ret;
+	CommandRadioResultPacket p;
+	rapidjson::Document d;
+	rapidjson::ParseResult r = d.Parse(packet.data());
+	if (!r) { throw std::exception("Invalid json packet"); }
+
+	if (d.HasMember("aesIV") && d["aesIV"].IsString()) {
+		auto vec = base64_decode_vector(d["aesIV"].GetString());
+		if (vec.size() != 16) throw std::exception("Invalid aesIV size");
+		std::copy(vec.begin(), vec.begin() + 16, p.AES.IV.begin());
+	}
+	if (d.HasMember("aesKey") && d["aesKey"].IsString()) {
+		auto vec = base64_decode_vector(d["aesKey"].GetString());
+		if (vec.size() != 32) throw std::exception("Invalid aesKey size");
+		std::copy(vec.begin(), vec.begin() + 16, p.AES.Key.begin());
+	}
+	if (d.HasMember("uplinkFrequency") && d["uplinkFrequency"].IsInt()) {
+		p.UplinkFrequency = d["uplinkFrequency"].GetInt();
+	}
+	if (d.HasMember("downlinkFrequency") && d["downlinkFrequency"].IsInt()) {
+		p.DownlinkFrequency = d["downlinkFrequency"].GetInt();
+	}
+	if (d.HasMember("encrypted") && d["encrypted"].IsBool()) {
+		p.Encrypted = d["encrypted"].GetBool();
+	}
+	if (d.HasMember("rfConfig") && d["rfConfig"].IsInt()) {
+		p.RFConfig = d["rfConfig"].GetInt();
+	}
+
+	return p;
 }
+
 
 RoSatProcessor::CommandRotatorResultPacket RoSatProcessor::WebSocketPacket::ParseRotatorResult(std::string_view packet)
 {
@@ -600,17 +702,13 @@ RoSatProcessor::CommandStatePacket RoSatProcessor::WebSocketPacket::ParseStateRe
 	}
 
 	if (d.HasMember("data")) {
-		if (d["data"].IsArray()) {
-			for (const auto& i : d["data"].GetArray()) {
-				if (i.IsInt()) {
-					p.Data.push_back(i.GetInt());
-				}
-				else {
-					throw std::exception("Invalid payload element");
-				}
-			}
+		if (d["data"].IsString()) {
+			auto str = d["data"].GetString();
+			p.Data = base64_decode_vector(str);
 		}
-		else {
+		else if (d["data"].IsNull()) {
+
+		} else {
 			throw std::exception("Invalid payload");
 		}
 	}

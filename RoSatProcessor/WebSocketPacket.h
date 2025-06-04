@@ -4,16 +4,16 @@
 
 namespace RoSatProcessor {
 	struct CommandCpPacket;
-	struct CommandFwUpdatePacket;
 	struct CommandRadioPacket;
 	struct CommandAesPacket;
 	struct CommandRotatorPacket;
 	struct CommandBeaconPacket;
 	struct CommandStatePacket;
 	struct CommandCpResultPacket;
-	struct CommandFwUpdateResultPacket;
 	struct CommandRadioResultPacket;
 	struct CommandRotatorResultPacket;
+	struct FirmwareUpdatePacket;
+	struct FirmwareUpdateResultPacket;
 	class DataFrame;
 
 	enum class WebSocketPriority {
@@ -47,9 +47,9 @@ namespace RoSatProcessor {
 
 		static WebSocketPacket CreateCPCommand(const CommandCpPacket& packet);
 		static WebSocketPacket CreateCPCommandOneWay(const CommandCpPacket& packet);
-		static WebSocketPacket CreateFWUpd(const CommandFwUpdatePacket& packet);
-		static WebSocketPacket CreateFWUpdBundle(const CommandFwUpdatePacket& packet);
-		static WebSocketPacket CreateFile(const CommandFwUpdatePacket& packet);
+		static WebSocketPacket CreateFWUpd(const FirmwareUpdatePacket& packet);
+		static WebSocketPacket CreateFWUpdBundle(const FirmwareUpdatePacket& packet);
+		static WebSocketPacket CreateFilePacket(const FirmwareUpdatePacket& packet);
 		static WebSocketPacket CreateInitRadio(const CommandRadioPacket& packet);
 		static WebSocketPacket CreateUpdateRadio(const CommandRadioPacket& packet);
 		static WebSocketPacket CreateUpdateAESKey(const CommandRadioPacket& packet);
@@ -62,7 +62,7 @@ namespace RoSatProcessor {
 		static uint64_t GetRequestId(std::string_view packet);
 
 		static CommandCpResultPacket ParseCpResult(std::string_view packet);
-		static CommandFwUpdateResultPacket ParseFwUpdateResult(std::string_view packet);
+		static FirmwareUpdateResultPacket ParseFwUpdateResult(std::string_view packet);
 		static CommandRadioResultPacket ParseRadioResult(std::string_view packet);
 		static CommandRotatorResultPacket ParseRotatorResult(std::string_view packet);
 		static CommandBeaconPacket ParseBeaconResult(std::string_view packet);

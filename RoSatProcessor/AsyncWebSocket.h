@@ -66,4 +66,6 @@ private:
     std::atomic<bool> connecting_;
 
     std::function<void(const std::string&)> callback_;
+
+    const std::size_t kChunkSize = 8192;
 };

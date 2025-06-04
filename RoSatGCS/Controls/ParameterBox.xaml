@@ -197,6 +197,7 @@
                                                                        Grid.Column="0" VerticalAlignment="Center" Margin="11,0,0,0" HorizontalAlignment="Left"/>
                                                             <TextBlock Text="{Binding InputMethod, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InputMethodStringConverter}}"
                                                                        Grid.Column="1" VerticalAlignment="Center" Margin="14,0,0,0" HorizontalAlignment="Left" FontSize="10" Cursor="Hand" MouseLeftButtonDown="SwapInputMode"/>
+                                                            
                                                         </Grid>
                                                         <ControlTemplate.Triggers>
                                                             <Trigger Property="Validation.HasError" Value="True">
@@ -226,7 +227,7 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="65"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBox Grid.Column="0" MinWidth="110" KeyboardNavigation.TabIndex="0" Focusable="{Binding IsEnabled}">
+                                            <TextBox Grid.Column="0" MinWidth="110" KeyboardNavigation.TabIndex="0" Focusable="True">
                                                 <TextBox.Text>
                                                     <Binding Path="Value" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" ValidatesOnNotifyDataErrors="True"
                                                         NotifyOnSourceUpdated="True"

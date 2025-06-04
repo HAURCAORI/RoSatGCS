@@ -378,4 +378,97 @@
   <data name="sPreview" xml:space="preserve">
     <value>Preview</value>
   </data>
+  <data name="sDisplay" xml:space="preserve">
+    <value>Display</value>
+  </data>
+  <data name="sRadio" xml:space="preserve">
+    <value>Radio</value>
+  </data>
+  <data name="sGeneral" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="sEncryption" xml:space="preserve">
+    <value>Encryption</value>
+  </data>
+  <data name="sEnable" xml:space="preserve">
+    <value>Enable</value>
+  </data>
+  <data name="sCommit" xml:space="preserve">
+    <value>Commit</value>
+  </data>
+  <data name="sCancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="sOk" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="sPush" xml:space="preserve">
+    <value>Push</value>
+  </data>
+  <data name="sPull" xml:space="preserve">
+    <value>Pull</value>
+  </data>
+  <data name="sRoSatProcessor" xml:space="preserve">
+    <value>RoSatProcessor</value>
+  </data>
+  <data name="sAdvanced" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
+  <data name="sDebug" xml:space="preserve">
+    <value>Debug</value>
+  </data>
+  <data name="sFileShare" xml:space="preserve">
+    <value>File Share</value>
+  </data>
+  <data name="sModuleMac" xml:space="preserve">
+    <value>Module Mac</value>
+  </data>
+  <data name="sSatID" xml:space="preserve">
+    <value>Satellite ID</value>
+  </data>
+  <data name="sConfiguration" xml:space="preserve">
+    <value>Configuration</value>
+  </data>
+  <data name="sBoardRevision" xml:space="preserve">
+    <value>Board Revision</value>
+  </data>
+  <data name="sCPUType" xml:space="preserve">
+    <value>CPU Type</value>
+  </data>
+  <data name="sFlags" xml:space="preserve">
+    <value>Flags</value>
+  </data>
+  <data name="sFwType" xml:space="preserve">
+    <value>FW Type</value>
+  </data>
+  <data name="sFwVersionMajor" xml:space="preserve">
+    <value>FW Version Major</value>
+  </data>
+  <data name="sFwVersionMinor" xml:space="preserve">
+    <value>FW Version Minor</value>
+  </data>
+  <data name="sGeneralConfig" xml:space="preserve">
+    <value>General Configuration</value>
+  </data>
+  <data name="sFWConfig" xml:space="preserve">
+    <value>Firmware Configuration</value>
+  </data>
+  <data name="sModuleType" xml:space="preserve">
+    <value>ModuleType</value>
+  </data>
+  <data name="sModuleConfig" xml:space="preserve">
+    <value>ModuleConfig</value>
+  </data>
+  <data name="sSubModule" xml:space="preserve">
+    <value>Sub Module</value>
+  </data>
+  <data name="zNullArgument" xml:space="preserve">
+    <value>Null Argument</value>
+  </data>
+  <data name="sOrbitalElements" xml:space="preserve">
+    <value>Orbital Elements</value>
+  </data>
+  <data name="sSatelliteInfo" xml:space="preserve">
+    <value>Satellite Information</value>
+  </data>
 </root>
