@@ -1,0 +1,15 @@
+※ Documentation은 Visual Studio Code로 열어보는 것을 권장합니다.
+
+다음 Extension을 설치해서 문서 작업해주세요.
+1. Markdown All in One
+2. Markdown PDF
+3. PlantUML
+4. Draw.io Integration
+
+Markdown의 경우 '.md' 확장자를 가지는 파일로 문서 작업을 하는데 사용됩니다. 원하는 파일을 열고 Ctrl+K V를 입력하면 미리보기를 볼 수 있습니다. 그리고 F1키를 누르면 명령어를 입력할 수 있는 창이 나오는데, >markdown PDF:Export(pdf)을 입력하면 pdf 파일로 출력할 수 있습니다.
+
+PlantUML의 경우 UML을 만드는 도구로, Alt+D를 눌러서 미리보기가 가능합니다.
+
+Draw.io Integration은 UI를 이용하여 다이어그램을 만들 수 있습니다.
+
+문서를 작성한 후 Github에 커밋내용을 반영해주세요.

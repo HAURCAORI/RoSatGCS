@@ -1,0 +1,326 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseWindowsForms>False</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Dependency\abseil_dll.dll" />
+    <None Remove="Dependency\gnuradio-pmt.dll" />
+    <None Remove="Dependency\gtest.pdb" />
+    <None Remove="Dependency\gtest_main.pdb" />
+    <None Remove="Dependency\libcrypto-3-x64.dll" />
+    <None Remove="Dependency\libcurl.dll" />
+    <None Remove="Dependency\librdkafka.dll" />
+    <None Remove="Dependency\librdkafkacpp.dll" />
+    <None Remove="Dependency\libssl-3-x64.dll" />
+    <None Remove="Dependency\libzmq-mt-4_3_5.dll" />
+    <None Remove="Dependency\msvcp140.dll" />
+    <None Remove="Dependency\re2.dll" />
+    <None Remove="Dependency\RoSatParser.dll" />
+    <None Remove="Dependency\RoSatParser.exp" />
+    <None Remove="Dependency\RoSatParser.lib" />
+    <None Remove="Dependency\RoSatParser.pdb" />
+    <None Remove="Dependency\RoSatProcessor.exe" />
+    <None Remove="Dependency\RoSatProcessor.pdb" />
+    <None Remove="Dependency\RoSatProcessorTest.exe" />
+    <None Remove="Dependency\RoSatProcessorTest.ilk" />
+    <None Remove="Dependency\RoSatProcessorTest.pdb" />
+    <None Remove="Dependency\vcruntime140.dll" />
+    <None Remove="Dependency\volk.dll" />
+    <None Remove="Dependency\zlib1.dll" />
+    <None Remove="Dependency\zstd.dll" />
+    <None Remove="Images\Docker\DockAnchorableBottom.png" />
+    <None Remove="Images\Docker\DockAnchorableLeft.png" />
+    <None Remove="Images\Docker\DockAnchorableRight.png" />
+    <None Remove="Images\Docker\DockAnchorableTop.png" />
+    <None Remove="Images\Docker\DockDocumentAsAnchorableBottom.png" />
+    <None Remove="Images\Docker\DockDocumentAsAnchorableLeft.png" />
+    <None Remove="Images\Docker\DockDocumentAsAnchorableRight.png" />
+    <None Remove="Images\Docker\DockDocumentAsAnchorableTop.png" />
+    <None Remove="Images\Docker\DockDocumentBottom.png" />
+    <None Remove="Images\Docker\DockDocumentInside.png" />
+    <None Remove="Images\Docker\DockDocumentLeft.png" />
+    <None Remove="Images\Docker\DockDocumentRight.png" />
+    <None Remove="Images\Docker\DockDocumentTop.png" />
+    <None Remove="Images\Docker\DockPaneEmpty.png" />
+    <None Remove="Images\Docker\DockPaneLargeEmpty.png" />
+    <None Remove="Images\Docker\HTabGroup.png" />
+    <None Remove="Images\Docker\Locked.png" />
+    <None Remove="Images\Docker\PinAutoHide.png" />
+    <None Remove="Images\Docker\PinAutoHide_Black.png" />
+    <None Remove="Images\Docker\PinAutoHide_Dark.png" />
+    <None Remove="Images\Docker\PinClose.png" />
+    <None Remove="Images\Docker\PinClose_Black.png" />
+    <None Remove="Images\Docker\PinClose_Dark.png" />
+    <None Remove="Images\Docker\PinDocMenu.png" />
+    <None Remove="Images\Docker\PinDocMenu_Black.png" />
+    <None Remove="Images\Docker\PinDocMenu_Dark.png" />
+    <None Remove="Images\Docker\PinMaximize.png" />
+    <None Remove="Images\Docker\PinMaximize_Black.png" />
+    <None Remove="Images\Docker\PinMaximize_Dark.png" />
+    <None Remove="Images\Docker\PinMenu.png" />
+    <None Remove="Images\Docker\PinMenu_Black.png" />
+    <None Remove="Images\Docker\PinMenu_Dark.png" />
+    <None Remove="Images\Docker\PinRestore.png" />
+    <None Remove="Images\Docker\PinRestore_Black.png" />
+    <None Remove="Images\Docker\PinRestore_Dark.png" />
+    <None Remove="Images\Docker\VTabGroup.png" />
+    <None Remove="Images\icon_setting.png" />
+    <None Remove="Images\map.png" />
+    <None Remove="Fonts\KoPubWorld Dotum Bold.ttf" />
+    <None Remove="Fonts\KoPubWorld Dotum Light.ttf" />
+    <None Remove="Fonts\KoPubWorld Dotum Medium.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Fonts\KoPubWorld Dotum Bold.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Fonts\KoPubWorld Dotum Light.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Fonts\KoPubWorld Dotum Medium.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockAnchorableBottom.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockAnchorableLeft.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockAnchorableRight.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockAnchorableTop.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentAsAnchorableBottom.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentAsAnchorableLeft.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentAsAnchorableRight.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentAsAnchorableTop.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentBottom.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentInside.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentLeft.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentRight.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockDocumentTop.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockPaneEmpty.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\DockPaneLargeEmpty.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\HTabGroup.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\Locked.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinAutoHide.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinAutoHide_Black.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinAutoHide_Dark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinClose.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinClose_Black.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinClose_Dark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinDocMenu.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinDocMenu_Black.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinDocMenu_Dark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinMaximize.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinMaximize_Black.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinMaximize_Dark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinMenu.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinMenu_Black.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinMenu_Dark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinRestore.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinRestore_Black.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\PinRestore_Dark.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Docker\VTabGroup.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\icon_setting.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Content Include="Images\map.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Dependency\abseil_dll.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\gnuradio-pmt.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\gtest.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\gtest_main.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\libcrypto-3-x64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\libcurl.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\librdkafka.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\librdkafkacpp.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\libssl-3-x64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\libzmq-mt-4_3_5.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\msvcp140.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\re2.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatParser.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatParser.exp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatParser.lib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatParser.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatProcessor.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatProcessor.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatProcessorTest.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatProcessorTest.ilk">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\RoSatProcessorTest.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\vcruntime140.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\volk.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\zlib1.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dependency\zstd.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AdonisUI" Version="1.17.1" />
+    <PackageReference Include="AdonisUI.ClassicTheme" Version="1.17.1" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="Dirkster.AvalonDock" Version="4.72.1" />
+    <PackageReference Include="Dirkster.AvalonDock.Themes.VS2013" Version="4.72.1" />
+    <PackageReference Include="GMap.NET.Core" Version="2.1.7" />
+    <PackageReference Include="GMap.NET.WinPresentation" Version="2.1.7" />
+    <PackageReference Include="MessagePack" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.122" />
+    <PackageReference Include="NetMQ" Version="4.0.1.13" />
+    <PackageReference Include="NLog" Version="5.3.4" />
+    <PackageReference Include="System.ServiceProcess.ServiceController" Version="9.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\Resource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Resource.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

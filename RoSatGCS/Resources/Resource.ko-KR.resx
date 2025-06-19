@@ -1,0 +1,474 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="MenuFile" xml:space="preserve">
+    <value>파일(_F)</value>
+  </data>
+  <data name="MenuHelp" xml:space="preserve">
+    <value>도움말(_H)</value>
+  </data>
+  <data name="MenuTool" xml:space="preserve">
+    <value>도구(_T)</value>
+  </data>
+  <data name="MenuView" xml:space="preserve">
+    <value>보기(_V)</value>
+  </data>
+  <data name="MenuWindow" xml:space="preserve">
+    <value>창(_W)</value>
+  </data>
+  <data name="sApply" xml:space="preserve">
+    <value>적용</value>
+  </data>
+  <data name="sArchive" xml:space="preserve">
+    <value>아카이브</value>
+  </data>
+  <data name="sCommand" xml:space="preserve">
+    <value>커맨드</value>
+  </data>
+  <data name="sConnect" xml:space="preserve">
+    <value>연결</value>
+  </data>
+  <data name="sDashboard" xml:space="preserve">
+    <value>대시보드</value>
+  </data>
+  <data name="sDatabase" xml:space="preserve">
+    <value>데이터베이스</value>
+  </data>
+  <data name="sDownlink" xml:space="preserve">
+    <value>다운링크</value>
+  </data>
+  <data name="sGroundTrack" xml:space="preserve">
+    <value>지상 궤도</value>
+  </data>
+  <data name="sProcessor" xml:space="preserve">
+    <value>프로세서</value>
+  </data>
+  <data name="sRefresh" xml:space="preserve">
+    <value>새로고침</value>
+  </data>
+  <data name="sScheduler" xml:space="preserve">
+    <value>스케줄러</value>
+  </data>
+  <data name="sSerial" xml:space="preserve">
+    <value>시리얼</value>
+  </data>
+  <data name="sSetting" xml:space="preserve">
+    <value>설정</value>
+  </data>
+  <data name="sUplink" xml:space="preserve">
+    <value>업링크</value>
+  </data>
+  <data name="TopBarPreset" xml:space="preserve">
+    <value>위성 프리셋</value>
+  </data>
+  <data name="TopBarSchedule" xml:space="preserve">
+    <value>스케줄</value>
+  </data>
+  <data name="TopBarSerialPort" xml:space="preserve">
+    <value>시리얼 포트</value>
+  </data>
+  <data name="TopBarStatus" xml:space="preserve">
+    <value>상태</value>
+  </data>
+  <data name="TopBarTime" xml:space="preserve">
+    <value>현재 시간</value>
+  </data>
+  <data name="Korean" xml:space="preserve">
+    <value>한국어</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>영어</value>
+  </data>
+  <data name="zFileNotFound" xml:space="preserve">
+    <value>파일 찾기 오류</value>
+  </data>
+  <data name="zNoSuchFile" xml:space="preserve">
+    <value>파일을 찾을 수 없습니다.</value>
+  </data>
+  <data name="zExtensionJson" xml:space="preserve">
+    <value>확장자는 json이어야 합니다.</value>
+  </data>
+  <data name="zExtensionMismatch" xml:space="preserve">
+    <value>확장자 불일치</value>
+  </data>
+  <data name="zSameFileExists" xml:space="preserve">
+    <value>동일한 파일</value>
+  </data>
+  <data name="sWarning" xml:space="preserve">
+    <value>경고</value>
+  </data>
+  <data name="zReplaceIt" xml:space="preserve">
+    <value>파일을 변경하시겠습니까?</value>
+  </data>
+  <data name="zFailToLoad" xml:space="preserve">
+    <value>읽기 오류</value>
+  </data>
+  <data name="sRemove" xml:space="preserve">
+    <value>제거</value>
+  </data>
+  <data name="zAreYouSure" xml:space="preserve">
+    <value>확실합니까?</value>
+  </data>
+  <data name="sClear" xml:space="preserve">
+    <value>초기화</value>
+  </data>
+  <data name="sSearch" xml:space="preserve">
+    <value>검색</value>
+  </data>
+  <data name="sCommandFile" xml:space="preserve">
+    <value>명령 파일</value>
+  </data>
+  <data name="sTypeDictionary" xml:space="preserve">
+    <value>타입 사전</value>
+  </data>
+  <data name="sFunctions" xml:space="preserve">
+    <value>함수</value>
+  </data>
+  <data name="sCommandSet" xml:space="preserve">
+    <value>커맨드 집합</value>
+  </data>
+  <data name="sName" xml:space="preserve">
+    <value>이름</value>
+  </data>
+  <data name="sDescription" xml:space="preserve">
+    <value>설명</value>
+  </data>
+  <data name="sParameters" xml:space="preserve">
+    <value>값</value>
+  </data>
+  <data name="zParseError" xml:space="preserve">
+    <value>파싱 오류</value>
+  </data>
+  <data name="zStructEnumParseError" xml:space="preserve">
+    <value>구조체 Enum 파싱 오류</value>
+  </data>
+  <data name="zTypeNotFound" xml:space="preserve">
+    <value>비정의 타입 오류</value>
+  </data>
+  <data name="sError" xml:space="preserve">
+    <value>오류</value>
+  </data>
+  <data name="sFile" xml:space="preserve">
+    <value>파일</value>
+  </data>
+  <data name="sSize" xml:space="preserve">
+    <value>사이즈</value>
+  </data>
+  <data name="sType" xml:space="preserve">
+    <value>타입</value>
+  </data>
+  <data name="sShow" xml:space="preserve">
+    <value>보기</value>
+  </data>
+  <data name="sHide" xml:space="preserve">
+    <value>숨기기</value>
+  </data>
+  <data name="sCheckAll" xml:space="preserve">
+    <value>모두 선택</value>
+  </data>
+  <data name="sUncheckAll" xml:space="preserve">
+    <value>모두 선택 해제</value>
+  </data>
+  <data name="sAdd" xml:space="preserve">
+    <value>추가</value>
+  </data>
+  <data name="sClose" xml:space="preserve">
+    <value>닫기</value>
+  </data>
+  <data name="sExecute" xml:space="preserve">
+    <value>실행</value>
+  </data>
+  <data name="sSave" xml:space="preserve">
+    <value>저장</value>
+  </data>
+  <data name="sResults" xml:space="preserve">
+    <value>결과</value>
+  </data>
+  <data name="sRun" xml:space="preserve">
+    <value>실행</value>
+  </data>
+  <data name="sRunAll" xml:space="preserve">
+    <value>모두 실행</value>
+  </data>
+  <data name="sEdit" xml:space="preserve">
+    <value>편집</value>
+  </data>
+  <data name="sRename" xml:space="preserve">
+    <value>이름 변경</value>
+  </data>
+  <data name="zSameCommandExists" xml:space="preserve">
+    <value>동일한 명령</value>
+  </data>
+  <data name="sDelete" xml:space="preserve">
+    <value>지우기</value>
+  </data>
+  <data name="sProperties" xml:space="preserve">
+    <value>속성</value>
+  </data>
+  <data name="sExecuteAll" xml:space="preserve">
+    <value>모두 실행</value>
+  </data>
+  <data name="sExecuteOnce" xml:space="preserve">
+    <value>한 번 실행</value>
+  </data>
+  <data name="zCommandAlreadyExists" xml:space="preserve">
+    <value>명령이 이미 존재합니다.</value>
+  </data>
+  <data name="sSelect" xml:space="preserve">
+    <value>선택</value>
+  </data>
+  <data name="sDeselect" xml:space="preserve">
+    <value>선택 해제</value>
+  </data>
+  <data name="sGroup" xml:space="preserve">
+    <value>그룹</value>
+  </data>
+  <data name="sDeleteAll" xml:space="preserve">
+    <value>모두 삭제</value>
+  </data>
+  <data name="zSerializeError" xml:space="preserve">
+    <value>직렬화 오류</value>
+  </data>
+  <data name="sInvalid" xml:space="preserve">
+    <value>값 오류</value>
+  </data>
+  <data name="zParametersInvalid" xml:space="preserve">
+    <value>잘못된 파라미터가 존재합니다.</value>
+  </data>
+  <data name="zExecuteAnyway" xml:space="preserve">
+    <value>제외하고 실행하겠습니까?</value>
+  </data>
+  <data name="zInvalidSize" xml:space="preserve">
+    <value>잘못된 사이즈입니다.</value>
+  </data>
+  <data name="zSaveAnyway" xml:space="preserve">
+    <value>무시하고 저장하시겠습니까?</value>
+  </data>
+  <data name="sStart" xml:space="preserve">
+    <value>시작</value>
+  </data>
+  <data name="sStop" xml:space="preserve">
+    <value>정지</value>
+  </data>
+  <data name="sRestart" xml:space="preserve">
+    <value>재시작</value>
+  </data>
+  <data name="zFailToExecute" xml:space="preserve">
+    <value>실행 실패</value>
+  </data>
+  <data name="zExecutionTimeout" xml:space="preserve">
+    <value>실행 시간 초과</value>
+  </data>
+  <data name="sPreview" xml:space="preserve">
+    <value>미리보기</value>
+  </data>
+  <data name="sDisplay" xml:space="preserve">
+    <value>보기</value>
+  </data>
+  <data name="sRadio" xml:space="preserve">
+    <value>라디오</value>
+  </data>
+  <data name="sGeneral" xml:space="preserve">
+    <value>일반</value>
+  </data>
+  <data name="sEncryption" xml:space="preserve">
+    <value>암호</value>
+  </data>
+  <data name="sEnable" xml:space="preserve">
+    <value>사용</value>
+  </data>
+  <data name="sCommit" xml:space="preserve">
+    <value>제출</value>
+  </data>
+  <data name="sCancel" xml:space="preserve">
+    <value>취소</value>
+  </data>
+  <data name="sOk" xml:space="preserve">
+    <value>확인</value>
+  </data>
+  <data name="sPush" xml:space="preserve">
+    <value>푸시</value>
+  </data>
+  <data name="sPull" xml:space="preserve">
+    <value>풀</value>
+  </data>
+  <data name="sRoSatProcessor" xml:space="preserve">
+    <value>RoSatProcessor</value>
+  </data>
+  <data name="sAdvanced" xml:space="preserve">
+    <value>고급</value>
+  </data>
+  <data name="sDebug" xml:space="preserve">
+    <value>디버그</value>
+  </data>
+  <data name="sFileShare" xml:space="preserve">
+    <value>파일 공유</value>
+  </data>
+  <data name="sModuleMac" xml:space="preserve">
+    <value>모듈 주소</value>
+  </data>
+  <data name="sSatID" xml:space="preserve">
+    <value>위성 ID</value>
+  </data>
+  <data name="sConfiguration" xml:space="preserve">
+    <value>설정</value>
+  </data>
+  <data name="sBoardRevision" xml:space="preserve">
+    <value>개정</value>
+  </data>
+  <data name="sCPUType" xml:space="preserve">
+    <value>CPU 종류</value>
+  </data>
+  <data name="sFlags" xml:space="preserve">
+    <value>플래그</value>
+  </data>
+  <data name="sFwType" xml:space="preserve">
+    <value>펌웨어 종류</value>
+  </data>
+  <data name="sFwVersionMajor" xml:space="preserve">
+    <value>펌웨어 버전 Major</value>
+  </data>
+  <data name="sFwVersionMinor" xml:space="preserve">
+    <value>펌웨어 버전 Minor</value>
+  </data>
+  <data name="sGeneralConfig" xml:space="preserve">
+    <value>일반 설정</value>
+  </data>
+  <data name="sFWConfig" xml:space="preserve">
+    <value>펌웨어 설정</value>
+  </data>
+  <data name="sModuleType" xml:space="preserve">
+    <value>모듈 타입</value>
+  </data>
+  <data name="sModuleConfig" xml:space="preserve">
+    <value>모듈 구성</value>
+  </data>
+  <data name="sSubModule" xml:space="preserve">
+    <value>하위 모듈</value>
+  </data>
+  <data name="zNullArgument" xml:space="preserve">
+    <value>입력값 없음</value>
+  </data>
+  <data name="sOrbitalElements" xml:space="preserve">
+    <value>궤도 요소</value>
+  </data>
+  <data name="sSatelliteInfo" xml:space="preserve">
+    <value>위성 정보</value>
+  </data>
+</root>

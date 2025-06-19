@@ -1,0 +1,13 @@
+[공통]
+- Requirements 작성
+
+[RoSatGCS]
+- 예외 처리 구현
+- Satellite 클래스 정의
+- 위성 궤적 계산
+
+[RoSatParser]
+- EPS 모듈 테스트
+
+[RoSatProcessor]
+- 백그라운드 실행 구현

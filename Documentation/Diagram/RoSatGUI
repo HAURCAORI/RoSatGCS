@@ -1,0 +1,110 @@
+@startuml
+
+class SatelliteMethodModel {
+    - int _id
+    - bool _isSelected
+    - bool _visibility
+    - string _name
+    - string _file
+    - string _description
+    - List<ParameterModel> _methodIn
+    - List<ParameterModel> _methodOut
+    - Dictionary<string, SatelliteFunctionTypeModel> _associatedType
+    + SatelliteCommandModel GetCommandModel()
+}
+
+class SatelliteCommandModel {
+    - List<List<object>> _inputParameters
+    - int _groupIndex
+    - string _groupName
+    + Clone()
+}
+
+class SatelliteCommandGroupModel {
+    - string _name
+    - ObservableCollection<SatelliteCommandModel> _commands
+    + Add(SatelliteCommandModel command)
+}
+
+class ParameterModel {
+    - string _name
+    - int _id
+    - int _byteSize
+    - SatelliteFunctionFileModel.DataType _dataType
+    + object Clone()
+}
+
+class ParameterBoxValueModel {
+    - string _value
+    - List<ParameterModel> _enumerationValues
+    + ValidateValue()
+    + SwapRefresh(InputMethod prev, InputMethod current)
+}
+
+class SatelliteFunctionFileModel {
+    - string _fileName
+    - string _filePath
+    - FunctionFileStructure? _structure
+    + Initialize(string path)
+}
+
+class SatelliteFunctionTypeModel {
+    - string _name
+    - ArgumentType _type
+    - List<ParameterModel> _parameters
+    + object Clone()
+}
+
+class PageCommandViewModel {
+    - ObservableCollection<SatelliteFunctionFileModel> _satFuncFile
+    - ObservableCollection<SatelliteMethodModel> _satMethod
+    - ObservableCollection<SatelliteCommandGroupModel> _satCommandGroup
+    + AddCommand(SatelliteCommandModel command)
+    + OpenFunctionPropertyPane(SatelliteMethodModel model)
+}
+
+class PaneFunctionPropertyViewModel {
+    - SatelliteCommandModel _command
+    - ObservableCollection<ParameterModel> _inputParameters
+    - ObservableCollection<ParameterModel> _outputParameters
+    + OnSave()
+    + OnExecute()
+}
+
+class PaneFunctionListViewModel {
+    - string _searchString
+    - ObservableCollection<SatelliteMethodModel> _selectedItems
+    - SatelliteCommandGroupModel _selectedCommandGroup
+    + ApplyFilter()
+}
+
+class PaneTypeDictionaryViewModel {
+    - string _searchString
+    - SatelliteFunctionTypeModel _selectedItem
+    + ApplyFilter()
+}
+
+PageCommandViewModel "1" *-- "*" SatelliteFunctionFileModel
+PageCommandViewModel "1" *-- "*" SatelliteMethodModel
+PageCommandViewModel "1" *-- "*" SatelliteCommandGroupModel
+
+SatelliteMethodModel "1" <|-- "1" SatelliteCommandModel
+SatelliteCommandGroupModel "1" *-- "*" SatelliteCommandModel
+SatelliteMethodModel "1" *-- "*" ParameterModel
+SatelliteFunctionFileModel "1" *-- "*" ParameterModel
+SatelliteFunctionFileModel "1" *-- "*" SatelliteFunctionTypeModel
+SatelliteFunctionTypeModel "1" *-- "*" ParameterModel
+ParameterBoxValueModel "1" *-- "1" ParameterModel
+
+PageCommandViewModel "1" *-- "1" PaneFunctionPropertyViewModel
+PageCommandViewModel "1" *-- "1" PaneFunctionListViewModel
+PageCommandViewModel "1" *-- "1" PaneTypeDictionaryViewModel
+
+PaneFunctionPropertyViewModel "1" *-- "1" SatelliteCommandModel
+PaneFunctionPropertyViewModel "1" *-- "*" ParameterModel
+
+PaneFunctionListViewModel "1" *-- "*" SatelliteMethodModel
+
+PaneTypeDictionaryViewModel "1" *-- "1" SatelliteFunctionTypeModel
+
+@enduml

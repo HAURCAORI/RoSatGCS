@@ -1,0 +1,13 @@
+static size_t getMaxFallbackSize() {
+    char* envValue = nullptr;
+    size_t len = 0;
+    
+    // Securely get environment variable
+    if (_dupenv_s(&envValue, &len, "UWS_HTTP_MAX_HEADERS_SIZE") == 0 && envValue != nullptr) {
+        size_t value = static_cast<size_t>(atoi(envValue));
+        free(envValue);  // Free memory allocated by _dupenv_s
+        return value;
+    }
+    
+    return 4096;  // Default value if the environment variable is not set
+}

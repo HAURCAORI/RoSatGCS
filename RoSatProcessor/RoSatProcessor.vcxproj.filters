@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일\Task">
+      <UniqueIdentifier>{de1421e3-2bde-490c-86ce-006e0b74e76a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Task">
+      <UniqueIdentifier>{82ecfb6f-1ce5-4ffb-9153-5a805e43a16d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\CRC">
+      <UniqueIdentifier>{c35c0a78-5059-426b-b28b-8bea78591559}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\CRC">
+      <UniqueIdentifier>{995c99b1-877f-4b31-8a15-9091dc403609}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Packet">
+      <UniqueIdentifier>{029cd612-1457-4b3a-b85e-4242a52b68d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Packet">
+      <UniqueIdentifier>{7f5ef0e2-aa93-491b-8103-bf05dd39ee49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PCH">
+      <UniqueIdentifier>{3ecc23ea-2298-48c1-9bad-5ba8e5be0955}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Configuration">
+      <UniqueIdentifier>{1c68ab9d-5a23-4531-8e1e-e215c701af14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Connection">
+      <UniqueIdentifier>{c0d2a454-54b3-40a5-a237-cf5006dbdc8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Connection">
+      <UniqueIdentifier>{279f45e9-fa65-4270-a036-b4742e356e44}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="RoSatProcessor.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceBase.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceInstaller.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceImpl.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="RoSatTaskManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="RoSatTask.h">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="RoSatTask.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DataFrame.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskTemplate.cpp">
+      <Filter>소스 파일\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskPacketProcess.cpp">
+      <Filter>소스 파일\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskPacketReceiveQueue.cpp">
+      <Filter>소스 파일\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskPrint.cpp">
+      <Filter>소스 파일\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="crc16-ccitt.cpp">
+      <Filter>소스 파일\CRC</Filter>
+    </ClCompile>
+    <ClCompile Include="crc32.cpp">
+      <Filter>소스 파일\CRC</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskPacketTransmitQueue.cpp">
+      <Filter>소스 파일\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="Constants.h">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AsyncSerial.cpp">
+      <Filter>소스 파일\Connection</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskSerial.cpp">
+      <Filter>소스 파일\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>PCH</Filter>
+    </ClCompile>
+    <ClCompile Include="crc16-ccitt-false.cpp">
+      <Filter>소스 파일\CRC</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskQueryRequestHandler.cpp">
+      <Filter>소스 파일\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="WebSocketPacket.cpp">
+      <Filter>소스 파일\Packet</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskWebSocketConnector.cpp">
+      <Filter>소스 파일\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="AsyncWebSocket.cpp">
+      <Filter>소스 파일\Connection</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskQueryResponseSender.cpp">
+      <Filter>소스 파일\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="base64.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="vcpkg.json" />
+    <None Include="ReadMe" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ServiceBase.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceInstaller.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceImpl.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadPool.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="RoSatTaskManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="DataFrame.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskTemplate.h">
+      <Filter>헤더 파일\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskPacketProcess.h">
+      <Filter>헤더 파일\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskPacketReceiveQueue.h">
+      <Filter>헤더 파일\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskPrint.h">
+      <Filter>헤더 파일\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="crc16-ccitt.h">
+      <Filter>헤더 파일\CRC</Filter>
+    </ClInclude>
+    <ClInclude Include="crc32.h">
+      <Filter>헤더 파일\CRC</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskPacketTransmitQueue.h">
+      <Filter>헤더 파일\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="AsyncSerial.h">
+      <Filter>헤더 파일\Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskSerial.h">
+      <Filter>헤더 파일\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>PCH</Filter>
+    </ClInclude>
+    <ClInclude Include="crc16-ccitt-false.h">
+      <Filter>헤더 파일\CRC</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskQueryRequestHandler.h">
+      <Filter>헤더 파일\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryPacket.h">
+      <Filter>헤더 파일\Packet</Filter>
+    </ClInclude>
+    <ClInclude Include="WebSocketPacket.h">
+      <Filter>헤더 파일\Packet</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>헤더 파일\Configuration</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskWebSocketConnector.h">
+      <Filter>헤더 파일\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="AsyncWebSocket.h">
+      <Filter>헤더 파일\Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskQueryResponseSender.h">
+      <Filter>헤더 파일\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="base64.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,48 @@
+GMAT 프로그램 사용
+
+orbit(궤도 설정)
+ Epoch Format
+ -> 시간 포맷 ex) TAIModJ -> Modified Julian Date
+ Epoch
+ -> 초기시간 설정
+ Coordinate system
+ -> 좌표계 설정 ex) EarthMJ2000Eq -> 지구 중심의 2000년 기준 좌표계
+ State Type
+ -> 위성의 상태 설정 ex) cartesian(직교좌표계), keplarian 등등
+ Elements
+  X, Y, Z VX, VY, VZ 
+  -> 좌표값과 속도값 ex) X는 지구 중심에서 위성까지의 좌표값(km), VX는 위성의 X축 방향 속도(km/s)
+
+Attitude
+ Attitude
+ -> 위성 자세 설정 ex) CoordinateSystemFixed -> 우주선 자세가 특정 좌표계에 고정 -> 시간에 따라 방향 변화x
+ Coordinate
+ -> 좌표계 설정 ex) orbit 탭의 coordinate system과 동일
+ Euler Angle
+ -> 오일러각 -> 123, 231, 321 형식으로 나타내고 321은 오일러각이 z축, y축, x축 순으로 회전한다는 의미
+
+Ballistic/Mass
+ Spherical
+  Dry Mass
+  -> 위성 건조 중량 설정
+  Coefficient of Drag
+  -> 공기저항 계수 설정
+  Coefficient of Reflectivity
+  -> 반사율 계수 설정
+  Drag Area
+  -> 저항 면적 설정
+  SRP Area
+  -> 태양 복사 압력 면적 설정
+ SPAD Files(SPAD 파일을 사용할때 관련 설정 정의)
+  SPAD SRP File
+ ->SPAD 파일 지정
+ SPAD SRP Scale Factor
+ -> SRP 데이터에 적용할 스케일링 계수 기본값 1
+ SPAD SRP Interpolation Method
+ -> 보간 방법 선택 ex) Biline(2차원 보간)
+ SPAD Drag File
+ -> 공기 저항 데이터 SPAD 파일 지정
+ SPAD Drag Scale Factor
+ -> 공기 저항 데이터에 적용할 스케일링 계수 기본값 1
+ SPAD Drag Interpolation Method
+->  공기 저항 데이터를 읽을 때 보간 방법 선택 ex) Biline(2차원 보간)

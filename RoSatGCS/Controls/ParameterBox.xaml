@@ -1,0 +1,306 @@
+﻿<UserControl x:Class="RoSatGCS.Controls.ParameterBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RoSatGCS.Controls"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+             xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="24" d:DesignWidth="120">
+    <UserControl.Resources>
+        <local:InputMethodStringConverter x:Key="InputMethodStringConverter"/>
+        <local:InputMethodPrefixConverter x:Key="InputMethodPrefixConverter"/>
+        <local:ValidationConverter x:Key="ValidationConverter"/>
+        <local:BoolToStringConverter x:Key="BoolToStringConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        <Style TargetType="ToolTip">
+            <Style.Triggers>
+                <Trigger Property="Content" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Margin="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="75"/>
+            </Grid.ColumnDefinitions>
+            <WrapPanel>
+                <TextBlock Grid.Column="0" Text="{Binding ParameterName, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="5,0,0,0" FontSize="10" FontWeight="Bold" Cursor=""
+                           TextTrimming="CharacterEllipsis" ToolTip="{Binding ParameterName, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                <Rectangle VerticalAlignment="Center" Margin="5,3,0,0"
+                           Cursor="Help" ToolTipService.InitialShowDelay="0" ToolTipService.Placement="Bottom">
+                    <Rectangle.ToolTip>
+                        <TextBlock Text="{Binding Description}" TextWrapping="Wrap" MaxWidth="400"/>
+                    </Rectangle.ToolTip>
+                    <Rectangle.Style>
+                        <Style TargetType="Rectangle" BasedOn="{StaticResource Icon}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Description, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="">
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Rectangle.Style>
+                    <Rectangle.OpacityMask>
+                        <VisualBrush Stretch="Fill" Visual="{StaticResource IconHelp}"/>
+                    </Rectangle.OpacityMask>
+                </Rectangle>
+            </WrapPanel>
+            
+            <TextBlock Grid.Column="1" Text="Expand" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Bold" FontSize="10"
+                       Visibility="{Binding CanExpand, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"/>
+            <ToggleButton Grid.Column="1" Style="{DynamicResource {x:Static adonisUi:Styles.ToggleSwitch }}" HorizontalAlignment="Right" KeyboardNavigation.IsTabStop="False"
+                          ToolTip="Expand" Visibility="{Binding CanExpand, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"
+                          IsChecked="{Binding ArrayExpand, RelativeSource={RelativeSource AncestorType=UserControl}}" Click="ToggleButton_Click"/>
+        </Grid>
+        <ListBox Grid.Row="1" x:Name="ControlList" ItemsSource="{Binding ValueModels, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" KeyboardNavigation.TabNavigation="Continue">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Focusable" Value="False"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <ContentControl Content="{Binding}" KeyboardNavigation.IsTabStop="False">
+                        <ContentControl.ContentTemplateSelector>
+                            <local:ParameterBoxTemplateSelector>
+                                <local:ParameterBoxTemplateSelector.HeaderTemplate>
+                                    <DataTemplate>
+                                        <WrapPanel Margin="20,0,0,0">
+                                            <TextBlock Text="Struct Size : " FontWeight="Bold" FontSize="10"/>
+                                            <TextBlock Text="{Binding ByteSize}" FontSize="10"/>
+                                            <TextBlock Text=" Bytes" FontSize="10"/>
+                                        </WrapPanel>
+                                    </DataTemplate>
+                                </local:ParameterBoxTemplateSelector.HeaderTemplate>
+                                <local:ParameterBoxTemplateSelector.NoneTemplate>
+                                    <DataTemplate>
+                                        <Border Height="26" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderBrush="Red" BorderThickness="1">
+                                            <TextBlock Margin="5,0,0,0" Text="{Binding Error, RelativeSource={RelativeSource AncestorType=UserControl}}" VerticalAlignment="Center" Foreground="Red"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </local:ParameterBoxTemplateSelector.NoneTemplate>
+                                <local:ParameterBoxTemplateSelector.BooleanTemplate>
+                                    <DataTemplate>
+                                        <Grid Height="26">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="65"/>
+                                            </Grid.ColumnDefinitions>
+                                            <CheckBox Grid.Column="0" Content="Boolean" Margin="20,0,0,0" IsChecked="{Binding Value, Converter={StaticResource BoolToStringConverter}, Mode=TwoWay}"
+                                                      IsHitTestVisible="{Binding IsEnabled}" Focusable="{Binding IsEnabled}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </local:ParameterBoxTemplateSelector.BooleanTemplate>
+                                <local:ParameterBoxTemplateSelector.EnumerationTemplate>
+                                    <DataTemplate>
+                                        <Grid Height="26">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="65"/>  
+                                            </Grid.ColumnDefinitions>
+                                            <ComboBox Grid.Column="0" MinWidth="110" KeyboardNavigation.TabIndex="0" SelectedItem="{Binding SelectedEnumItem}"
+                                                      ItemsSource="{Binding EnumerationValues}" FontSize="10"
+                                                      IsHitTestVisible="{Binding IsEnabled}" Focusable="{Binding IsEnabled}">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Viewbox Stretch="Uniform" HorizontalAlignment="Left" MaxHeight="14">
+                                                            <TextBlock Text="{Binding EnumValue}" TextWrapping="NoWrap"/>
+                                                        </Viewbox>
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
+                                            <TextBlock Text="{Binding TypeString}" Grid.Column="1" VerticalAlignment="Center" Margin="5,0,0,0" HorizontalAlignment="Left"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </local:ParameterBoxTemplateSelector.EnumerationTemplate>
+                                <local:ParameterBoxTemplateSelector.NumberTemplate>
+                                    <DataTemplate>
+                                        <Grid Height="26">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="65"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox Grid.Column="0" MinWidth="110" KeyboardNavigation.TabIndex="0" Focusable="{Binding IsEnabled}">
+                                                <TextBox.Text>
+                                                    <Binding Path="Value" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" ValidatesOnNotifyDataErrors="True"
+                                                             NotifyOnSourceUpdated="True"
+                                                             NotifyOnValidationError="True">
+                                                    </Binding>
+                                                </TextBox.Text>
+
+                                                <b:Interaction.Behaviors>
+                                                    <local:InputTextBoxBehavior ValueModel="{Binding}"/>
+                                                </b:Interaction.Behaviors>
+
+                                                <TextBox.Template>
+                                                    <ControlTemplate TargetType="TextBox">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="40"/>
+                                                            </Grid.ColumnDefinitions>
+
+
+                                                            <Border Grid.Column="0" Grid.ColumnSpan="2" BorderThickness="1" Background="{TemplateBinding Background}" x:Name="ValidationBorder">
+                                                                <ScrollViewer x:Name="PART_ContentHost"/>
+                                                                <Border.Style>
+                                                                    <Style TargetType="Border">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding InputMethod, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="{x:Static local:InputMethod.HEX}">
+                                                                                <Setter Property="Padding" Value="13,0,20,0"/>
+                                                                            </DataTrigger>
+                                                                            <DataTrigger Binding="{Binding InputMethod, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="{x:Static local:InputMethod.BIN}">
+                                                                                <Setter Property="Padding" Value="14,0,20,0"/>
+                                                                            </DataTrigger>
+                                                                            <DataTrigger Binding="{Binding InputMethod, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="{x:Static local:InputMethod.DEC}">
+                                                                                <Setter Property="Padding" Value="0,0,20,0"/>
+                                                                            </DataTrigger>
+                                                                            <DataTrigger Binding="{Binding InputMethod, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="{x:Static local:InputMethod.FLT}">
+                                                                                <Setter Property="Padding" Value="0,0,20,0"/>
+                                                                            </DataTrigger>
+                                                                            <DataTrigger Binding="{Binding InputMethod, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="{x:Static local:InputMethod.STR}">
+                                                                                <Setter Property="Padding" Value="0,0,20,0"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Border.Style>
+                                                            </Border>
+
+                                                            <TextBlock Text="{Binding InputMethod, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InputMethodPrefixConverter}}"
+                                                                       Grid.Column="0" VerticalAlignment="Center" Margin="11,0,0,0" HorizontalAlignment="Left"/>
+                                                            <TextBlock Text="{Binding InputMethod, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InputMethodStringConverter}}"
+                                                                       Grid.Column="1" VerticalAlignment="Center" Margin="14,0,0,0" HorizontalAlignment="Left" FontSize="10" Cursor="Hand" MouseLeftButtonDown="SwapInputMode"/>
+                                                            
+                                                        </Grid>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="Validation.HasError" Value="True">
+                                                                <Setter TargetName="ValidationBorder" Property="BorderBrush" Value="Red"/>
+                                                                <Setter TargetName="ValidationBorder" Property="BorderThickness" Value="1"/>
+                                                                <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors), Converter={StaticResource ValidationConverter}}"/>
+                                                                <Setter Property="ToolTipService.InitialShowDelay" Value="0"/>
+                                                                <Setter Property="ToolTipService.Placement" Value="Bottom"/>
+                                                                <Setter Property="ToolTipService.VerticalOffset" Value="2"/>
+                                                            </Trigger>
+                                                            <Trigger Property="Validation.HasError" Value="False">
+                                                                <Setter TargetName="ValidationBorder" Property="BorderBrush" Value="Gray"/>
+                                                                <Setter Property="ToolTip" Value="{x:Null}"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </TextBox.Template>
+                                            </TextBox>
+                                            <TextBlock Text="{Binding TypeString}" Grid.Column="1" VerticalAlignment="Center" Margin="5,0,0,0" HorizontalAlignment="Left"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </local:ParameterBoxTemplateSelector.NumberTemplate>
+                                <local:ParameterBoxTemplateSelector.ArrayTemplate>
+                                    <DataTemplate>
+                                        <Grid Height="26">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="65"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox Grid.Column="0" MinWidth="110" KeyboardNavigation.TabIndex="0" Focusable="True">
+                                                <TextBox.Text>
+                                                    <Binding Path="Value" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" ValidatesOnNotifyDataErrors="True"
+                                                        NotifyOnSourceUpdated="True"
+                                                        NotifyOnValidationError="True">
+                                                    </Binding>
+                                                </TextBox.Text>
+                                                <b:Interaction.Behaviors>
+                                                    <local:InputTextBoxBehavior ValueModel="{Binding}"/>
+                                                </b:Interaction.Behaviors>
+                                                <TextBox.Template>
+                                                    <ControlTemplate TargetType="TextBox">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="40"/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <!-- Required PART_ContentHost for TextBox to function properly -->
+                                                            <Border Grid.Column="0" Grid.ColumnSpan="2" BorderThickness="1" Background="{TemplateBinding Background}" x:Name="ValidationBorder">
+                                                                <ScrollViewer x:Name="PART_ContentHost"/>
+                                                                <Border.Style>
+                                                                    <Style TargetType="Border">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding InputMethod, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="{x:Static local:InputMethod.HEX}">
+                                                                                <Setter Property="Padding" Value="13,0,20,0"/>
+                                                                            </DataTrigger>
+                                                                            <DataTrigger Binding="{Binding InputMethod, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="{x:Static local:InputMethod.BIN}">
+                                                                                <Setter Property="Padding" Value="14,0,20,0"/>
+                                                                            </DataTrigger>
+                                                                            <DataTrigger Binding="{Binding InputMethod, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="{x:Static local:InputMethod.DEC}">
+                                                                                <Setter Property="Padding" Value="0,0,20,0"/>
+                                                                            </DataTrigger>
+                                                                            <DataTrigger Binding="{Binding InputMethod, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="{x:Static local:InputMethod.FLT}">
+                                                                                <Setter Property="Padding" Value="0,0,20,0"/>
+                                                                            </DataTrigger>
+                                                                            <DataTrigger Binding="{Binding InputMethod, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="{x:Static local:InputMethod.STR}">
+                                                                                <Setter Property="Padding" Value="0,0,20,0"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Border.Style>
+                                                            </Border>
+                                                            <TextBlock Text="{Binding InputMethod, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InputMethodPrefixConverter}}"
+                               Grid.Column="0" VerticalAlignment="Center" Margin="11,0,0,0" HorizontalAlignment="Left"/>
+                                                            <TextBlock Text="{Binding InputMethod, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InputMethodStringConverter}}"
+                               Grid.Column="1" VerticalAlignment="Center" Margin="14,0,0,0" HorizontalAlignment="Left" FontSize="10" Cursor="Hand" MouseLeftButtonDown="SwapInputMode"/>
+                                                        </Grid>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="Validation.HasError" Value="True">
+                                                                <Setter TargetName="ValidationBorder" Property="BorderBrush" Value="Red"/>
+                                                                <Setter TargetName="ValidationBorder" Property="BorderThickness" Value="1"/>
+                                                                <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors), Converter={StaticResource ValidationConverter}}"/>
+                                                                <Setter Property="ToolTipService.InitialShowDelay" Value="0"/>
+                                                                <Setter Property="ToolTipService.Placement" Value="Bottom"/>
+                                                                <Setter Property="ToolTipService.VerticalOffset" Value="2"/>
+                                                            </Trigger>
+                                                            <Trigger Property="Validation.HasError" Value="False">
+                                                                <Setter TargetName="ValidationBorder" Property="BorderBrush" Value="Gray"/>
+                                                                <Setter Property="ToolTip" Value="{x:Null}"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </TextBox.Template>
+                                            </TextBox>
+                                            <TextBlock Text="{Binding TypeString}" Grid.Column="1" VerticalAlignment="Center" Margin="5,0,0,0" HorizontalAlignment="Left"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </local:ParameterBoxTemplateSelector.ArrayTemplate>
+                            </local:ParameterBoxTemplateSelector>
+                        </ContentControl.ContentTemplateSelector>
+                    </ContentControl>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>
