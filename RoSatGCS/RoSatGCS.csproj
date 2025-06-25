@@ -8,6 +8,7 @@
     <UseWPF>true</UseWPF>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseWindowsForms>False</UseWindowsForms>
+    <ApplicationIcon>Images\ground_station.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -203,6 +204,7 @@
     <Resource Include="Images\icon_setting.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Content Include="Images\ground_station.ico" />
     <Content Include="Images\map.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
