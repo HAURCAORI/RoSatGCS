@@ -471,4 +471,10 @@
   <data name="sSatelliteInfo" xml:space="preserve">
     <value>Satellite Information</value>
   </data>
+  <data name="sUnsavedChanges" xml:space="preserve">
+    <value>Unsaved Changes</value>
+  </data>
+  <data name="zCloseAnyway" xml:space="preserve">
+    <value>Do you want to close anyway?</value>
+  </data>
 </root>

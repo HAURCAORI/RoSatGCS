@@ -871,6 +871,15 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Unsaved Changes과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sUnsavedChanges {
+            get {
+                return ResourceManager.GetString("sUnsavedChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Uplink과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sUplink {
@@ -939,6 +948,15 @@ namespace RoSatGCS.Resources {
         public static string zAreYouSure {
             get {
                 return ResourceManager.GetString("zAreYouSure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Do you want to close anyway?과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string zCloseAnyway {
+            get {
+                return ResourceManager.GetString("zCloseAnyway", resourceCulture);
             }
         }
         

@@ -4,6 +4,8 @@ using RoSatGCS.Models;
 using RoSatGCS.Utils.Localization;
 using RoSatGCS.Utils.Satellites;
 using RoSatGCS.Utils.Satellites.Core;
+using RoSatGCS.Utils.Satellites.TLE;
+using RoSatGCS.Utils.Satellites.Observation;
 using RoSatGCS.ViewModels;
 using System.Diagnostics;
 using System.Runtime.InteropServices;

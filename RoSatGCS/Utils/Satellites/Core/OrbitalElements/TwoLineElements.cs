@@ -4,7 +4,6 @@
 // Copyright (c) 2021-2022 Michael F. Henry
 // Version 07/2022
 //
-using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Globalization;
 
@@ -200,7 +199,7 @@ namespace RoSatGCS.Utils.Satellites.Core
         /// <param name="name">The satellite name.</param>
         /// <param name="line1">Line 1 of the orbital elements.</param>
         /// <param name="line2">Line 2 of the orbital elements.</param>
-        public TwoLineElements(string name, string line1, string line2)
+        public TwoLineElements(string name, string line1, string line2, bool ignoreCheckSum = false)
         {
             SatelliteName = name;
 
@@ -213,8 +212,9 @@ namespace RoSatGCS.Utils.Satellites.Core
                 throw new FormatException("Invalid TLE length.");
             }
 
+
             // Check for valid checksum
-            if (!ChecksumValidatation(line1) || !ChecksumValidatation(line2))
+            if (!ignoreCheckSum && (!ChecksumValidatation(line1) || !ChecksumValidatation(line2)))
             {
                 throw new FormatException("Invalid TLE checksum.");
             }
@@ -376,7 +376,7 @@ namespace RoSatGCS.Utils.Satellites.Core
 
             // Format output
             string signChar = value >= 0 ? " " : "-";
-            return $"{signChar}{mantissa:D5}-{exponent-1}";
+            return $"{signChar}{mantissa:D5}-{exponent - 1}";
         }
         #endregion
     }

@@ -1,14 +1,13 @@
-﻿using System;
+﻿using RoSatGCS.Utils.Satellites.Observation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Data;
-
 namespace RoSatGCS.Utils.Satellites.Core
 {
-    public class Topoentric
+    public class Topocentric
     {
         public Angle Azimuth { get; protected set; }
         public Angle Elevation { get; protected set; }
@@ -31,7 +30,7 @@ namespace RoSatGCS.Utils.Satellites.Core
         /// <param name="range">Range relative to the observer, in kilometers</param>
         /// <param name="rangeRate">Range rate relative to the observer, in kilometers/second</param>
         /// <param name="referencePosition">The position from which the satellite was observed to generate this observation</param>
-        public Topoentric(Angle azimuth, Angle elevation, double range, double rangeRate, Julian date, Coordinate? referencePosition = null)
+        public Topocentric(Angle azimuth, Angle elevation, double range, double rangeRate, Julian date, Coordinate? referencePosition = null)
         {
             this.Azimuth = azimuth;
             this.Elevation = elevation;
@@ -41,9 +40,9 @@ namespace RoSatGCS.Utils.Satellites.Core
             this.ReferencePosition = referencePosition;
         }
 
-        public Topoentric() : this(Angle.Zero, Angle.Zero, 0, 0, new Julian()) { }
+        public Topocentric() : this(Angle.Zero, Angle.Zero, 0, 0, new Julian()) { }
 
-        public Topoentric(Topoentric topo)
+        public Topocentric(Topocentric topo)
         {
             Azimuth = topo.Azimuth;
             Elevation = topo.Elevation;
@@ -71,10 +70,10 @@ namespace RoSatGCS.Utils.Satellites.Core
 		/// <returns>The doppler shift of the satellite</returns>
 		public double GetDopplerShift(double inputFrequency)
         {
-            return - RangeRate / Globals.LightSpeed * inputFrequency;
+            return -RangeRate / Globals.LightSpeed * inputFrequency;
         }
 
-        protected bool Equals(Topoentric other)
+        protected bool Equals(Topocentric other)
         {
             return Azimuth.Equals(other.Azimuth) && Elevation.Equals(other.Elevation) && Range.Equals(other.Range) && RangeRate.Equals(other.RangeRate) &&
                    Equals(ReferencePosition, other.ReferencePosition);
@@ -85,7 +84,7 @@ namespace RoSatGCS.Utils.Satellites.Core
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Topoentric)obj);
+            return Equals((Topocentric)obj);
         }
 
         public override int GetHashCode()
@@ -101,14 +100,20 @@ namespace RoSatGCS.Utils.Satellites.Core
             }
         }
 
-        public static bool operator ==(Topoentric left, Topoentric right)
+        public static bool operator ==(Topocentric left, Topocentric right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(Topoentric left, Topoentric right)
+        public static bool operator !=(Topocentric left, Topocentric right)
         {
             return !Equals(left, right);
+        }
+
+        public override string ToString()
+        {
+            return
+                $"TopocentricObservation[Azimuth={Azimuth}, Elevation={Elevation}, Range={Range}km, RangeRate={RangeRate}km/s]";
         }
     }
 }

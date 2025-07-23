@@ -1,5 +1,10 @@
-﻿using System;
+﻿using GCSControls;
+using RoSatGCS.Utils.Satellites.Core;
+using RoSatGCS.Utils.Satellites.Observation;
+using RoSatGCS.Utils.Satellites.TLE;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +13,47 @@ namespace RoSatGCS.ViewModels
 {
     public class PageSchedulerViewModel : ViewModelPageBase
     {
-        
+        private ObservableCollection<TimeSlotItem> _slots = new ObservableCollection<TimeSlotItem>();
+
+        public ObservableCollection<TimeSlotItem> TimeSlotList
+        {
+            get => _slots;
+        }
+
+        public PageSchedulerViewModel()
+        {
+
+            var tle1 = "ISS (ZARYA)";
+            var tle2 = "1 25544U 98067A   19034.73310439  .00001974  00000-0  38215-4 0  9991";
+            var tle3 = "2 25544  51.6436 304.9146 0005074 348.4622  36.8575 15.53228055154526";
+            var tle = new TLE(tle1, tle2, tle3);
+
+            var sat = new Satellite(tle);
+
+            var location = new GeoCoordinate(Angle.FromDegrees(40.689236), Angle.FromDegrees(-74.044563), 0);
+            var ground = new GroundStation(location);
+
+            var start = new Julian(DateTime.Now);
+            var end = new Julian(DateTime.Now.AddDays(2));
+            var delta = new TimeSpan(0, 1, 0);
+            var observations = ground.Observe(sat, start, end, delta, resolution: 4);
+
+            for (var i = 0; i < observations.Count; i++)
+            {
+                var observation = observations[i];
+                TimeSlotPriority priority;
+                if (observation.MaxElevation < 20)
+                {
+                    priority = TimeSlotPriority.Low;
+                }
+                else if (observation.MaxElevation < 40) {
+                    priority = TimeSlotPriority.Mid;
+                }
+                else {
+                    priority = TimeSlotPriority.High;
+                }
+                _slots.Add(new TimeSlotItem("ISS[" + i.ToString() + "]", observation.Start.ToTime(), observation.End.ToTime(), priority));
+            }
+        }
     }
 }

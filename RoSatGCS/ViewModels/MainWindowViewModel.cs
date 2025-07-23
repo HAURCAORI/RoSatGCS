@@ -64,7 +64,8 @@ namespace RoSatGCS.ViewModels
             //pageDashboard = new PageDashboard();
             pageCommand = new PageCommand();
             pageFileShare = new PageFileShare();
-            NavigationSource = pageCommand;
+            pageScheduler = new PageScheduler();
+            NavigationSource = pageScheduler;
             NavigateCommand = new RelayCommand<string>(OnNavigate);
             WeakReferenceMessenger.Default.Register<NavigationMessage>(this, OnNavigationMessage);
 

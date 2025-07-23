@@ -41,7 +41,7 @@ namespace RoSatGCS.Utils.Converter
                         list.Add(str);
                     }
                 }
-                
+
             }
             return list;
         }
@@ -118,7 +118,7 @@ namespace RoSatGCS.Utils.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if(value is int v)
+            if (value is int v)
             {
                 if (v > 1)
                     return v + " bytes";
@@ -202,7 +202,7 @@ namespace RoSatGCS.Utils.Converter
         {
             if (value is long v)
             {
-                if(v >= 1000000000)
+                if (v >= 1000000000)
                 {
                     return (v / 1000000000.0).ToString("0.000") + " GHz";
                 }
@@ -272,5 +272,21 @@ namespace RoSatGCS.Utils.Converter
             return Binding.DoNothing;
         }
     }
-}
 
+    public class StringToBytesCountConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string str)
+            {
+                return Encoding.UTF8.GetByteCount(str);
+            }
+            return Binding.DoNothing;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
+        }
+    }
+
+}

@@ -1,27 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RoSatGCS.Utils.Satellites.Core
 {
     /// <summary>
-    /// Generic coordinate system.
+    /// Abstract base class representing a spatial coordinate.
     /// </summary>
     public abstract class Coordinate
     {
-
+        /// <summary>Converts this coordinate to ECI at the given Julian time.</summary>
         public abstract EciCoordinate ToEci(Julian dt);
 
+        /// <summary>Converts this coordinate to geodetic format.</summary>
         public abstract GeoCoordinate ToGeo();
 
+        /// <summary>Computes the Earth central angle beyond which this coordinate cannot see.</summary>
         public Angle GetVisibilityAngle()
         {
             var geo = ToGeo();
             return Angle.FromRadians(Math.Acos(Globals.EarthRadius / (Globals.EarthRadius + geo.Altitude)));
         }
 
+        /// <summary>Computes the surface radius visible from this coordinate.</summary>
         public double GetVisibilityRadius()
         {
             return GetVisibilityAngle().Radians * Globals.EarthRadius;
@@ -65,7 +65,7 @@ namespace RoSatGCS.Utils.Satellites.Core
 		/// <param name="time">The time of observation</param>
 		/// <param name="to">The coordinate to observe</param>
 		/// <returns>The topocentric angles between this coordinate and another</returns>
-		public Topoentric Observe(Coordinate to, Julian? time = null)
+		public Topocentric Observe(Coordinate to, Julian? time = null)
         {
             var t = time ?? new Julian();
 
@@ -77,7 +77,7 @@ namespace RoSatGCS.Utils.Satellites.Core
             var range = eci.Position - self.Position;
 
             var theta = eci.Date.ToLmst(geo.Longitude.Radians);
-            
+
             var sinLat = Math.Sin(geo.Latitude.Radians);
             var cosLat = Math.Cos(geo.Latitude.Radians);
             var sinTheta = Math.Sin(theta);
@@ -100,7 +100,7 @@ namespace RoSatGCS.Utils.Satellites.Core
             var el = Math.Asin(topZ / range.Magnitude());
             var rate = range.Dot(rangeRate) / range.Magnitude();
 
-            return new Topoentric(Angle.FromRadians(az), Angle.FromRadians(el), range.Magnitude(), rate, t, this);
+            return new Topocentric(Angle.FromRadians(az), Angle.FromRadians(el), range.Magnitude(), rate, t, this);
         }
 
         /// <summary>
@@ -141,6 +141,7 @@ namespace RoSatGCS.Utils.Satellites.Core
             return AngleTo(other) < other.GetVisibilityAngle();
         }
 
+        #region Equals and Operators
         public override bool Equals(object? obj)
         {
             return obj is Coordinate coord && Equals(coord);
@@ -159,10 +160,12 @@ namespace RoSatGCS.Utils.Satellites.Core
         {
             return !Equals(left, right);
         }
+
         public override int GetHashCode()
         {
             return ToGeo().GetHashCode();
         }
 
+        #endregion
     }
 }

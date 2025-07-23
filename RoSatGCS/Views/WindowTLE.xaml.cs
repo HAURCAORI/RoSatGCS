@@ -1,4 +1,5 @@
 ﻿using AdonisUI.Controls;
+using RoSatGCS.Utils.Satellites.TLE;
 using RoSatGCS.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,24 @@ namespace RoSatGCS.Views
         {
             InitializeComponent();
             DataContext = App.Current.Services.GetService(typeof(WindowTLEViewModel));
+        }
+
+        public void Initialize(TLE tle, Action<TLE> onClose)
+        {
+            if (DataContext is WindowTLEViewModel viewModel)
+            {
+                viewModel.Initialize(tle);
+            }
+            this.Closed += (s, e) => 
+            {
+                if (DataContext is WindowTLEViewModel viewModel)
+                {
+                    if (viewModel.TLEData != null && viewModel.TLEData.IsValid)
+                    {
+                        onClose?.Invoke(viewModel.TLEData);
+                    }
+                }
+            };
         }
     }
 }

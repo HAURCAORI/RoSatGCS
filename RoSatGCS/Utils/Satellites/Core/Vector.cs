@@ -5,8 +5,6 @@
 // Version 08/2020
 //
 using System;
-using System.Windows.Controls;
-using System.Xml.Linq;
 
 namespace RoSatGCS.Utils.Satellites.Core
 {

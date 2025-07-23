@@ -106,7 +106,7 @@ namespace RoSatGCS.Utils.Satellites.Core
         /// </summary>
         /// <param name="eci">The ECI coordinates of the target object.</param>
         /// <returns>The look angle to the target object.</returns>
-        public Topoentric GetLookAngle(EciCoordinate eci)
+        public Topocentric GetLookAngle(EciCoordinate eci)
         {
             // Calculate the ECI coordinates for this Site object at the time
             // of interest.
@@ -176,7 +176,7 @@ namespace RoSatGCS.Utils.Satellites.Core
             }
 #endif
 
-            Topoentric topo = new Topoentric(Angle.FromRadians(az),         // azimuth, radians
+            Topocentric topo = new Topocentric(Angle.FromRadians(az),         // azimuth, radians
                                          Angle.FromRadians(el),         // elevation, radians
                                          vecRange.W, // range, km
                                          rate,       // rate, km / sec

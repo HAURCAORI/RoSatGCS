@@ -1,5 +1,4 @@
-﻿using AvalonDock.Themes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,7 +10,7 @@ namespace RoSatGCS.Utils.Satellites.Core
 {
     public class EciCoordinate : Coordinate
     {
-        public Julian Date {  get; protected set; }
+        public Julian Date { get; protected set; }
 
         public Vector Position { get; protected set; }
         public Vector Velocity { get; protected set; }

@@ -22,10 +22,10 @@ namespace RoSatGCS.Utils.Satellites.Core
         public static Angle FromDegrees(double degrees) => new Angle(Globals.ToRadians(degrees));
 
 
-        
+
         public override string ToString()
         {
-            return $"Angle[{Degrees}°]";
+            return $"{Degrees}°";
         }
 
         public string ToDegreesMinutesSeconds()
@@ -92,5 +92,7 @@ namespace RoSatGCS.Utils.Satellites.Core
         {
             return 1530437289 + Radians.GetHashCode();
         }
+
+
     }
 }

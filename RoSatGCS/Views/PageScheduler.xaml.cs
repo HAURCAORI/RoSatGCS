@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RoSatGCS.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,8 @@ namespace RoSatGCS.Views
         public PageScheduler()
         {
             InitializeComponent();
+
+            DataContext = App.Current.Services.GetService(typeof(PageSchedulerViewModel));
         }
     }
 }

@@ -12,7 +12,7 @@
         xmlns:ap="clr-namespace:RoSatGCS.Utils.AttachedProperties"                     
         xmlns:valid="clr-namespace:RoSatGCS.Utils.Validation"
         mc:Ignorable="d"
-        Title="TLE Viewer" Height="420" Width="600" WindowStyle="ToolWindow" ResizeMode="CanMinimize">
+        Title="{Binding WindowTitle}" Height="420" Width="600" WindowStyle="ToolWindow" ResizeMode="CanMinimize">
     <adonisControls:AdonisWindow.Resources>
         <Style TargetType="GroupBox">
             <Setter Property="Margin" Value="10,2,10,5"/>
@@ -22,6 +22,7 @@
             <Setter Property="FontWeight" Value="Normal"/>
         </Style>
         <cvt:InvisibleCharacterConverter x:Key="InvisibleCharacterConverter"/>
+        <cvt:StringToBytesCountConverter x:Key="StringToBytesCountConverter"/>
     </adonisControls:AdonisWindow.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -59,9 +60,12 @@
                 <TextBox Grid.Row="0" TextWrapping="Wrap" AcceptsReturn="True" Margin="5,5,5,0" Height="50" ap:TextBoxScrollSync.SyncTarget="{Binding ElementName=tle_textbox}"
                          FontFamily="Consolas" IsHitTestVisible="False" Foreground="Red" Text="{Binding ElementName=tle_textbox, Path=Text, Converter={StaticResource InvisibleCharacterConverter}}"/>
                 <TextBox x:Name="tle_textbox" Grid.Row="0" TextWrapping="Wrap" AcceptsReturn="True" Margin="5,5,5,0" Height="50"
-                    FontFamily="Consolas" Background="Transparent" Text="{Binding TLEString}"/>
+                    FontFamily="Consolas" Background="Transparent" Text="{Binding TLEString, UpdateSourceTrigger=PropertyChanged}"/>
                 
-                <Label Content="Total Bytes : 0 bytes" Grid.Row="1" Margin="5,0,0,0"/>
+                <Label Content="Total Bytes :" Grid.Row="1" Margin="5,0,0,0"/>
+                <Label Content="{Binding TLEString, Converter={StaticResource StringToBytesCountConverter}}" Grid.Row="1" Margin="65,0,0,0"/>
+
+                <CheckBox Content="Ignore Checksum" IsChecked="{Binding IgnoreChecksum}" Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,110,0"/>
                 <Button Content="TLE ∨" Grid.Row="1" Width="45" Height="24" HorizontalAlignment="Right" Margin="0,0,5,0" Command="{Binding TLE2Value}"/>
                 <Button Content="TLE ∧" Grid.Row="1" Width="45" Height="24" HorizontalAlignment="Right" Margin="0,0,52,0" Command="{Binding Value2TLE}"/>
                 
@@ -364,8 +368,10 @@
         </GroupBox>
 
         <StackPanel Grid.Row="4" FlowDirection="RightToLeft" Orientation="Horizontal">
-            <Button Width="70" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10,0,5,0" Content="{loc:Localization sClose}"/>
-            <Button Width="70" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5,0,5,0" Content="{loc:Localization sSave}"/>
+            <Button Width="70" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10,0,5,0" Content="{loc:Localization sClose}"
+                    Command="{Binding OnCloseCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=adonisControls:AdonisWindow}}"/>
+            <Button Width="70" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5,0,5,0" Content="{loc:Localization sSave}"
+                    Command="{Binding OnSaveCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=adonisControls:AdonisWindow}}"/>
         </StackPanel>
     </Grid>
 </adonisControls:AdonisWindow>

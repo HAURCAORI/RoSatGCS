@@ -140,9 +140,9 @@ namespace RoSatGCS.Utils.Validation
     public class MeanMotionDt2ValidationRule : ValidationRule
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo) =>
-            double.TryParse(value as string, out _)
+            double.TryParse(value as string, out double d) && d < 1
                 ? ValidationResult.ValidResult
-                : new ValidationResult(false, "Second derivative of Mean Motion must be a number.");
+                : new ValidationResult(false, "Second derivative of Mean Motion must be a number less than 1.");
     }
 
     public class BStarValidationRule : ValidationRule

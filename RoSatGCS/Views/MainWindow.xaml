@@ -222,7 +222,7 @@
                 </Button>
                 -->
                 <!-- Scheduler -->
-                <!--
+
                 <Button Style="{DynamicResource SidebarButton}" ToolTip="{loc:Localization sScheduler}" Command="{Binding NavigateCommand}" CommandParameter="scheduler">
                     <Rectangle Style="{DynamicResource SidebarIcon}">
                         <Rectangle.OpacityMask>
@@ -230,7 +230,7 @@
                         </Rectangle.OpacityMask>
                     </Rectangle>
                 </Button>
-                -->
+
                 <!-- Ground Track -->
                 <!--
                 <Button Style="{DynamicResource SidebarButton}" ToolTip="{loc:Localization sGroundTrack}" Command="{Binding NavigateCommand}" CommandParameter="groundtrack">

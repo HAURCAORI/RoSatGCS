@@ -47,12 +47,22 @@ namespace RoSatGCS.Utils.Satellites.Core
         private const double EPOCH_JAN1_12H_1900 = 2415021.0; // Jan  1.5 1900 = Jan  1 1900 12h UTC
         private const double EPOCH_JAN1_12H_2000 = 2451545.0; // Jan  1.5 2000 = Jan  1 2000 12h UTC
 
+        private const double TICKS_PER_DAY = 8.64e11; // 1 tick = 100 nanoseconds, 1 day = 86400 seconds
+
+        // Minimum value for Julian
+        public static readonly Julian MinValue = new Julian(1900, 1.0);
+
         #region Construction
 
         /// <summary>
         /// Create a Julian date object from current date and time.
         /// </summary>
         public Julian() : this(DateTime.Now) { }
+
+        internal Julian(double value)
+        {
+            Date = value;
+        }
 
         /// <summary>
         /// Create a Julian date object from a DateTime object. The time
@@ -61,13 +71,28 @@ namespace RoSatGCS.Utils.Satellites.Core
         /// <param name="utc">The UTC time to convert.</param>
         public Julian(DateTime utc)
         {
-            double day = utc.DayOfYear +
-               (utc.Hour +
-               ((utc.Minute +
-               ((utc.Second + (utc.Millisecond / 1000.0)) / 60.0)) / 60.0)) / 24.0;
+            double dom = utc.Day
+                + (utc.Hour / 24.0)
+                + (utc.Minute / 1440.0)
+                + (utc.Second / 86400.0)
+                + (utc.Millisecond / 86400000.0);
 
-            Initialize(utc.Year, day);
+            Initialize(utc.Year, utc.Month, dom);
         }
+
+        public Julian(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int milli = 0)
+        {
+            DateTime utc = new DateTime(year, month, day, hour, minute, second, milli, DateTimeKind.Utc);
+            double dom = utc.Day
+                + (utc.Hour / 24.0)
+                + (utc.Minute / 1440.0)
+                + (utc.Second / 86400.0)
+                + (utc.Millisecond / 86400000.0);
+
+            Initialize(year, utc.Month, dom);
+        }
+
+
 
         /// <summary>
         /// Creates a copy of a Julian date object.
@@ -93,7 +118,22 @@ namespace RoSatGCS.Utils.Satellites.Core
         /// </remarks>
         public Julian(int year, double doy)
         {
-            Initialize(year, doy);
+            // Extract whole day and fractional part
+            int dayOfYear = (int)Math.Floor(doy);
+            double fraction = doy - dayOfYear;
+
+            // Compute the UTC DateTime from year and day-of-year
+            var jan1 = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var utc = jan1.AddDays(dayOfYear - 1).AddDays(fraction);
+
+            // Compute the day-of-month with fraction
+            double dom = utc.Day
+                + (utc.Hour / 24.0)
+                + (utc.Minute / 1440.0)
+                + (utc.Second / 86400.0)
+                + (utc.Millisecond / 86400000.0);
+
+            Initialize(utc.Year, utc.Month, dom);
         }
 
         #endregion
@@ -102,6 +142,13 @@ namespace RoSatGCS.Utils.Satellites.Core
         public void AddHour(double hr) { Date += (hr / Globals.HoursPerDay); }
         public void AddMin(double min) { Date += (min / Globals.MinPerDay); }
         public void AddSec(double sec) { Date += (sec / Globals.SecPerDay); }
+
+        public static Julian AddTicks(Julian julian, double tick)
+        {
+            Julian result = new Julian(julian);
+            result.Date += (tick / TICKS_PER_DAY);
+            return result;
+        }
 
         /// <summary>
         /// Calculates the time difference between two Julian dates.
@@ -112,13 +159,59 @@ namespace RoSatGCS.Utils.Satellites.Core
         /// </returns>
         public TimeSpan Diff(Julian date)
         {
-            const double TICKS_PER_DAY = 8.64e11; // 1 tick = 100 nanoseconds
             return new TimeSpan((long)((Date - date.Date) * TICKS_PER_DAY));
         }
 
         public static TimeSpan operator -(Julian date1, Julian date2)
         {
             return date1.Diff(date2);
+        }
+
+        public static Julian operator -(Julian date, TimeSpan span)
+        {
+            Julian result = new Julian(date);
+            result.Date -= span.TotalDays;
+            return result;
+        }
+
+        public static Julian operator +(Julian date, TimeSpan span)
+        {
+            Julian result = new Julian(date);
+            result.Date += span.TotalDays;
+            return result;
+        }
+
+        public static bool operator <(Julian date1, Julian date2)
+        {
+            return date1.Date < date2.Date;
+        }
+        public static bool operator >(Julian date1, Julian date2)
+        {
+            return date1.Date > date2.Date;
+        }
+
+        public static bool operator <=(Julian date1, Julian date2)
+        {
+            return date1.Date <= date2.Date;
+        }
+
+        public static bool operator >=(Julian date1, Julian date2)
+        {
+            return date1.Date >= date2.Date;
+        }
+
+        public static bool operator ==(Julian date1, Julian date2)
+        {
+            return date1.Date == date2.Date;
+        }
+        public static bool operator !=(Julian date1, Julian date2)
+        {
+            return date1.Date != date2.Date;
+        }
+
+        public static explicit operator DateTime(Julian date)
+        {
+            return date.ToTime();
         }
 
         /// <summary>
@@ -159,6 +252,45 @@ namespace RoSatGCS.Utils.Satellites.Core
 
             Date = jan01 + doy;
         }
+
+        /// <summary>
+        /// Initialize the Julian date object.
+        /// </summary>
+        /// <param name="year">The year, including the century.</param>
+        /// <param name="month">The month (1 = January, 2 = February, etc.)</param>
+        /// <param name="dom">Day of month (1 means the first day of the month, etc.)</param>
+        protected void Initialize(int year, int month, double dom)
+        {
+            // Arbitrary years used for error checking
+            if (year < 1900 || year > 2100)
+            {
+                throw new ArgumentOutOfRangeException("year");
+            }
+            if (month < 1 || month > 12)
+            {
+                throw new ArgumentOutOfRangeException("month");
+            }
+
+            // Now calculate Julian date
+            // Ref: "Astronomical Formulae for Calculators", Jean Meeus, pages 23-25
+
+            if (month <= 2)
+            {
+                year--;
+                month += 12; // Jan and Feb are treated as months 13 and 14 of the previous year
+            }
+
+            // Centuries are not leap years unless they divide by 400
+            int A = (year / 100);
+            int B = 2 - A + (A / 4);
+
+            double jan01 = (int)(365.25 * (year + 4716)) +
+                           (int)(30.6001 * (month + 1)) +
+                           dom + B - 1524.5;
+
+            Date = jan01;
+        }
+
 
         /// <summary>
         /// Calculate Greenwich Mean Sidereal Time for the Julian date.
@@ -214,27 +346,67 @@ namespace RoSatGCS.Utils.Satellites.Core
         {
             double d2 = Date + 0.5;
             int Z = (int)d2;
-            int alpha = (int)((Z - 1867216.25) / 36524.25);
-            int A = Z + 1 + alpha - (alpha / 4);
+            double F = d2 - Z;
+            int A = Z;
+            if (Z >= 2299161)
+            {
+                int alpha = (int)((Z - 1867216.25) / 36524.25);
+                A = Z + 1 + alpha - (alpha / 4);
+            }
+
             int B = A + 1524;
             int C = (int)((B - 122.1) / 365.25);
             int D = (int)(365.25 * C);
             int E = (int)((B - D) / 30.6001);
 
+
             // For reference: the fractional day of the month can be
             // calculated as follows:
-            //
-            // double day = B - D - (int)(30.6001 * E) + F;
+            double dom = B - D - (int)(30.6001 * E) + F;
 
             int month = (E <= 13) ? (E - 1) : (E - 13);
             int year = (month >= 3) ? (C - 4716) : (C - 4715);
 
-            Julian jdJan01 = new Julian(year, 1.0);
-            double doy = Date - jdJan01.Date; // zero-relative
 
-            DateTime dtJan01 = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            int day = (int)Math.Floor(dom);
+            double fractionalDay = dom - day;
 
-            return dtJan01.AddDays(doy);
+            int totalMs = (int)Math.Round(fractionalDay * 86400000.0);
+            int hour = totalMs / (60 * 60 * 1000);
+            int minute = (totalMs / (60 * 1000)) % 60;
+            int second = (totalMs / 1000) % 60;
+            int millisecond = totalMs % 1000;
+
+            return new DateTime(year, month, day, hour, minute, second, millisecond, DateTimeKind.Utc);
+        }
+
+        public Julian Round(TimeSpan span)
+        {
+            DateTime original = this.ToTime();
+            long ticks = (original.Ticks + span.Ticks / 2 + 1) / span.Ticks;
+            DateTime rounded = new DateTime(ticks * span.Ticks, original.Kind);
+            return new Julian(rounded);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is Julian other)
+            {
+                return Date.Equals(other.Date);
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return Date.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            DateTime dt = this.ToTime();
+            //return $"{dt:yyyy-MM-dd HH:mm:ss.fff} UTC (JD: {Date})";
+            return $"{dt:yyyy-MM-dd HH:mm:ss}";
         }
     }
 }

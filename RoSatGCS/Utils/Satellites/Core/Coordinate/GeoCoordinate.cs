@@ -17,17 +17,17 @@ namespace RoSatGCS.Utils.Satellites.Core
 
         public GeoCoordinate(Angle lat, Angle lon, double altitude)
         {
-            Latitude  = lat;
+            Latitude = lat;
             Longitude = lon;
-            Altitude  = altitude;
+            Altitude = altitude;
         }
 
-        public  GeoCoordinate(Coordinate coordinate)
+        public GeoCoordinate(Coordinate coordinate)
         {
             var geo = coordinate.ToGeo();
-            Latitude  = geo.Latitude;
+            Latitude = geo.Latitude;
             Longitude = geo.Longitude;
-            Altitude  = geo.Altitude;
+            Altitude = geo.Altitude;
         }
 
 

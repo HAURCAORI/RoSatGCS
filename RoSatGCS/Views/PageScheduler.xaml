@@ -4,11 +4,23 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:RoSatGCS.Views"
+      xmlns:controls="clr-namespace:GCSControls;assembly=GCSControls"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Scheduler">
 
     <Grid>
-        <Label>Scheduler</Label>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="200"/>
+        </Grid.RowDefinitions>
+        
+        <controls:SatelliteScheduler Grid.Row="1" Grid.ColumnSpan="3"
+            TimeSlotItems="{Binding DataContext.TimeSlotList, RelativeSource={RelativeSource AncestorType=Page}}"/>
     </Grid>
 </Page>

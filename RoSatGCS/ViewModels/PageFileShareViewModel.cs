@@ -2,6 +2,7 @@
 using RoSatGCS.Models;
 using RoSatGCS.Utils.Localization;
 using RoSatGCS.Utils.Query;
+using RoSatGCS.Utils.Satellites.TLE;
 using RoSatGCS.Views;
 using System;
 using System.Collections.Generic;
@@ -168,16 +169,19 @@ namespace RoSatGCS.ViewModels
         }
 
         static WindowTLE? _windowTLE = null;
+        TLE tle = new TLE("NOAA 1                  \r\n1 04793U 70106A   25196.89631242 -.00000037  00000+0  40365-4 0  9997\r\n2 04793 101.3876 240.5596 0030986 286.2886 247.2924 12.54043945498534", true);
         private void ON_TEMP_OPEN_TLE()
         {
             if(_windowTLE == null)
-            {
+            {  
                 _windowTLE = new WindowTLE();
+                _windowTLE.Initialize(tle, update => { tle = update; });
                 _windowTLE.Closed += (s, e) => { _windowTLE = null; };
                 _windowTLE.Show();
             }
             else
             {
+                _windowTLE.Initialize(tle, update => { tle = update; });
                 _windowTLE.Activate();
             }
         }
