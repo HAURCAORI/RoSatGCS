@@ -4,23 +4,43 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:RoSatGCS.Views"
+      xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+
       xmlns:controls="clr-namespace:GCSControls;assembly=GCSControls"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="Scheduler">
+      Title="Scheduler" Loaded="Page_Loaded">
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="200"/>
-        </Grid.RowDefinitions>
-        
-        <controls:SatelliteScheduler Grid.Row="1" Grid.ColumnSpan="3"
-            TimeSlotItems="{Binding DataContext.TimeSlotList, RelativeSource={RelativeSource AncestorType=Page}}"/>
+
+        <DockingManager x:Name="dockManager" AnchorablesSource="{Binding Anchorable}" DocumentsSource="{Binding DocumentPane}" ActiveContent="{Binding ActiveDocument, Mode=TwoWay}"
+                ShowNavigator="False">
+            <DockingManager.LayoutItemTemplateSelector>
+                <local:PanesTemplateSelector/>
+            </DockingManager.LayoutItemTemplateSelector>
+            <DockingManager.LayoutItemContainerStyleSelector>
+                <local:PanesStyleSelector>
+                    
+                </local:PanesStyleSelector>
+            </DockingManager.LayoutItemContainerStyleSelector>
+            <DockingManager.LayoutUpdateStrategy>
+                <local:PanesLayoutInitializerScheduler/>
+            </DockingManager.LayoutUpdateStrategy>
+            <LayoutRoot>
+                <LayoutPanel Orientation="Horizontal">
+                    <LayoutAnchorablePaneGroup DockWidth="300" Orientation="Vertical">
+                        <LayoutAnchorablePane Name="CommandFilePane" DockHeight="2*"/>
+                        <LayoutAnchorablePane Name="TypeDictionaryPane"/>
+                    </LayoutAnchorablePaneGroup>
+                </LayoutPanel>
+            </LayoutRoot>
+        </DockingManager>
+
+        <Border Grid.Row="2" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                BorderThickness="0 1 0 0" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}" Padding="0,5,0,2">
+            <controls:SatelliteScheduler
+     TimeSlotItems="{Binding DataContext.TimeSlotList, RelativeSource={RelativeSource AncestorType=Page}}"/>
+        </Border>
+       
     </Grid>
 </Page>

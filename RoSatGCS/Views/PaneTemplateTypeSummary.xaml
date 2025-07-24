@@ -1,0 +1,172 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+                    xmlns:bv="clr-namespace:RoSatGCS.Behaviors"
+                    xmlns:cvt="clr-namespace:RoSatGCS.Utils.Converter"
+                    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+                    xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+                    xmlns:loc="clr-namespace:RoSatGCS.Utils.Localization"
+                    xmlns:local="clr-namespace:RoSatGCS.Views"
+                    xmlns:vm="clr-namespace:RoSatGCS.ViewModels">
+
+    <cvt:EnumConverter x:Key="EnumConverter"/>
+    <cvt:EnumStructSizeStringConverter x:Key="EnumStructSizeStringConverter"/>
+    <Style x:Key="Splitter" TargetType="Rectangle">
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="Width" Value="1"/>
+        <Setter Property="Margin" Value="3,6,3,6"/>
+        <Setter Property="Stroke" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"/>
+    </Style>
+    <TextDecorationCollection x:Key="RedDottedUnderline">
+        <TextDecoration PenOffset="3" PenOffsetUnit="Pixel">
+            <TextDecoration.Pen>
+                <Pen Brush="Red" Thickness="1" DashStyle="{x:Static DashStyles.Dot}"/>
+            </TextDecoration.Pen>
+        </TextDecoration>
+    </TextDecorationCollection>
+
+    <DataTemplate x:Key="PaneTemplateTypeSummary" DataType="{x:Type vm:PaneTypeSummaryViewModel}">
+        <Grid x:Name="typeSummaryGrid" Margin="10,5,10,5" >
+            <b:Interaction.Triggers>
+                <b:EventTrigger EventName="Loaded">
+                    <b:InvokeCommandAction Command="{Binding SizeChanged}">
+                        <b:InvokeCommandAction.CommandParameter>
+                            <Binding ElementName="typeSummaryGrid"/>
+                        </b:InvokeCommandAction.CommandParameter>
+                    </b:InvokeCommandAction>
+                </b:EventTrigger>
+                <b:EventTrigger EventName="SizeChanged">
+                    <b:InvokeCommandAction Command="{Binding SizeChanged}">
+                        <b:InvokeCommandAction.CommandParameter>
+                            <Binding ElementName="typeSummaryGrid"/>
+                        </b:InvokeCommandAction.CommandParameter>
+                    </b:InvokeCommandAction>
+                </b:EventTrigger>
+            </b:Interaction.Triggers>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{loc:Localization sName}" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding SatFuncType.Identifier}" TextWrapping="Wrap" Margin="5,3,0,10"/>
+                    <TextBlock Text="{loc:Localization sDescription}" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding SatFuncType.Description}" TextWrapping="Wrap" Margin="5,3,0,10"/>
+                    <WrapPanel>
+                        <TextBlock Text="{loc:Localization sParameters}" FontWeight="Bold"/>
+                        <TextBlock Text=" [" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding SatFuncType.Type, Converter={StaticResource EnumConverter}}" FontWeight="Bold"/>
+                        <TextBlock Text="]" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding SatFuncType.Size}" Margin="10,2,0,0" FontWeight="Bold" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding SatFuncType.Type, Converter={StaticResource EnumStructSizeStringConverter}}" Margin="3,2,0,0" FontWeight="Bold" FontSize="11" VerticalAlignment="Center"/>
+                    </WrapPanel>
+
+
+                    <ListBox ItemsSource="{Binding SatFuncType.Parameters}" ScrollViewer.CanContentScroll="False"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"  bv:PassMouseWheelBehavior.EnableMouseWheelPass="True">
+                        <ListBox.ItemTemplateSelector>
+                            <local:TypeSummaryListTemplateSelector>
+                                <local:TypeSummaryListTemplateSelector.StructTypeTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="17"/>
+                                                <RowDefinition Height="15"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="40"/>
+                                                <ColumnDefinition Width="25"/>
+                                                <ColumnDefinition Width="30"/>
+                                                <ColumnDefinition Width="55"/>
+                                                <ColumnDefinition Width="35"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="Index" Grid.Row="0" Grid.Column="0" FontWeight="Bold"/>
+                                            <TextBlock Text="{Binding Index}" Grid.Row="0" Grid.Column="1"/>
+                                            <TextBlock Text="Size" Grid.Row="0" Grid.Column="2" FontWeight="Bold"/>
+                                            <Rectangle Grid.Column="1" Grid.Row="0" Margin="3,3,3,0" Style="{StaticResource Splitter}" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+                                            <WrapPanel Grid.Row="0" Grid.Column="3">
+                                                <TextBlock Text="{Binding ByteSize}"/>
+                                                <TextBlock Text=" Bytes"/>
+                                            </WrapPanel>
+                                            <Rectangle Grid.Column="3" Grid.Row="0" Margin="3,3,3,0" Style="{StaticResource Splitter}" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+                                            <TextBlock Text="Type" Grid.Row="0" Grid.Column="4" FontWeight="Bold"/>
+                                            <TextBlock Text="{Binding DataTypeString}" Grid.Row="0" Grid.Column="5" TextTrimming="CharacterEllipsis" ToolTip="{Binding DataTypeString}" HorizontalAlignment="Left">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <MultiDataTrigger>
+                                                                <MultiDataTrigger.Conditions>
+                                                                    <Condition Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                                                    <Condition Binding="{Binding IsUserDefined}" Value="True"/>
+                                                                </MultiDataTrigger.Conditions>
+                                                                <Setter Property="Cursor" Value="Hand"/>
+                                                            </MultiDataTrigger>
+                                                            <DataTrigger Binding="{Binding IsUserDefined}" Value="True">
+                                                                <Setter Property="TextDecorations" Value="{StaticResource RedDottedUnderline}"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            <b:Interaction.Triggers>
+                                                <b:EventTrigger EventName="MouseLeftButtonDown">
+                                                    <b:InvokeCommandAction Command="{Binding DataContext.TypeHyperLinkClick, RelativeSource={RelativeSource AncestorType=Page}}" CommandParameter="{Binding}"/>
+                                                </b:EventTrigger>
+                                            </b:Interaction.Triggers>
+                                            </TextBlock>
+                                            <TextBlock Text="Name" Grid.Row="1" Grid.Column="0" FontWeight="Bold"/>
+                                            <TextBlock Text="{Binding Name}" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="5" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" HorizontalAlignment="Left"/>
+                                            <TextBlock Text="{Binding Description}" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="6" TextWrapping="Wrap" Margin="5,0,0,8"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </local:TypeSummaryListTemplateSelector.StructTypeTemplate>
+                                <local:TypeSummaryListTemplateSelector.EnumTemplate>
+                                    <DataTemplate>
+                                        <Grid VerticalAlignment="Top">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="20"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="26"/>
+                                                <ColumnDefinition Width="40"/>
+                                                <ColumnDefinition Width="45"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="ID :" Grid.Row="0" Grid.Column="0" FontWeight="Bold"/>
+                                            <TextBlock Text="{Binding Id}" Grid.Row="0" Grid.Column="1" FontWeight="Bold"/>
+                                            <Rectangle Grid.Column="1" Grid.Row="0" Margin="3,3,3,6" Style="{StaticResource Splitter}" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+                                            <TextBlock Text="Value" Grid.Row="0" Grid.Column="2" FontWeight="Bold" Margin="5,0,0,0"/>
+                                            <TextBlock Text="{Binding Name}" Grid.Row="0" Grid.Column="3" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}"/>
+                                            <TextBlock Text="{Binding Description}" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" TextWrapping="Wrap" Margin="5,0,0,8"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </local:TypeSummaryListTemplateSelector.EnumTemplate>
+                            </local:TypeSummaryListTemplateSelector>
+                        </ListBox.ItemTemplateSelector>
+
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Focusable" Value="False"/>
+                                <!--
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter> -->
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="{Binding GridColumn}"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </DataTemplate>
+
+</ResourceDictionary>

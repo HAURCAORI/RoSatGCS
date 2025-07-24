@@ -78,7 +78,7 @@ namespace RoSatGCS.ViewModels
             
             foreach (string s in list)
             {
-                var item = Parent.SatFuncFile.Where(x => x.FilePath == s).FirstOrDefault();
+                var item = MainDataContext.Instance.SatFuncFile.Where(x => x.FilePath == s).FirstOrDefault();
                 if (item != null)
                 {
                     var ret = System.Windows.MessageBox.Show(TranslationSource.Instance["zSameFileExists"] + ":\r\n  " + s + "\r\n" + TranslationSource.Instance["zReplaceIt"], TranslationSource.Instance["sWarning"], MessageBoxButton.YesNo, MessageBoxImage.Warning);

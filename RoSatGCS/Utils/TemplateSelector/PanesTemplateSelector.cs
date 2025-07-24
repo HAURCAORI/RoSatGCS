@@ -15,13 +15,13 @@ namespace RoSatGCS.Views
         public PanesTemplateSelector() { }
 
 
-        public DataTemplate CommandFilePaneTemplate { get; set; }
-        public DataTemplate TypeDictionaryPaneTemplate { get; set; }
-        public DataTemplate FunctionListPaneTemplate { get; set; }
-        public DataTemplate FunctionPropertyPaneTemplate { get; set; }
-        public DataTemplate CommandSetPaneTemplate { get; set; }
-        public DataTemplate TypeSummaryPaneTemplate { get; set; }
-        public DataTemplate PropertyPreviewPaneTemplate { get; set; }
+        public DataTemplate? CommandFilePaneTemplate { get; set; }
+        public DataTemplate? TypeDictionaryPaneTemplate { get; set; }
+        public DataTemplate? FunctionListPaneTemplate { get; set; }
+        public DataTemplate? FunctionPropertyPaneTemplate { get; set; }
+        public DataTemplate? CommandSetPaneTemplate { get; set; }
+        public DataTemplate? TypeSummaryPaneTemplate { get; set; }
+        public DataTemplate? PropertyPreviewPaneTemplate { get; set; }
 
 
         public override System.Windows.DataTemplate SelectTemplate(object item, System.Windows.DependencyObject container)
@@ -29,19 +29,19 @@ namespace RoSatGCS.Views
             var itemAsLayoutContent = item as LayoutContent;
 
             if (item is PaneCommandFileViewModel)
-                return CommandFilePaneTemplate;
+                return CommandFilePaneTemplate ?? new DataTemplate();
             else if (item is PaneTypeDictionaryViewModel)
-                return TypeDictionaryPaneTemplate;
+                return TypeDictionaryPaneTemplate ?? new DataTemplate();
             else if (item is PaneFunctionListViewModel)
-                return FunctionListPaneTemplate;
+                return FunctionListPaneTemplate ?? new DataTemplate();
             else if (item is PaneFunctionPropertyViewModel)
-                return FunctionPropertyPaneTemplate;
+                return FunctionPropertyPaneTemplate ?? new DataTemplate();
             else if (item is PaneCommandSetViewModel)
-                return CommandSetPaneTemplate;
+                return CommandSetPaneTemplate ?? new DataTemplate();
             else if (item is PaneTypeSummaryViewModel)
-                return TypeSummaryPaneTemplate;
+                return TypeSummaryPaneTemplate ?? new DataTemplate();
             else if (item is PanePropertyPreviewViewModel)
-                return PropertyPreviewPaneTemplate;
+                return PropertyPreviewPaneTemplate ?? new DataTemplate();
 
             return base.SelectTemplate(item, container);
         }

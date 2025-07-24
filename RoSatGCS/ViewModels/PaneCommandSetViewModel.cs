@@ -57,7 +57,7 @@ namespace RoSatGCS.ViewModels
             if (Parent == null) { return; }
             if (GroupAddName == null) { return; }
             if (GroupAddName.Trim() == string.Empty) { return; }
-            var newGroup = new SatelliteCommandGroupModel(Parent, GroupAddName.Trim());
+            var newGroup = new SatelliteCommandGroupModel(GroupAddName.Trim());
             Parent.GroupAdd.Execute(newGroup);
             GroupAddName = null;
         }
@@ -65,7 +65,7 @@ namespace RoSatGCS.ViewModels
         private void OnDeleteAll()
         {
             if (Parent == null) { return; }
-            if (Parent.SatelliteCommandGroup.Count == 0) { return; }
+            if (MainDataContext.Instance.SatelliteCommandGroup.Count == 0) { return; }
             Parent.DeleteCommandGroupAll();
         }
 

@@ -19,15 +19,25 @@ namespace RoSatGCS.Utils.ServiceManager
 
         private ServiceManager()
         {
-            using ServiceController service = new(_serviceName);
-            if (service.Status == ServiceControllerStatus.Running)
+            try
             {
-                _started = true;
-                _state = ServiceState.Started;
-                OnPropertyChanged(nameof(State));
+                using ServiceController service = new(_serviceName);
+                if (service.Status == ServiceControllerStatus.Running)
+                {
+                    _started = true;
+                    _state = ServiceState.Started;
+                    OnPropertyChanged(nameof(State));
+                }
+                else if (service.Status == ServiceControllerStatus.Stopped)
+                {
+                    _started = false;
+                    _state = ServiceState.Stopped;
+                    OnPropertyChanged(nameof(State));
+                }
             }
-            else if (service.Status == ServiceControllerStatus.Stopped)
+            catch (System.Exception e)
             {
+                Logger.Error($"Failed to initialize service state: {e.Message}");
                 _started = false;
                 _state = ServiceState.Stopped;
                 OnPropertyChanged(nameof(State));
@@ -108,9 +118,10 @@ namespace RoSatGCS.Utils.ServiceManager
 
         private void StartService()
         {
-            using ServiceController service = new(_serviceName);
             try
             {
+                using ServiceController service = new(_serviceName);
+            
                 TimeSpan timeout = TimeSpan.FromMilliseconds(_timeout);
                 if (service.Status == ServiceControllerStatus.Running)
                 {
@@ -187,9 +198,10 @@ namespace RoSatGCS.Utils.ServiceManager
 
         private void RestartService()
         {
-            using ServiceController service = new(_serviceName);
             try
             {
+                using ServiceController service = new(_serviceName);
+            
                 TimeSpan timeout = TimeSpan.FromMilliseconds(_timeout);
                 if (service.Status == ServiceControllerStatus.Running)
                 {

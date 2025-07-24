@@ -27,15 +27,11 @@ namespace RoSatGCS.ViewModels
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private static readonly string PathCacheSetting = "Cache/setting";
 
+
+        public MainDataContext MainDataContext => MainDataContext.Instance;
+        
         private WindowSettings? windowSettings;
         private ServiceManager? _serviceManager;
-
-        private Page? pageArchive;
-        private Page? pageCommand;
-        private Page? pageDashboard;
-        private Page? pageGroundTrack;
-        private Page? pageScheduler;
-        private Page? pageFileShare;
 
         private Page? _navigationSource;
         public Page? NavigationSource
@@ -59,16 +55,19 @@ namespace RoSatGCS.ViewModels
 
         public MainWindowViewModel()
         {
+            
+            // Initialize MainDataContext
+            MainDataContext.Instance.Load();
+
             Title = "Main View";
 
-            //pageDashboard = new PageDashboard();
-            pageCommand = new PageCommand();
-            pageFileShare = new PageFileShare();
-            pageScheduler = new PageScheduler();
-            NavigationSource = pageScheduler;
+            
+            // Pages
+            NavigationSource = MainDataContext.PageScheduler;
             NavigateCommand = new RelayCommand<string>(OnNavigate);
             WeakReferenceMessenger.Default.Register<NavigationMessage>(this, OnNavigationMessage);
-
+            
+            // Commands
             OpenWindowCommand = new RelayCommand<string>(OnWindowOpen);
             ClosingCommand = new RelayCommand(OnClosing);
             ClosedCommand = new RelayCommand(OnClosed);
@@ -97,6 +96,7 @@ namespace RoSatGCS.ViewModels
                     }
                 }
             }
+            
         }
 
         private void OnNavigationMessage(object recipient, NavigationMessage message)
@@ -110,45 +110,22 @@ namespace RoSatGCS.ViewModels
             switch (uri)
             {
                 case "archive":
-                    if (pageArchive == null)
-                    {
-                        pageArchive = new PageArchive();
-                    }
-                    NavigationSource = pageArchive;
+                    NavigationSource = MainDataContext.PageArchive;
                     break;
                 case "command":
-                    if (pageCommand == null)
-                    {
-                        pageCommand = new PageCommand();
-                    }
-                    NavigationSource = pageCommand;
+                    NavigationSource = MainDataContext.PageCommand;
                     break;
                 case "dashboard":
-                    if(pageDashboard == null) {
-                        pageDashboard = new PageDashboard();
-                    }
-                    NavigationSource = pageDashboard;
+                    NavigationSource = MainDataContext.PageDashboard;
                     break;
                 case "groundtrack":
-                    if (pageGroundTrack == null)
-                    {
-                        pageGroundTrack = new PageGroundTrack();
-                    }
-                    NavigationSource = pageGroundTrack;
+                    NavigationSource = MainDataContext.PageGroundTrack;
                     break;
                 case "scheduler":
-                    if (pageScheduler == null)
-                    {
-                        pageScheduler = new PageScheduler();
-                    }
-                    NavigationSource = pageScheduler;
+                    NavigationSource = MainDataContext.PageScheduler;
                     break;
                 case "fileshare":
-                    if (pageFileShare == null)
-                    {
-                        pageFileShare = new PageFileShare();
-                    }
-                    NavigationSource = pageFileShare;
+                    NavigationSource = MainDataContext.PageFileShare;
                     break;
                 default:
                     break;
@@ -176,12 +153,16 @@ namespace RoSatGCS.ViewModels
 
         private void OnClosing()
         {
+            // Save MainDataContext
+            MainDataContext.Instance.Save();
+
             /*     private Page? pageArchive;
              private Page? pageCommand;
              private Page? pageDashboard;
              private Page? pageGroundTrack;
              private Page? pageScheduler;*/
-            if (pageCommand != null && pageCommand.DataContext is PageCommandViewModel vm)
+            PageCommandViewModel? vm = MainDataContext.Instance.GetPageCommandViewModel;
+            if (vm != null)
             {
                 vm.Closing.Execute(null);
             }

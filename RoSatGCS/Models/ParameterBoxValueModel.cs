@@ -84,6 +84,7 @@ namespace RoSatGCS.Models
         private readonly int _typesize = 0;
         private readonly int _id = -1;
         private string _value = "";
+        private bool _isLast = false;
         private List<ParameterModel>? _enumerationValues = [];
         private ParameterModel? _selectedEnumItem;
         #endregion
@@ -144,6 +145,12 @@ namespace RoSatGCS.Models
                 Value = ValueConvertBack(value);
             }
         }
+
+        public bool IsLast
+        {
+            get => _isLast;
+            set => _isLast = value;
+        }
         #endregion
 
         #region Constructor
@@ -167,6 +174,7 @@ namespace RoSatGCS.Models
             _typesize = typeSize;
             _isreadonly = isReadOnly;
             _id = id;
+            _isLast = parent.Parameter.IsLast;
         }
         ~ParameterBoxValueModel()
         {
@@ -234,7 +242,7 @@ namespace RoSatGCS.Models
                 if (_isArray)
                 {
                     if (Parent.InputMethod == InputMethod.HEX
-                        && _typesize * _length * 2 != Value.Replace(" ", "").Length)
+                        && _typesize * _length * 2 != Value.Replace(" ", "").Length && !IsLast)
                         AddError("Invalid Size", nameof(Value));
                     Parent.Parameter.HasError = Parent.ValueModels.Any(o => o.HasErrors);
                     Parent.Parameter.ValueChangedEvent(this);

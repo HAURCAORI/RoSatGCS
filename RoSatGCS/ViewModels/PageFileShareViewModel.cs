@@ -263,6 +263,7 @@ namespace RoSatGCS.ViewModels
             List<object> parameters = new List<object>();
             parameters.Add(paddedString);
             _command.InputParameters.Add(parameters);
+            _command.InputSerialized = QueryExecutorBase.Serializer(_command.InputParameters);
 
             try
             {

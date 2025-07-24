@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using NLog;
 using RoSatGCS.Models;
+using RoSatGCS.Utils.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ using System.Net.NetworkInformation;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace RoSatGCS.Utils.Query
@@ -117,23 +119,14 @@ namespace RoSatGCS.Utils.Query
                     NoProgressTimeout = "5s",
                     ReadTimeout = "999s",
                     WriteTimeout = "999s",
-                    Payload = [.. QueryExecutorBase.Serializer(c.InputParameters)]
+                    Payload = [.. c.InputSerialized]
                 };
 
+                AssignPayloadByGateway(commandPacket, c);
 
-                if (commandPacket.Gateway == 1212 || commandPacket.Gateway == 1300)
-                {
-                    commandPacket.Payload = BitConverter.GetBytes((ushort)c.FIDLId)
-                        .Concat(BitConverter.GetBytes((uint)c.Id))
-                        .Concat(new byte[] { 0, 0, 0 })
-                        .Concat(commandPacket.Payload)
-                        .ToArray();
-                    commandPacket.Payload = new byte[] { (byte)commandPacket.Payload.Length }.Concat(commandPacket.Payload).ToArray();
-                }
-                else if(commandPacket.Gateway == 1450)
-                {
-                    commandPacket.Payload = new byte[] { 0, 0, 0, 0 }.Concat(commandPacket.Payload).ToArray();
-                }
+                string hex = string.Join(" ", commandPacket.Payload.Select(b => b.ToString("X2")));
+
+                Application.Current.Dispatcher.Invoke(() => MessageBox.Show("Data: " + hex, "Hex Data"));
 
                 packet.Payload = CommandCpPacket.SerializePacket(commandPacket);
             }
@@ -187,6 +180,52 @@ namespace RoSatGCS.Utils.Query
             }
 
             return packet;
+        }
+
+        private static void AssignPayloadByGateway(CommandCpPacket commandPacket, SatelliteCommandModel c)
+        {
+            var gateway = commandPacket.Gateway;
+            switch(gateway)
+            {
+                case 1200:
+                    if (commandPacket.Payload.Length > 5)
+                    {
+                        var size = commandPacket.Payload[4];
+                        if (size == 0)
+                        {
+                            commandPacket.Payload = commandPacket.Payload[..5];
+                        }
+                        else if (size > commandPacket.Payload.Length - 5)
+                        {
+                            // Fill the payload to the expected size 
+                            commandPacket.Payload = commandPacket.Payload
+                                .Concat(new byte[size - (commandPacket.Payload.Length - 5)])
+                                .ToArray();
+                        }
+                    }
+                    
+                    break;
+                case 1202:
+                    break;
+                case 1212:
+                case 1300:
+                case 1302:
+                    // MacFPCommand
+                    // DataLen[UInt8] , FIDLID[Uint16], FunctionId[UInt32], Seq[UInt16], Error[UInt8], Payload[UInt8[]]
+                    commandPacket.Payload = BitConverter.GetBytes((ushort)c.FIDLId)
+                        .Concat(BitConverter.GetBytes((uint)c.Id))
+                        .Concat(new byte[] { 0, 0, 0 })
+                        .Concat(commandPacket.Payload)
+                        .ToArray();
+                    commandPacket.Payload = new byte[] { (byte)commandPacket.Payload.Length }.Concat(commandPacket.Payload).ToArray();
+                    break;
+                case 1450:
+                    // Offset[UInt32], Payload[UInt8[]]
+                    commandPacket.Payload = new byte[] { 0, 0, 0, 0 }.Concat(commandPacket.Payload).ToArray();
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void Dispose(bool disposing)

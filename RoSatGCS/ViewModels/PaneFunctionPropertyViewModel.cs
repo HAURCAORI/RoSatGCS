@@ -150,6 +150,7 @@ namespace RoSatGCS.ViewModels
                     Command.InputParameters.Add(input.Value ?? []);
                 }
             }
+
             IsModified = false;
             _save?.NotifyCanExecuteChanged();
 
@@ -250,6 +251,8 @@ namespace RoSatGCS.ViewModels
                 parameters.Add(values);
             }
 
+            Command.IsValid = CanExecute();
+
             try
             {
                 Command.InputSerialized = QueryExecutorBase.Serializer(parameters);
@@ -290,6 +293,12 @@ namespace RoSatGCS.ViewModels
                     continue;
                 if (j < Command.InputParameters.Count)
                     InputParameters[i].Value = Command.InputParameters[j++];
+            }
+
+            // To accomdate the last parameter which the size is variable
+            if (InputParameters.Count > 0)
+            {
+                InputParameters.Last().IsLast = true;
             }
 
             for (int i = 0, j = 0; i < OutputParameters.Count; i++)

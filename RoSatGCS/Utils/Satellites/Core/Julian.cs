@@ -372,6 +372,24 @@ namespace RoSatGCS.Utils.Satellites.Core
             double fractionalDay = dom - day;
 
             int totalMs = (int)Math.Round(fractionalDay * 86400000.0);
+            if (totalMs >= 86400000)
+            {
+                // Handle overflow to the next day
+                totalMs -= 86400000;
+                day++;
+                if (day > DateTime.DaysInMonth(year, month))
+                {
+                    day = 1;
+                    month++;
+                    if (month > 12)
+                    {
+                        month = 1;
+                        year++;
+                    }
+                }
+            }
+
+
             int hour = totalMs / (60 * 60 * 1000);
             int minute = (totalMs / (60 * 1000)) % 60;
             int second = (totalMs / 1000) % 60;

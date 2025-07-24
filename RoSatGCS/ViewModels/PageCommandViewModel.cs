@@ -1,28 +1,29 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using AvalonDock;
+using AvalonDock.Layout;
+using CommunityToolkit.Mvvm.Input;
+using MessagePack;
+using NLog.Layouts;
+using RoSatGCS.Controls;
 using RoSatGCS.Models;
+using RoSatGCS.Utils.Localization;
+using RoSatGCS.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using RoSatGCS.Views;
-using System.Diagnostics;
 using System.Windows;
-using System.Windows.Documents;
-using RoSatGCS.Utils.Localization;
-using MessagePack;
-using System.IO;
 using System.Windows.Data;
-using AvalonDock;
-using AvalonDock.Layout;
-using System.ComponentModel;
-using static RoSatGCS.Models.SatelliteFunctionFileModel;
-using RoSatGCS.Controls;
-using System.Security.Policy;
-using NLog.Layouts;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Threading;
+using static NetMQ.NetMQSelector;
+using static RoSatGCS.Models.SatelliteFunctionFileModel;
 
 namespace RoSatGCS.ViewModels
 {
@@ -30,8 +31,8 @@ namespace RoSatGCS.ViewModels
     public class PageCommandViewModel : ViewModelPageBase
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        private static readonly string PathCacheFuncFile = "Cache/func_file_list";
-        private static readonly string PathCacheCommandFile = "Cache/command_list";
+        //private static readonly string PathCacheFuncFile = "Cache/func_file_list";
+        //private static readonly string PathCacheCommandFile = "Cache/command_list";
 
         #region Fields
         private bool initialized = false;
@@ -46,7 +47,6 @@ namespace RoSatGCS.ViewModels
         #endregion
 
         #region Properties
-
         public ObservableCollection<PaneViewModel> Anchorable { get => _anchorable; }
         public ObservableCollection<PaneViewModel> DocumentPane { get => _document; }
 
@@ -58,33 +58,16 @@ namespace RoSatGCS.ViewModels
         public PanePropertyPreviewViewModel PanePropertyPreview { get => _panePropertyPreview; }
 
         // Sat Func File
-        private ObservableCollection<SatelliteFunctionFileModel> _satFuncFile = [];
-        public ReadOnlyObservableCollection<SatelliteFunctionFileModel> SatFuncFile { get; private set; }
-
-        private ListCollectionView _satFuncFileView;
-        public ListCollectionView SatelliteFunctionFileView { get => _satFuncFileView; }
+        public ListCollectionView SatelliteFunctionFileView { get => MainDataContext.Instance.SatelliteFunctionFileView; }
 
         // Sat Func Type
-        private readonly ObservableCollection<SatelliteFunctionTypeModel> _satFuncType = [];
-        public ObservableCollection<SatelliteFunctionTypeModel> SatelliteFunctionTypes { get => _satFuncType; }
-
-        private readonly ListCollectionView _satFuncTypeView;
-        public ListCollectionView SatelliteFunctionTypesView { get => _satFuncTypeView; }
+        public ListCollectionView SatelliteFunctionTypesView { get => MainDataContext.Instance.SatelliteFunctionTypesView; }
 
         // Sat Method
-        private readonly ObservableCollection<SatelliteMethodModel> _satMethod = [];
-        public ObservableCollection<SatelliteMethodModel> SatelliteMethod { get => _satMethod; }
-
-        private readonly ListCollectionView _satMethodView;
-        public ListCollectionView SatelliteMethodView { get => _satMethodView; }
+        public ListCollectionView SatelliteMethodView { get => MainDataContext.Instance.SatelliteMethodView; }
 
         // Sat Command
-
-        private ObservableCollection<SatelliteCommandGroupModel> _satCommandGroup = [];
-        public ReadOnlyObservableCollection<SatelliteCommandGroupModel> SatelliteCommandGroup { get; private set; }
-
-        private ListCollectionView _satCommandGroupView;
-        public ListCollectionView SatelliteCommandGroupView { get => _satCommandGroupView; }
+        public ListCollectionView SatelliteCommandGroupView { get => MainDataContext.Instance.SatelliteCommandGroupView; }
 
         // Temp
         private readonly List<SatelliteCommandModel> _satCommandTemp = [];
@@ -120,12 +103,6 @@ namespace RoSatGCS.ViewModels
         #region Constructor
         public PageCommandViewModel()
         {
-            _satFuncFileView = new ListCollectionView(_satFuncFile);
-            _satFuncFileView.SortDescriptions.Add(new SortDescription(nameof(SatelliteFunctionFileModel.Name), ListSortDirection.Ascending));
-            _satFuncTypeView = new ListCollectionView(_satFuncType);
-            _satMethodView = new ListCollectionView(_satMethod);
-            _satCommandGroupView = new ListCollectionView(_satCommandGroup);
-
             Loaded = new RelayCommand(OnLoaded);
             Closing = new RelayCommand(OnClosing);
             AddSatFuncFile = new RelayCommand<SatelliteFunctionFileModel>(OnAddSatFuncFile);
@@ -137,9 +114,6 @@ namespace RoSatGCS.ViewModels
             AddCommand = new RelayCommand<SatelliteCommandModel>(OnAddCommand);
             RemoveTempCommand = new RelayCommand<SatelliteCommandModel>(OnRemoveTempCommand);
             GroupAdd = new RelayCommand<SatelliteCommandGroupModel>(OnGroupAdd);
-
-            SatFuncFile = new ReadOnlyObservableCollection<SatelliteFunctionFileModel>(_satFuncFile);
-            SatelliteCommandGroup = new ReadOnlyObservableCollection<SatelliteCommandGroupModel>(_satCommandGroup);
 
             _paneCommandFile = new WeakReference<PaneCommandFileViewModel>(new PaneCommandFileViewModel(this));
             if (PaneCommandFile != null)
@@ -167,48 +141,6 @@ namespace RoSatGCS.ViewModels
         {
             if(initialized) { return; }
      
-            if (File.Exists(PathCacheFuncFile))
-            {
-                using (var fileStream = File.OpenRead(PathCacheFuncFile))
-                {
-                    try
-                    {
-                        _satFuncFile = MessagePackSerializer.Deserialize<ObservableCollection<SatelliteFunctionFileModel>>(fileStream);
-                        SatFuncFile = new ReadOnlyObservableCollection<SatelliteFunctionFileModel>(_satFuncFile);
-                        _satFuncFileView = new ListCollectionView(_satFuncFile);
-                        _satFuncFileView.SortDescriptions.Add(new SortDescription(nameof(SatelliteFunctionFileModel.Name), ListSortDirection.Ascending));
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Warn(ex);
-                    }
-                }
-            }
-
-            if (File.Exists(PathCacheCommandFile))
-            {
-                using (var fileStream = File.OpenRead(PathCacheCommandFile))
-                {
-                    try
-                    {
-                        var temp = MessagePackSerializer.Deserialize<ObservableCollection<SatelliteCommandGroupModel>>(fileStream);
-                        foreach (var item in temp)
-                        {
-                            item.Init();
-                            _satCommandGroup.Add(new SatelliteCommandGroupModel(this, item));
-                        }
-                        
-                        SatelliteCommandGroup = new ReadOnlyObservableCollection<SatelliteCommandGroupModel>(_satCommandGroup);
-                        _satCommandGroupView = new ListCollectionView(_satCommandGroup);
-
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Warn(ex);
-                    }
-                }
-            }
-
             
             RefreshAll.Execute(null);
             initialized = true;
@@ -217,19 +149,14 @@ namespace RoSatGCS.ViewModels
         private void OnClosing()
         {
             if (!initialized) { return; }
-            Directory.CreateDirectory("Cache");
-            using var fileStream = new FileStream(PathCacheFuncFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            MessagePackSerializer.Serialize(fileStream, _satFuncFile);
-            using var commandStream = new FileStream(PathCacheCommandFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            MessagePackSerializer.Serialize(commandStream, _satCommandGroup);
         }
 
         private void OnAddSatFuncFile(SatelliteFunctionFileModel? model)
         {
             if(model != null)
             {
-                _satFuncFile.Add(model);
-                
+                MainDataContext.Instance.AddSatelliteFunctionFile(model);
+
                 Refresh.Execute(model);
             }
         }
@@ -239,17 +166,17 @@ namespace RoSatGCS.ViewModels
             if (model != null)
             {
                 // Remove all related type
-                var e_type = SatelliteFunctionTypes.Where(t => t.File == model.Name).ToList();
+                var e_type = MainDataContext.Instance.SatelliteFunctionTypes.Where(t => t.File == model.Name).ToList();
                 foreach (var t in e_type)
-                    _satFuncType.Remove(t);
+                    MainDataContext.Instance.SatelliteFunctionTypes.Remove(t);
 
                 // Remove all related method
-                var e_method = SatelliteMethod.Where(t => t.File == model.Name).ToList();
+                var e_method = MainDataContext.Instance.SatelliteMethod.Where(t => t.File == model.Name).ToList();
                 foreach (var t in e_method)
-                    _satMethod.Remove(t);
+                    MainDataContext.Instance.SatelliteMethod.Remove(t);
 
                 // Remove function file
-                _satFuncFile.Remove(model);
+                MainDataContext.Instance.RemoveSatelliteFunctionFile(model);
             }
         }
 
@@ -259,20 +186,20 @@ namespace RoSatGCS.ViewModels
 
             bool error = false;
             model.Valid = false;
-
-            var file = SatFuncFile.FirstOrDefault(t => t.Name == model.Name);
+            
+            var file = MainDataContext.Instance.SatFuncFile.FirstOrDefault(t => t.Name == model.Name);
             if (file == null) { return; }
             if (file.Structure == null) { return; }
 
             // Remove all related type
-            var e_type = SatelliteFunctionTypes.Where(t => t.File == model.Name).ToList();
+            var e_type = MainDataContext.Instance.SatelliteFunctionTypes.Where(t => t.File == model.Name).ToList();
             foreach (var t in e_type)
-                _satFuncType.Remove(t);
+                MainDataContext.Instance.SatelliteFunctionTypes.Remove(t);
 
             // Remove all related method
-            var e_method = SatelliteMethod.Where(t => t.File == model.Name).ToList();
+            var e_method = MainDataContext.Instance.SatelliteMethod.Where(t => t.File == model.Name).ToList();
             foreach (var t in e_method)
-                _satMethod.Remove(t);
+                MainDataContext.Instance.SatelliteMethod.Remove(t);
 
             var st = file.Structure.Value;
 
@@ -402,9 +329,9 @@ namespace RoSatGCS.ViewModels
             if (!error)
             {
                 foreach (var i in tempSatFuncType)
-                    _satFuncType.Add(i);
+                    MainDataContext.Instance.SatelliteFunctionTypes.Add(i);
                 foreach (var i in tempSatMethod)
-                    _satMethod.Add(i);
+                    MainDataContext.Instance.SatelliteMethod.Add(i);
             }
             
             PaneTypeDictionary?.ApplyFilter.Execute(null);
@@ -426,8 +353,8 @@ namespace RoSatGCS.ViewModels
 
         private void OnRefreshAll()
         {
-            _satFuncType.Clear();
-            foreach (var item in _satFuncFile)
+            MainDataContext.Instance.SatelliteFunctionTypes.Clear();
+            foreach (var item in MainDataContext.Instance.SatFuncFile)
             {
                 Refresh.Execute(item);
             }
@@ -439,7 +366,7 @@ namespace RoSatGCS.ViewModels
             {
                 if (param.Name == "" || !param.IsUserDefined) { return; }
 
-                var search = SearchType([.. _satFuncType], param.File, param.UserDefinedType);
+                var search = SearchType([.. MainDataContext.Instance.SatelliteFunctionTypes], param.File, param.UserDefinedType);
                 if (search == null)
                 {
                     Application.Current.Dispatcher.Invoke(() =>
@@ -472,13 +399,13 @@ namespace RoSatGCS.ViewModels
             if (obj is SatelliteFunctionFileModel model)
             {
                 // Remove all related type
-                var e_type = SatelliteFunctionTypes.Where(t => t.File == model.Name).ToList();
+                var e_type = MainDataContext.Instance.SatelliteFunctionTypes.Where(t => t.File == model.Name).ToList();
                 foreach (var t in e_type)
                     t.Visibility = model.Visibility;
                 PaneTypeDictionary?.ApplyFilter.Execute(null);
 
                 // Remove all related method
-                var e_method = SatelliteMethod.Where(t => t.File == model.Name).ToList();
+                var e_method = MainDataContext.Instance.SatelliteMethod.Where(t => t.File == model.Name).ToList();
                 foreach (var t in e_method)
                     t.Visibility = model.Visibility;
                 PaneFunctionList?.ApplyFilter.Execute(null);
@@ -494,11 +421,11 @@ namespace RoSatGCS.ViewModels
 
             FindFunctionPropertyPane(o)?.UpdateTitle();
 
-            var item = SatelliteCommandGroup.FirstOrDefault(g => g.Name == o.GroupName);
+            var item = MainDataContext.Instance.SatelliteCommandGroup.FirstOrDefault(g => g.Name == o.GroupName);
             if(item == null)
             {
-                item = new SatelliteCommandGroupModel(this, o.GroupName);
-                _satCommandGroup.Add(item);
+                item = new SatelliteCommandGroupModel(o.GroupName);
+                MainDataContext.Instance.AddSatelliteCommandGroup(item);
             }
 
             if (o.IsTemp == true)
@@ -529,7 +456,7 @@ namespace RoSatGCS.ViewModels
         private void OnGroupAdd(SatelliteCommandGroupModel? o)
         {
             if (o == null) { return; }
-            _satCommandGroup.Add(o);
+            MainDataContext.Instance.AddSatelliteCommandGroup(o);
         }
 
         #endregion
@@ -656,8 +583,8 @@ namespace RoSatGCS.ViewModels
                 return false;
 
 
-            if (!SatelliteCommandGroup.Contains(model)) { return false; }
-            _satCommandGroup.Remove(model);
+            if (!MainDataContext.Instance.SatelliteCommandGroup.Contains(model)) { return false; }
+            MainDataContext.Instance.RemoveSatelliteCommandGroup(model);
             foreach(var c in model.Commands)
                 FindFunctionPropertyPane(c)?.Close.Execute(null);
 
@@ -673,9 +600,9 @@ namespace RoSatGCS.ViewModels
             if (result != MessageBoxResult.OK)
                 return;
 
-            for (int i = 0; i < SatelliteCommandGroup.Count;)
+            for (int i = 0; i < MainDataContext.Instance.SatelliteCommandGroup.Count;)
             {
-                if (!DeleteCommandGroup(SatelliteCommandGroup[i]))
+                if (!DeleteCommandGroup(MainDataContext.Instance.SatelliteCommandGroup[i]))
                     i++;
             }   
         }

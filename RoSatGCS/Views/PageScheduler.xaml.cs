@@ -27,5 +27,13 @@ namespace RoSatGCS.Views
 
             DataContext = App.Current.Services.GetService(typeof(PageSchedulerViewModel));
         }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is PageSchedulerViewModel vm)
+            {
+                vm.Init();
+            }
+        }
     }
 }

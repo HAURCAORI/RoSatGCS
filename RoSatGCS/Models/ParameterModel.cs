@@ -73,6 +73,8 @@ namespace RoSatGCS.Models
         private bool _hasError = true;
         [IgnoreMember]
         private bool _init = false;
+        [IgnoreMember]
+        private bool _isLast = false;
         #endregion
 
         #region Properties
@@ -110,6 +112,8 @@ namespace RoSatGCS.Models
         public bool HasError { get => _hasError; internal set => _hasError = value; }
         [IgnoreMember]
         public bool Init { get => _init; internal set => _init = value; }
+        [IgnoreMember]
+        public bool IsLast { get => _isLast; internal set => _isLast = value; } // Indicates the last parameter which can have variable length, such as a byte buffer or string
 
 
         // Enum Only Properties
@@ -336,7 +340,9 @@ namespace RoSatGCS.Models
                 IsArray = this.IsArray,
                 CommandModel = this.CommandModel,
                 IsReadOnly = this.IsReadOnly,
-                Sequence = this.Sequence
+                Sequence = this.Sequence,
+                IsLast = this.IsLast,
+
             };
         }
         #endregion

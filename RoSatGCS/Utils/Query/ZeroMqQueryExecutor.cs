@@ -87,7 +87,7 @@ namespace RoSatGCS.Utils.Query
                     int timeout = _timeout;
                     if(packet.Type == QueryType.Command)
                     {
-                        timeout = 120;
+                        timeout = 5;
                     }
                     if (socket.TryReceiveFrameBytes(TimeSpan.FromSeconds(timeout), out byte[]? respond))
                     {

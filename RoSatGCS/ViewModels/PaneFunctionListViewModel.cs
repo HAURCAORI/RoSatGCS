@@ -109,8 +109,7 @@ namespace RoSatGCS.ViewModels
 
         private void OnCheckAll()
         {
-            if (Parent == null) { return; }
-            foreach (var item in Parent.SatelliteMethod)
+            foreach (var item in MainDataContext.Instance.SatelliteMethod)
             {
                 if (item.Visibility == true)
                     item.IsSelected = true;
@@ -121,8 +120,7 @@ namespace RoSatGCS.ViewModels
 
         private void OnUncheckAll()
         {
-            if (Parent == null) { return; }
-            foreach (var item in Parent.SatelliteMethod)
+            foreach (var item in MainDataContext.Instance.SatelliteMethod)
             {
                 item.IsSelected = false;
             }
@@ -153,7 +151,7 @@ namespace RoSatGCS.ViewModels
                 groupName = SelectedCommandGroup.Name;
             }
 
-            Parent.SatelliteMethod.Where(o => o.IsSelected).ToList().ForEach(o => Parent.AddCommand.Execute(new SatelliteCommandModel(o) { GroupName = groupName}));
+            MainDataContext.Instance.SatelliteMethod.Where(o => o.IsSelected).ToList().ForEach(o => Parent.AddCommand.Execute(new SatelliteCommandModel(o) { GroupName = groupName}));
 
         }
         private void OnAddToCommandSelected()

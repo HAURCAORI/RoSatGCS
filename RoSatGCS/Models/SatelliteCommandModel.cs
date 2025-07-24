@@ -281,9 +281,6 @@ namespace RoSatGCS.Models
             IsExecuting = true;
             try
             {
-                string hex = string.Join(" ", InputSerialized.Select(b => b.ToString("X2")));
-                MessageBox.Show(hex);
-
                 var ret = await ZeroMqQueryExecutor.Instance.ExecuteAsync(this, DispatcherType.Postpone);
                 if (ret is byte[] b)
                 {

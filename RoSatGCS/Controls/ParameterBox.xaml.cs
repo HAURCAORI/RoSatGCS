@@ -535,10 +535,10 @@ namespace RoSatGCS.Controls
             }
             else
             {
-                if (param.ArrayExpand)
+                if ((!param.IsArray || param.ArrayExpand))
                     param.AvailableInput.Add(InputMethod.DEC);
                 param.AvailableInput.Add(InputMethod.HEX);
-                if (includeBinary && param.ArrayExpand)
+                if (includeBinary && (!param.IsArray || param.ArrayExpand))
                     param.AvailableInput.Add(InputMethod.BIN);
             }
 
@@ -563,6 +563,7 @@ namespace RoSatGCS.Controls
         private static void InitializeParameter(ParameterBox param, bool swapExpand = false)
         {
             List<string> prevValues = [];
+
             if (swapExpand)
             {
                 foreach (var i in param.ValueModels)
@@ -820,7 +821,7 @@ namespace RoSatGCS.Controls
         private string _error = "";
         private int _length = 0;
         private int inputMethodIndex = 0;
-        private bool _arrayExpand = true;
+        private bool _arrayExpand = false;
         private bool _isheader = false;
 
         public ObservableCollection<ParameterBoxValueModel> ValueModels
@@ -859,7 +860,7 @@ namespace RoSatGCS.Controls
 
         public bool CanExpand
         {
-            get => (Parameter?.BaseType != SatelliteFunctionTypeModel.ArgumentType.Enum) && (Parameter?.IsArray ?? false);
+            get => (Parameter?.BaseType != SatelliteFunctionTypeModel.ArgumentType.Enum) && (Parameter?.IsArray ?? false) && Parameter.ByteSize < 16 ;
         }
 
         public ParameterBox()
@@ -887,6 +888,7 @@ namespace RoSatGCS.Controls
 
         private void ToggleButton_Click(object sender, RoutedEventArgs e)
         {
+
             InitializeParameter(this, true);
             OnPushValue();
         }

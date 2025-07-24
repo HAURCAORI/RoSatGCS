@@ -19,19 +19,6 @@ namespace RoSatGCS.Models
     [MessagePackObject(AllowPrivate = true)]
     public partial class SatelliteCommandGroupModel : ObservableObject, IDisposable
     {
-        [IgnoreMember]
-        private readonly WeakReference<PageCommandViewModel>? _parent;
-        [IgnoreMember]
-        public PageCommandViewModel? Parent
-        {
-            get
-            {
-                if (_parent != null && _parent.TryGetTarget(out var target))
-                    return target;
-                return null;
-            }
-        }
-
         #region Fields
         [IgnoreMember]
         private bool _disposed = false;
@@ -147,9 +134,8 @@ namespace RoSatGCS.Models
         #endregion
 
         private SatelliteCommandGroupModel() { }
-        public SatelliteCommandGroupModel(PageCommandViewModel parent, SatelliteCommandGroupModel model)
+        public SatelliteCommandGroupModel(SatelliteCommandGroupModel model)
         {
-            _parent = new WeakReference<PageCommandViewModel>(parent);
             _isRename = model.IsRename;
             _name = model.Name;
             _rename = model.Rename;
@@ -161,9 +147,8 @@ namespace RoSatGCS.Models
             }
             TimeUpdateManager.Instance.Subscribe(UpdateElapsedTime);
         }
-        public SatelliteCommandGroupModel(PageCommandViewModel parent, string name)
+        public SatelliteCommandGroupModel(string name)
         {
-            _parent = new WeakReference<PageCommandViewModel>(parent);
             _name = name;
             TimeUpdateManager.Instance.Subscribe(UpdateElapsedTime);
         }
@@ -184,15 +169,14 @@ namespace RoSatGCS.Models
             if (SelectedItems == null) { return; }
             if (IsSingleSelection)
             {
-                Parent?.OpenFunctionPropertyPane(SelectedItems.First());
+                MainDataContext.Instance.GetPageCommandViewModel?.OpenFunctionPropertyPane(SelectedItems.First());
             }
         }
 
         private void OnDeleteCommandGroup()
         {
-            if (Parent == null) { return; }
             this.Dispose();
-            Parent.DeleteCommandGroup(this);
+            MainDataContext.Instance.GetPageCommandViewModel?.DeleteCommandGroup(this);
         }
 
         private void OnRenameCommandGroup()
@@ -204,10 +188,9 @@ namespace RoSatGCS.Models
         {
             IsRename = !IsRename;
             if (Rename == null) { return; }
-            if (Parent == null) { Rename = null; return; }
             if (Name == Rename) { Rename = null; return; }
-
-            if (Parent.SatelliteCommandGroup.FirstOrDefault(o => o.Name == Rename) != null)
+            
+            if (MainDataContext.Instance.SatelliteCommandGroup.FirstOrDefault(o => o.Name == Rename) != null)
             {
                 Application.Current.Dispatcher.Invoke(() => MessageBox.Show(TranslationSource.Instance["zSameCommandExists"] + ": " + Rename,
                     TranslationSource.Instance["sWarning"], MessageBoxButton.OK, MessageBoxImage.Warning));
@@ -218,7 +201,7 @@ namespace RoSatGCS.Models
                 foreach (var item in Commands)
                 {
                     item.GroupName = Name;
-                    Parent.FindFunctionPropertyPane(item)?.UpdateTitle();
+                    MainDataContext.Instance.GetPageCommandViewModel?.FindFunctionPropertyPane(item)?.UpdateTitle();
                 }
             }
 
@@ -294,7 +277,7 @@ namespace RoSatGCS.Models
             if (SelectedItems == null) { return; }
             if (IsSingleSelection)
             {
-                Parent?.OpenFunctionPropertyPane(SelectedItems.First());
+                MainDataContext.Instance.GetPageCommandViewModel?.OpenFunctionPropertyPane(SelectedItems.First());
             }
         }
 
@@ -303,7 +286,7 @@ namespace RoSatGCS.Models
             if (SelectedItems == null) { return; }
             if (IsSingleSelection)
             {
-                Parent?.OpenPropertyPreviewPane(SelectedItems.First(), value);
+                MainDataContext.Instance.GetPageCommandViewModel?.OpenPropertyPreviewPane(SelectedItems.First(), value);
             }
         }
 
