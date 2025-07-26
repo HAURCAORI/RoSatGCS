@@ -477,4 +477,28 @@
   <data name="zCloseAnyway" xml:space="preserve">
     <value>Do you want to close anyway?</value>
   </data>
+  <data name="sPassTimeLine" xml:space="preserve">
+    <value>Pass Time Line</value>
+  </data>
+  <data name="sTLEList" xml:space="preserve">
+    <value>TLE List</value>
+  </data>
+  <data name="sPassQueue" xml:space="preserve">
+    <value>Pass Queue</value>
+  </data>
+  <data name="sPassSchedule" xml:space="preserve">
+    <value>Pass Schedule</value>
+  </data>
+  <data name="sPassCommand" xml:space="preserve">
+    <value>Pass Command</value>
+  </data>
+  <data name="sUpdate" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="sAttach" xml:space="preserve">
+    <value>Attach</value>
+  </data>
+  <data name="sDetach" xml:space="preserve">
+    <value>Detach</value>
+  </data>
 </root>

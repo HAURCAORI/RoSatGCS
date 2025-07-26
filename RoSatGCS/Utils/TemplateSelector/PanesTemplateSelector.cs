@@ -22,6 +22,11 @@ namespace RoSatGCS.Views
         public DataTemplate? CommandSetPaneTemplate { get; set; }
         public DataTemplate? TypeSummaryPaneTemplate { get; set; }
         public DataTemplate? PropertyPreviewPaneTemplate { get; set; }
+        public DataTemplate? TleListPaneTemplate { get; set; }
+        public DataTemplate? PassCommnadPaneTemplate { get; set; }
+        public DataTemplate? PassQueuePaneTemplate { get; set; }
+        public DataTemplate? PassSchedulePaneTemplate { get; set; }
+        public DataTemplate? PassTimelinePaneTemplate { get; set; }
 
 
         public override System.Windows.DataTemplate SelectTemplate(object item, System.Windows.DependencyObject container)
@@ -42,6 +47,16 @@ namespace RoSatGCS.Views
                 return TypeSummaryPaneTemplate ?? new DataTemplate();
             else if (item is PanePropertyPreviewViewModel)
                 return PropertyPreviewPaneTemplate ?? new DataTemplate();
+            else if (item is PaneTleListViewModel)
+                return TleListPaneTemplate ?? new DataTemplate();
+            else if (item is PanePassCommandViewModel)
+                return PassCommnadPaneTemplate ?? new DataTemplate();
+            else if (item is PanePassQueueViewModel)
+                return PassQueuePaneTemplate ?? new DataTemplate();
+            else if (item is PanePassScheduleViewModel)
+                return PassSchedulePaneTemplate ?? new DataTemplate();
+            else if (item is PanePassTimelineViewModel)
+                return PassTimelinePaneTemplate ?? new DataTemplate();
 
             return base.SelectTemplate(item, container);
         }

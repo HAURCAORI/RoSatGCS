@@ -15,18 +15,6 @@ namespace RoSatGCS.ViewModels
     public class PaneFunctionListViewModel : PaneViewModel
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-
-        private WeakReference<PageCommandViewModel> _parent;
-        public PageCommandViewModel? Parent
-        {
-            get
-            {
-                if (_parent != null && _parent.TryGetTarget(out var target))
-                    return target;
-                return null;
-            }
-        }
-
         
         private string _searchString = "";
         private ObservableCollection<SatelliteMethodModel> _selectedItems = [];
@@ -58,10 +46,8 @@ namespace RoSatGCS.ViewModels
         public ICommand AddToCommandSelected { get; }
         public ICommand UpdateSelectedItems { get; }
 
-        public PaneFunctionListViewModel(PageCommandViewModel viewModel)
+        public PaneFunctionListViewModel()
         {
-            _parent = new WeakReference<PageCommandViewModel>(viewModel);
-
             ApplyFilter = new RelayCommand(OnApplyFilter);
             SearchClear = new RelayCommand(OnSearchClear);
             ListItemDoubleClick = new RelayCommand(OnListItemDoubleClick);
@@ -77,6 +63,7 @@ namespace RoSatGCS.ViewModels
 
         private void OnApplyFilter()
         {
+            var Parent = MainDataContext.Instance.GetPageCommandViewModel;
             if (Parent != null)
                 Parent.SatelliteMethodView.Filter = new Predicate<object>(o =>
                 {
@@ -92,6 +79,7 @@ namespace RoSatGCS.ViewModels
 
         private void OnListItemDoubleClick()
         {
+            var Parent = MainDataContext.Instance.GetPageCommandViewModel;
             if (SelectedItems == null) { return; }
             if (Parent == null) { return; }
             if (!IsSingleSelection) { return; }
@@ -143,6 +131,7 @@ namespace RoSatGCS.ViewModels
 
         private void OnAddToCommand()
         {
+            var Parent = MainDataContext.Instance.GetPageCommandViewModel;
             if (Parent == null) { return; }
 
             string? groupName = null;
@@ -156,6 +145,7 @@ namespace RoSatGCS.ViewModels
         }
         private void OnAddToCommandSelected()
         {
+            var Parent = MainDataContext.Instance.GetPageCommandViewModel;
             if (Parent == null) { return; }
             string? groupName = null;
             if (SelectedCommandGroup != null)

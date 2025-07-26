@@ -61,9 +61,15 @@ namespace RoSatGCS.ViewModels
 
             Title = "Main View";
 
-            
+
             // Pages
+#if DEBUG
             NavigationSource = MainDataContext.PageScheduler;
+#else
+            NavigationSource = MainDataContext.PageCommand;
+#endif
+
+
             NavigateCommand = new RelayCommand<string>(OnNavigate);
             WeakReferenceMessenger.Default.Register<NavigationMessage>(this, OnNavigationMessage);
             

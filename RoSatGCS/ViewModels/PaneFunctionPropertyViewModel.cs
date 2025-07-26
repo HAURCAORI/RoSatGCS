@@ -23,16 +23,6 @@ namespace RoSatGCS.ViewModels
     {
         #region Fields
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        private readonly WeakReference<PageCommandViewModel> _parent;
-        public PageCommandViewModel? Parent
-        {
-            get
-            {
-                if (_parent != null && _parent.TryGetTarget(out var target))
-                    return target;
-                return null;
-            }
-        }
 
         private bool _isModified = false;
         private bool _isParametersVisible = true;
@@ -66,9 +56,8 @@ namespace RoSatGCS.ViewModels
         #endregion
 
 
-        public PaneFunctionPropertyViewModel(PageCommandViewModel viewModel, SatelliteCommandModel command)
+        public PaneFunctionPropertyViewModel(SatelliteCommandModel command)
         {
-            _parent = new WeakReference<PageCommandViewModel>(viewModel);
             _command = command;
             _command.Received += OnReceived;
 
@@ -84,6 +73,7 @@ namespace RoSatGCS.ViewModels
         #region Implementations
         private void OnClose()
         {
+            var Parent = MainDataContext.Instance.GetPageCommandViewModel;
             if (Parent == null)
                 return;
             if (Command != null && Command.IsTemp)
@@ -115,7 +105,8 @@ namespace RoSatGCS.ViewModels
 
         private void OnSave()
         {
-            if(Parent == null) { return; }
+            var Parent = MainDataContext.Instance.GetPageCommandViewModel;
+            if (Parent == null) { return; }
             if(Command == null) { return; }
 
             // Save Praameters

@@ -19,18 +19,6 @@ namespace RoSatGCS.ViewModels
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-       
-        private readonly WeakReference<PageCommandViewModel> _parent;
-        public PageCommandViewModel? Parent
-        {
-            get
-            {
-                if (_parent != null && _parent.TryGetTarget(out var target))
-                    return target;
-                return null;
-            }
-        }
-
         private SatelliteFunctionFileModel? _selectedItem;
 
         public bool Visibility { get; set; }
@@ -45,8 +33,7 @@ namespace RoSatGCS.ViewModels
 
 
 
-        public PaneCommandFileViewModel(PageCommandViewModel viewModel) {
-            _parent = new WeakReference<PageCommandViewModel>(viewModel);
+        public PaneCommandFileViewModel() {
             AddFile = new RelayCommand(AddFileFunc);
             AddFileFromDrag = new RelayCommand<object>(AddFileFromDragFunc);
             RemoveFile = new RelayCommand<SatelliteFunctionFileModel>(RemoveFileFunc);
@@ -73,7 +60,8 @@ namespace RoSatGCS.ViewModels
 
         private void AddFileHelper(string[] list)
         {
-            if (Parent == null) { return; }
+            var CommandVM = MainDataContext.Instance.GetPageCommandViewModel;
+            if (CommandVM == null) { return; }
             List<string> error = [];
             
             foreach (string s in list)
@@ -84,7 +72,7 @@ namespace RoSatGCS.ViewModels
                     var ret = System.Windows.MessageBox.Show(TranslationSource.Instance["zSameFileExists"] + ":\r\n  " + s + "\r\n" + TranslationSource.Instance["zReplaceIt"], TranslationSource.Instance["sWarning"], MessageBoxButton.YesNo, MessageBoxImage.Warning);
                     if (ret == MessageBoxResult.Yes)
                     {
-                        Parent.RemoveSatFuncFile.Execute(item);
+                        CommandVM.RemoveSatFuncFile.Execute(item);
                     }
                     else
                     {
@@ -96,7 +84,7 @@ namespace RoSatGCS.ViewModels
                 try
                 {
                     ffm.Initialize(s);
-                    Parent.AddSatFuncFile.Execute(ffm);
+                    CommandVM.AddSatFuncFile.Execute(ffm);
                     
                 }
                 catch (Exception ex)
@@ -114,13 +102,14 @@ namespace RoSatGCS.ViewModels
 
         private void RemoveFileFunc(object? o)
         {
-            if (Parent == null) { return; }
+            var CommandVM = MainDataContext.Instance.GetPageCommandViewModel;
+            if (CommandVM == null) { return; }
             if (o is SatelliteFunctionFileModel item)
             {
                 var ret = MessageBox.Show(TranslationSource.Instance["zAreYouSure"], TranslationSource.Instance["sRemove"], MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (ret == MessageBoxResult.Yes)
                 {
-                    Parent.RemoveSatFuncFile.Execute(item);
+                    CommandVM.RemoveSatFuncFile.Execute(item);
                 }
             }
         }
@@ -131,11 +120,12 @@ namespace RoSatGCS.ViewModels
 
         private void OnRefreshFile(object? o)
         {
-            if (Parent == null) { return; }
+            var CommandVM = MainDataContext.Instance.GetPageCommandViewModel;
+            if (CommandVM == null) { return; }
             if (o is SatelliteFunctionFileModel item)
             {
                 var path = item.FilePath;
-                Parent.RemoveSatFuncFile.Execute(item);
+                CommandVM.RemoveSatFuncFile.Execute(item);
                 AddFileHelper([path]);
             }
         }

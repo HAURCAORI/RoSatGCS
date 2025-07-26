@@ -20,17 +20,6 @@ namespace RoSatGCS.ViewModels
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        private WeakReference<PageCommandViewModel> _parent;
-        public PageCommandViewModel? Parent
-        {
-            get
-            {
-                if (_parent != null && _parent.TryGetTarget(out var target))
-                    return target;
-                return null;
-            }
-        }
-
         private WeakReference<SatelliteCommandModel>? _commandModel;
 
         public SatelliteCommandModel? CommandModel
@@ -56,16 +45,15 @@ namespace RoSatGCS.ViewModels
         public ICommand Close { get; set; }
         public ICommand SizeChanged { get; set; }
 
-        public PanePropertyPreviewViewModel(PageCommandViewModel viewModel)
+        public PanePropertyPreviewViewModel()
         {
-            _parent = new WeakReference<PageCommandViewModel>(viewModel);
-
             Close = new RelayCommand(OnClose);
             SizeChanged = new RelayCommand<object>(OnSizeChanged);
         }
 
         private void OnClose()
         {
+            var Parent = MainDataContext.Instance.GetPageCommandViewModel;
             Parent?.CloseDocument(this);
         }
 

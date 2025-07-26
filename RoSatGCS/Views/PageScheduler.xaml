@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:RoSatGCS.Views"
       xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
-
+      xmlns:loc="clr-namespace:RoSatGCS.Utils.Localization"
       xmlns:controls="clr-namespace:GCSControls;assembly=GCSControls"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
@@ -16,10 +16,76 @@
         <DockingManager x:Name="dockManager" AnchorablesSource="{Binding Anchorable}" DocumentsSource="{Binding DocumentPane}" ActiveContent="{Binding ActiveDocument, Mode=TwoWay}"
                 ShowNavigator="False">
             <DockingManager.LayoutItemTemplateSelector>
-                <local:PanesTemplateSelector/>
+                <local:PanesTemplateSelector>
+                    <local:PanesTemplateSelector.TleListPaneTemplate>
+                        <DataTemplate>
+                            
+                        </DataTemplate>
+                    </local:PanesTemplateSelector.TleListPaneTemplate>
+                    <local:PanesTemplateSelector.PassQueuePaneTemplate>
+                        <DataTemplate>
+                            
+                        </DataTemplate>
+                    </local:PanesTemplateSelector.PassQueuePaneTemplate>
+                    <local:PanesTemplateSelector.PassSchedulePaneTemplate>
+                        <DataTemplate>
+
+                        </DataTemplate>
+                    </local:PanesTemplateSelector.PassSchedulePaneTemplate>
+                    <local:PanesTemplateSelector.PassCommnadPaneTemplate>
+                        <DataTemplate>
+
+                        </DataTemplate>
+                    </local:PanesTemplateSelector.PassCommnadPaneTemplate>
+                    <local:PanesTemplateSelector.PassTimelinePaneTemplate>
+                        <DataTemplate>
+                            <Border Grid.Row="2" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                            BorderThickness="0 1 0 0" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}" Padding="0,5,0,2">
+                                <controls:SatelliteScheduler TimeSlotItems="{Binding DataContext.TimeSlotList, RelativeSource={RelativeSource AncestorType=Page}}"/>
+                            </Border>
+                        </DataTemplate>
+                    </local:PanesTemplateSelector.PassTimelinePaneTemplate>
+                    
+                    
+                </local:PanesTemplateSelector>
             </DockingManager.LayoutItemTemplateSelector>
             <DockingManager.LayoutItemContainerStyleSelector>
                 <local:PanesStyleSelector>
+                    <local:PanesStyleSelector.TLEListPaneStyle>
+                        <Style TargetType="{x:Type LayoutAnchorableItem}">
+                            <Setter Property="Title" Value="{loc:Localization sTLEList}"/>
+                            <Setter Property="CanMove" Value="False"/>
+                            <Setter Property="CanFloat" Value="False"/>
+                            <Setter Property="CanClose" Value="False"/>
+                            <Setter Property="CanHide" Value="False"/>
+                        </Style>
+                    </local:PanesStyleSelector.TLEListPaneStyle>
+                    <local:PanesStyleSelector.PassQueuePaneStyle>
+                        <Style TargetType="{x:Type LayoutDocumentItem}">
+                            <Setter Property="Title" Value="{loc:Localization sPassQueue}"/>
+                        </Style>
+                    </local:PanesStyleSelector.PassQueuePaneStyle>
+                    <local:PanesStyleSelector.PassSchedulePaneStyle>
+                        <Style TargetType="{x:Type LayoutDocumentItem}">
+                            <Setter Property="Title" Value="{loc:Localization sPassSchedule}"/>
+                        </Style>
+                    </local:PanesStyleSelector.PassSchedulePaneStyle>
+
+                    <local:PanesStyleSelector.PassCommandPaneStyle>
+                        <Style TargetType="{x:Type LayoutDocumentItem}">
+                            <Setter Property="Title" Value="{loc:Localization sPassCommand}"/>
+                        </Style>
+                    </local:PanesStyleSelector.PassCommandPaneStyle>
+
+                    <local:PanesStyleSelector.PassTimelinePaneStyle>
+                        <Style TargetType="{x:Type LayoutAnchorableItem}">
+                            <Setter Property="Title" Value="{loc:Localization sPassTimeLine}"/>
+                            <Setter Property="CanMove" Value="False"/>
+                            <Setter Property="CanFloat" Value="False"/>
+                            <Setter Property="CanClose" Value="False"/>
+                            <Setter Property="CanHide" Value="False"/>
+                        </Style>
+                    </local:PanesStyleSelector.PassTimelinePaneStyle>
                     
                 </local:PanesStyleSelector>
             </DockingManager.LayoutItemContainerStyleSelector>
@@ -27,20 +93,19 @@
                 <local:PanesLayoutInitializerScheduler/>
             </DockingManager.LayoutUpdateStrategy>
             <LayoutRoot>
-                <LayoutPanel Orientation="Horizontal">
-                    <LayoutAnchorablePaneGroup DockWidth="300" Orientation="Vertical">
-                        <LayoutAnchorablePane Name="CommandFilePane" DockHeight="2*"/>
-                        <LayoutAnchorablePane Name="TypeDictionaryPane"/>
+                <LayoutPanel Orientation="Vertical">
+                    <LayoutPanel Orientation="Horizontal">
+                        <LayoutAnchorablePane Name="SidePane"/>
+                        <LayoutDocumentPaneGroup Orientation="Horizontal" DockHeight="3*"/>
+                    </LayoutPanel>
+                    <LayoutAnchorablePaneGroup Orientation="Vertical" DockHeight="*">
+                        <LayoutAnchorablePane Name="LowerPane"/>
                     </LayoutAnchorablePaneGroup>
                 </LayoutPanel>
             </LayoutRoot>
         </DockingManager>
 
-        <Border Grid.Row="2" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                BorderThickness="0 1 0 0" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}" Padding="0,5,0,2">
-            <controls:SatelliteScheduler
-     TimeSlotItems="{Binding DataContext.TimeSlotList, RelativeSource={RelativeSource AncestorType=Page}}"/>
-        </Border>
+        
        
     </Grid>
 </Page>

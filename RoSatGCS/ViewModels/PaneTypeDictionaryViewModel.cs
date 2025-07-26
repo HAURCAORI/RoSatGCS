@@ -17,17 +17,6 @@ namespace RoSatGCS.ViewModels
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        private WeakReference<PageCommandViewModel> _parent;
-        public PageCommandViewModel? Parent
-        {
-            get
-            {
-                if (_parent != null && _parent.TryGetTarget(out var target))
-                    return target;
-                return null;
-            }
-        }
-
 
         private string _searchString = "";
         private SatelliteFunctionTypeModel? _selectedItem;
@@ -50,10 +39,8 @@ namespace RoSatGCS.ViewModels
         public ICommand LostListFocus { get; }
         
 
-        public PaneTypeDictionaryViewModel(PageCommandViewModel viewModel)
+        public PaneTypeDictionaryViewModel()
         {
-            _parent = new WeakReference<PageCommandViewModel>(viewModel);
-
             ApplyFilter = new RelayCommand(OnApplyFilter);
             SearchClear = new RelayCommand(OnSearchClear);
             ListItemDoubleClick = new RelayCommand(OnListItemDoubleClick);
@@ -61,6 +48,7 @@ namespace RoSatGCS.ViewModels
         }
         private void OnApplyFilter()
         {
+            var Parent = MainDataContext.Instance.GetPageCommandViewModel;
             if (Parent != null)
                 Parent.SatelliteFunctionTypesView.Filter = new Predicate<object>(o =>
                 {
@@ -76,10 +64,11 @@ namespace RoSatGCS.ViewModels
 
         private void OnListItemDoubleClick()
         {
+            var Parent = MainDataContext.Instance.GetPageCommandViewModel;
             if (SelectedItem == null) { return; }
             if (Parent == null) { return; }
 
-            var pane = new PaneTypeSummaryViewModel(Parent);
+            var pane = new PaneTypeSummaryViewModel();
             pane.Title = SelectedItem.Name;
             pane.id = (SelectedItem.Name + SelectedItem.File).GetHashCode();
             pane.SatFuncType = SelectedItem;

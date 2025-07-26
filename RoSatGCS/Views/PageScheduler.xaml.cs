@@ -1,4 +1,5 @@
-﻿using RoSatGCS.ViewModels;
+﻿using AvalonDock;
+using RoSatGCS.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +22,12 @@ namespace RoSatGCS.Views
     /// </summary>
     public partial class PageScheduler : Page
     {
+
+        public static DockingManager DockingManager { get; private set; }
         public PageScheduler()
         {
             InitializeComponent();
-
+            DockingManager = dockManager;
             DataContext = App.Current.Services.GetService(typeof(PageSchedulerViewModel));
         }
 

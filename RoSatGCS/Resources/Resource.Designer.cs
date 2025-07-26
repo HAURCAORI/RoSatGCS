@@ -160,6 +160,15 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Attach과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sAttach {
+            get {
+                return ResourceManager.GetString("sAttach", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Board Revision과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sBoardRevision {
@@ -327,6 +336,15 @@ namespace RoSatGCS.Resources {
         public static string sDeselect {
             get {
                 return ResourceManager.GetString("sDeselect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Detach과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sDetach {
+            get {
+                return ResourceManager.GetString("sDetach", resourceCulture);
             }
         }
         
@@ -601,6 +619,42 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Pass Command과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sPassCommand {
+            get {
+                return ResourceManager.GetString("sPassCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Pass Queue과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sPassQueue {
+            get {
+                return ResourceManager.GetString("sPassQueue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Pass Schedule과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sPassSchedule {
+            get {
+                return ResourceManager.GetString("sPassSchedule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Pass Time Line과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sPassTimeLine {
+            get {
+                return ResourceManager.GetString("sPassTimeLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Preview과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sPreview {
@@ -844,6 +898,15 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   TLE List과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sTLEList {
+            get {
+                return ResourceManager.GetString("sTLEList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Type과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sType {
@@ -876,6 +939,15 @@ namespace RoSatGCS.Resources {
         public static string sUnsavedChanges {
             get {
                 return ResourceManager.GetString("sUnsavedChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Update과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sUpdate {
+            get {
+                return ResourceManager.GetString("sUpdate", resourceCulture);
             }
         }
         

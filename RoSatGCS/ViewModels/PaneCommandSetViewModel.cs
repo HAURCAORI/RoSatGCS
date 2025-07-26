@@ -13,17 +13,6 @@ namespace RoSatGCS.ViewModels
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        private readonly WeakReference<PageCommandViewModel>? _parent;
-        public PageCommandViewModel? Parent
-        {
-            get
-            {
-                if (_parent != null && _parent.TryGetTarget(out var target))
-                    return target;
-                return null;
-            }
-        }
-
         #region Fields
         private string? _groupAddName;
         private RelayCommand? _groupAdd;
@@ -46,14 +35,11 @@ namespace RoSatGCS.ViewModels
 
         #endregion
 
-        private PaneCommandSetViewModel() { }
-        public PaneCommandSetViewModel(PageCommandViewModel viewModel)
-        {
-            _parent = new WeakReference<PageCommandViewModel>(viewModel);
-        }
+        public PaneCommandSetViewModel() { }
 
         private void OnGroupAdd()
         {
+            var Parent = MainDataContext.Instance.GetPageCommandViewModel;
             if (Parent == null) { return; }
             if (GroupAddName == null) { return; }
             if (GroupAddName.Trim() == string.Empty) { return; }
@@ -64,6 +50,7 @@ namespace RoSatGCS.ViewModels
 
         private void OnDeleteAll()
         {
+            var Parent = MainDataContext.Instance.GetPageCommandViewModel;
             if (Parent == null) { return; }
             if (MainDataContext.Instance.SatelliteCommandGroup.Count == 0) { return; }
             Parent.DeleteCommandGroupAll();

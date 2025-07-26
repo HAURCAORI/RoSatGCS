@@ -115,23 +115,23 @@ namespace RoSatGCS.ViewModels
             RemoveTempCommand = new RelayCommand<SatelliteCommandModel>(OnRemoveTempCommand);
             GroupAdd = new RelayCommand<SatelliteCommandGroupModel>(OnGroupAdd);
 
-            _paneCommandFile = new WeakReference<PaneCommandFileViewModel>(new PaneCommandFileViewModel(this));
+            _paneCommandFile = new WeakReference<PaneCommandFileViewModel>(new PaneCommandFileViewModel());
             if (PaneCommandFile != null)
                 _anchorable.Add(PaneCommandFile);
 
-            _paneTypeDictionary = new WeakReference<PaneTypeDictionaryViewModel>(new PaneTypeDictionaryViewModel(this));
+            _paneTypeDictionary = new WeakReference<PaneTypeDictionaryViewModel>(new PaneTypeDictionaryViewModel());
             if (PaneTypeDictionary != null)
                 _anchorable.Add(PaneTypeDictionary);
 
-            _paneFunctionList = new WeakReference<PaneFunctionListViewModel>(new PaneFunctionListViewModel(this));
+            _paneFunctionList = new WeakReference<PaneFunctionListViewModel>(new PaneFunctionListViewModel());
             if (PaneFunctionList != null)
                 _document.Add(PaneFunctionList);
 
-            _paneCommandSet = new WeakReference<PaneCommandSetViewModel>(new PaneCommandSetViewModel(this));
+            _paneCommandSet = new WeakReference<PaneCommandSetViewModel>(new PaneCommandSetViewModel());
             if (PaneCommandSet != null)
                 _document.Add(PaneCommandSet);
 
-            _panePropertyPreview = new PanePropertyPreviewViewModel(this);
+            _panePropertyPreview = new PanePropertyPreviewViewModel();
         }
         #endregion
 
@@ -157,7 +157,7 @@ namespace RoSatGCS.ViewModels
             {
                 MainDataContext.Instance.AddSatelliteFunctionFile(model);
 
-                Refresh.Execute(model);
+                OnRefresh(model);
             }
         }
 
@@ -336,6 +336,9 @@ namespace RoSatGCS.ViewModels
             
             PaneTypeDictionary?.ApplyFilter.Execute(null);
             PaneFunctionList?.ApplyFilter.Execute(null);
+
+
+
             /*
 #if DEBUG
             
@@ -356,7 +359,7 @@ namespace RoSatGCS.ViewModels
             MainDataContext.Instance.SatelliteFunctionTypes.Clear();
             foreach (var item in MainDataContext.Instance.SatFuncFile)
             {
-                Refresh.Execute(item);
+                OnRefresh(item);
             }
         }
         
@@ -375,7 +378,7 @@ namespace RoSatGCS.ViewModels
                     return;
                 }
 
-                var pane = new PaneTypeSummaryViewModel(this)
+                var pane = new PaneTypeSummaryViewModel()
                 {
                     Title = search.Name,
                     id = (search.Name + search.File).GetHashCode(),
@@ -539,7 +542,7 @@ namespace RoSatGCS.ViewModels
             var command = new SatelliteCommandModel(model);
             command.IsTemp = true;
             _satCommandTemp.Add(command);
-            var pane = new PaneFunctionPropertyViewModel(this, command);
+            var pane = new PaneFunctionPropertyViewModel(command);
             DocumentPane.Add(pane);
         }
 
@@ -548,7 +551,7 @@ namespace RoSatGCS.ViewModels
             var item = FindFunctionPropertyPane(model);
             if (item == null)
             {
-                var pane = new PaneFunctionPropertyViewModel(this, model);
+                var pane = new PaneFunctionPropertyViewModel(model);
                 DocumentPane.Add(pane);
                 ActiveDocument = pane;
             }

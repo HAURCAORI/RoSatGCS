@@ -32,6 +32,24 @@ namespace RoSatGCS.ViewModels
             }
         }
 
+        private readonly WeakReference<PaneTleListViewModel> _paneTleList;
+        public PaneTleListViewModel? PaneTleList { get => _paneTleList?.TryGetTarget(out var target) == true ? target : null; }
+
+        private readonly WeakReference<PanePassCommandViewModel> _panePassCommand;
+        public PanePassCommandViewModel? PanePassCommand { get => _panePassCommand?.TryGetTarget(out var target) == true ? target : null; }
+
+        private readonly WeakReference<PanePassQueueViewModel> _panePassQueue;
+        public PanePassQueueViewModel? PanePassQueue { get => _panePassQueue?.TryGetTarget(out var target) == true ? target : null; }
+
+        private readonly WeakReference<PanePassScheduleViewModel> _panePassSchedule;
+        public PanePassScheduleViewModel? PanePassSchedule { get => _panePassSchedule?.TryGetTarget(out var target) == true ? target : null; }
+
+        private readonly WeakReference<PanePassTimelineViewModel> _panePassTimeline;
+        public PanePassTimelineViewModel? PanePassTimeline { get => _panePassTimeline?.TryGetTarget(out var target) == true ? target : null; }
+
+
+
+
 
 
         private ObservableCollection<TimeSlotItem> _slots = new ObservableCollection<TimeSlotItem>();
@@ -43,7 +61,28 @@ namespace RoSatGCS.ViewModels
 
         public PageSchedulerViewModel()
         {
-          
+            _paneTleList = new WeakReference<PaneTleListViewModel>(new PaneTleListViewModel());
+            if (PaneTleList != null)
+                _anchorable.Add(PaneTleList);
+
+            _panePassQueue = new WeakReference<PanePassQueueViewModel>(new PanePassQueueViewModel());
+            if (PanePassQueue != null)
+                _document.Add(PanePassQueue);
+
+            _panePassSchedule = new WeakReference<PanePassScheduleViewModel>(new PanePassScheduleViewModel());
+            if (PanePassSchedule != null)
+                _document.Add(PanePassSchedule);
+
+            _panePassCommand = new WeakReference<PanePassCommandViewModel>(new PanePassCommandViewModel());
+            if (PanePassCommand != null)
+                _document.Add(PanePassCommand);
+
+            _panePassTimeline = new WeakReference<PanePassTimelineViewModel>(new PanePassTimelineViewModel());
+            if (PanePassTimeline != null)
+                _anchorable.Add(PanePassTimeline);
+
+            
+
         }
 
         public void Init()

@@ -477,4 +477,28 @@
   <data name="zCloseAnyway" xml:space="preserve">
     <value>무시하고 닫겠습니까?</value>
   </data>
+  <data name="sPassTimeLine" xml:space="preserve">
+    <value>패스 시계열 그래프</value>
+  </data>
+  <data name="sTLEList" xml:space="preserve">
+    <value>TLE 목록</value>
+  </data>
+  <data name="sPassQueue" xml:space="preserve">
+    <value>패스 큐</value>
+  </data>
+  <data name="sPassSchedule" xml:space="preserve">
+    <value>패스 스케줄</value>
+  </data>
+  <data name="sPassCommand" xml:space="preserve">
+    <value>패스 명령</value>
+  </data>
+  <data name="sUpdate" xml:space="preserve">
+    <value>업데이트</value>
+  </data>
+  <data name="sAttach" xml:space="preserve">
+    <value>연결</value>
+  </data>
+  <data name="sDetach" xml:space="preserve">
+    <value>분리</value>
+  </data>
 </root>

@@ -10,6 +10,10 @@ namespace RoSatGCS.ViewModels
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        
+        public PaneTleListViewModel()
+        {
+
+        }
+
     }
 }
