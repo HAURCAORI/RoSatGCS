@@ -22,8 +22,10 @@ namespace GCSControls
 
             var span = (timeLineEnd - timeLineStart).TotalMilliseconds;
             var diff = (endTime - startTime).TotalMilliseconds;
-
-            return (diff / span) * totalWidth;
+            double ret = (diff / span) * totalWidth;
+            if(ret.Equals(double.NaN) || ret.Equals(double.PositiveInfinity) || ret.Equals(double.NegativeInfinity))
+                return 0.0;
+            return ret;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

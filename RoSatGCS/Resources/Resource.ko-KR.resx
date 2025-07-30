@@ -501,4 +501,22 @@
   <data name="sDetach" xml:space="preserve">
     <value>분리</value>
   </data>
+  <data name="sOkSelect" xml:space="preserve">
+    <value>선택</value>
+  </data>
+  <data name="sUpload" xml:space="preserve">
+    <value>업로드</value>
+  </data>
+  <data name="sDownload" xml:space="preserve">
+    <value>다운로드</value>
+  </data>
+  <data name="sImport" xml:space="preserve">
+    <value>불러오기</value>
+  </data>
+  <data name="sExport" xml:space="preserve">
+    <value>내보내기</value>
+  </data>
+  <data name="sShared" xml:space="preserve">
+    <value>공유</value>
+  </data>
 </root>

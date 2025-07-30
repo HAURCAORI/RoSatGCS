@@ -41,8 +41,8 @@ namespace RoSatGCS.Views
                 if (anchPane != null)
                 {
                     anchorableToShow.CanDockAsTabbedDocument = false;
-                    anchorableToShow.AutoHideMinWidth = 200;
-                    anchPane.DockMinWidth = 200;
+                    anchorableToShow.AutoHideMinWidth = 220;
+                    anchPane.DockMinWidth = 220;
                     anchPane.Children.Add(anchorableToShow);
                     return true;
                 }
@@ -82,7 +82,7 @@ namespace RoSatGCS.Views
 
                 var doc = new LayoutDocumentPane();
                 doc.Children.Add(anchorableToShow);
-                doc.DockWidth = new GridLength(3, GridUnitType.Star);
+                doc.DockWidth = new GridLength(4, GridUnitType.Star);
                 main.Children.Add(doc);
                 return true;
             }

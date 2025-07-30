@@ -10,33 +10,25 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Scheduler" Loaded="Page_Loaded">
-
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Views/PaneTemplateTleList.xaml"/>
+                <ResourceDictionary Source="/Views/PaneTemplatePassQueue.xaml"/>
+                <ResourceDictionary Source="/Views/PaneTemplatePassSchedule.xaml"/>
+                <ResourceDictionary Source="/Views/PaneTemplatePassCommand.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
     <Grid>
 
         <DockingManager x:Name="dockManager" AnchorablesSource="{Binding Anchorable}" DocumentsSource="{Binding DocumentPane}" ActiveContent="{Binding ActiveDocument, Mode=TwoWay}"
                 ShowNavigator="False">
             <DockingManager.LayoutItemTemplateSelector>
-                <local:PanesTemplateSelector>
-                    <local:PanesTemplateSelector.TleListPaneTemplate>
-                        <DataTemplate>
-                            
-                        </DataTemplate>
-                    </local:PanesTemplateSelector.TleListPaneTemplate>
-                    <local:PanesTemplateSelector.PassQueuePaneTemplate>
-                        <DataTemplate>
-                            
-                        </DataTemplate>
-                    </local:PanesTemplateSelector.PassQueuePaneTemplate>
-                    <local:PanesTemplateSelector.PassSchedulePaneTemplate>
-                        <DataTemplate>
-
-                        </DataTemplate>
-                    </local:PanesTemplateSelector.PassSchedulePaneTemplate>
-                    <local:PanesTemplateSelector.PassCommnadPaneTemplate>
-                        <DataTemplate>
-
-                        </DataTemplate>
-                    </local:PanesTemplateSelector.PassCommnadPaneTemplate>
+                <local:PanesTemplateSelector TleListPaneTemplate="{StaticResource PaneTemplateTleList}"
+                                             PassQueuePaneTemplate="{StaticResource PaneTemplatePassQueue}"
+                                             PassSchedulePaneTemplate="{StaticResource PaneTemplatePassSchedule}"
+                                             PassCommnadPaneTemplate="{StaticResource PaneTemplatePassCommand}">
                     <local:PanesTemplateSelector.PassTimelinePaneTemplate>
                         <DataTemplate>
                             <Border Grid.Row="2" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"

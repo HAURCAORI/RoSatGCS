@@ -27,6 +27,7 @@ namespace RoSatGCS.ViewModels
     {
         public required string BusId { get; set; }
         public required string DeviceName { get; set; }
+        public required string DeviceShared { get; set; }
     }
 
     public class WindowSettingsViewModel : ViewModelBase
@@ -377,35 +378,34 @@ namespace RoSatGCS.ViewModels
             }
         }
 
-        private void OnUpdateUSBList()
+        private async void OnUpdateUSBList()
         {
-            var psi = new ProcessStartInfo
-            {
-                FileName = "usbipd",
-                Arguments = "list",
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                StandardOutputEncoding = Encoding.UTF8
-            };
-
-
             var devices = new List<UsbDevice>();
-            try
+
+            await Task.Run(() =>
             {
-                using (var process = Process.Start(psi))
+                try
                 {
-                    if (process == null)
+                    var startInfo = new ProcessStartInfo
                     {
-                        return;
-                    }
+                        FileName = "usbipd",
+                        Arguments = "list",
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        StandardOutputEncoding = Encoding.UTF8
+                    };
+
+                    using var process = Process.Start(startInfo);
+                    if (process == null)
+                        throw new InvalidOperationException("usbipd process could not be started.");
 
                     string output = process.StandardOutput.ReadToEnd();
                     process.WaitForExit();
 
                     var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
                     bool headerSkipped = false;
+
                     foreach (var line in lines)
                     {
                         if (!headerSkipped)
@@ -414,148 +414,148 @@ namespace RoSatGCS.ViewModels
                                 headerSkipped = true;
                             continue;
                         }
-                        else
-                        {
-                            if (line.Trim().Length == 0 || line.StartsWith("Persisted"))
-                                break;
-                        }
+
+                        if (line.Trim().Length == 0 || line.StartsWith("Persisted"))
+                            break;
 
                         if (line.Length < 17)
-                        {
-                            continue; // Skip lines that are too short to contain valid data
-                        }
+                            continue;
 
                         string busId = line.Substring(0, 6).Trim();
-                        string deviceName = line.Substring(17, line.Length - 17 - 11).Trim();
+                        string deviceName = line.Substring(17, line.Length - 28).Trim(); // safe margin
+                        string deviceShared = line.Substring(line.Length - 11).Trim();
 
                         devices.Add(new UsbDevice
                         {
                             BusId = busId,
-                            DeviceName = deviceName
+                            DeviceName = deviceName,
+                            DeviceShared = deviceShared
                         });
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "Failed to execute usbipd command");
-                Application.Current.Dispatcher.Invoke(() => System.Windows.MessageBox.Show("Failed to retrieve USB devices. Please ensure usbipd is installed and accessible."));
-                return;
-            }
-            UsbDevices = new ObservableCollection<UsbDevice>(devices);
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Failed to execute usbipd list");
+                    ShowMessage("Failed to retrieve USB devices. Please ensure usbipd is installed and accessible.", "USB Error");
+                    return;
+                }
+
+                // UI thread: update observable collection
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    UsbDevices = new ObservableCollection<UsbDevice>(devices);
+                });
+            });
         }
 
-        private void OnAttachUSBDevice()
+        private bool ExecuteUsbipdCommand(string args, out string errorOutput)
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "usbipd",
+                Arguments = args,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                StandardOutputEncoding = Encoding.UTF8
+            };
+
+            using var process = Process.Start(startInfo);
+            errorOutput = "";
+
+            if (process == null)
+                return false;
+
+            errorOutput = process.StandardError.ReadToEnd();
+            process.WaitForExit();
+
+            return process.ExitCode == 0;
+        }
+
+        private void ShowMessage(string message, string title)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                System.Windows.MessageBox.Show(message, title);
+            });
+        }
+
+        private async void OnAttachUSBDevice()
+        {
+            if (SelectedUsbDevice == null)
+                return;
+
+            string busId = SelectedUsbDevice.BusId;
+
+            await Task.Run(() =>
+            {
+                try
+                {
+                    // Step 1: Bind the device
+                    if (!ExecuteUsbipdCommand($"bind --busid {busId}", out var bindError))
+                    {
+                        ShowMessage(bindError, "USB Error");
+                        return;
+                    }
+
+                    // Step 2: Attach to WSL
+                    if (!ExecuteUsbipdCommand($"attach --wsl --busid {busId}", out var attachError))
+                    {
+                        ShowMessage(attachError, "USB Error");
+                        return;
+                    }
+
+                    ShowMessage($"USB device '{SelectedUsbDevice.DeviceName}' attached to WSL successfully." , "USB Success");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Failed to attach USB device");
+                    ShowMessage("An error occurred while attaching the USB device. Please ensure usbipd is installed and run with administrator privileges.", "USB Error");
+                }
+            });
+
+            OnUpdateUSBList();
+        }
+
+        private async void OnDetachUSBDevice()
         {
             if (SelectedUsbDevice == null)
             {
+                ShowMessage("No USB device selected.", "USB Error");
                 return;
             }
 
             string busId = SelectedUsbDevice.BusId;
 
-            try
+            await Task.Run(() =>
             {
-                // Step 1: Bind the device
-                var bindProcess = new ProcessStartInfo
+                try
                 {
-                    FileName = "usbipd",
-                    Arguments = $"bind --busid {busId}",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    StandardOutputEncoding = Encoding.UTF8
-                };
-
-                using (var proc = Process.Start(bindProcess))
-                {
-                    if (proc == null) { return; }
-                    string error = proc.StandardError.ReadToEnd();
-                    proc.WaitForExit();
-
-                    if (proc.ExitCode != 0)
+                    if (!ExecuteUsbipdCommand($"detach --busid {busId}", out var detachError))
                     {
-                        System.Windows.MessageBox.Show($"{error}");
-                        return;
-                    }
-                }
-
-                // Step 2: Attach to WSL
-                var attachProcess = new ProcessStartInfo
-                {
-                    FileName = "usbipd",
-                    Arguments = $"attach --wsl --busid {busId}",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    StandardOutputEncoding = Encoding.UTF8
-                };
-
-                using (var proc = Process.Start(attachProcess))
-                {
-                    if (proc == null) { return; }
-                    string error = proc.StandardError.ReadToEnd();
-                    proc.WaitForExit();
-
-                    if (proc.ExitCode != 0)
-                    {
-                        System.Windows.MessageBox.Show($"{error}");
+                        ShowMessage(detachError, "USB Error");
                         return;
                     }
 
-                    System.Windows.MessageBox.Show($"USB device '{SelectedUsbDevice.DeviceName}' attached to WSL successfully.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Failed to attach USB device");
-                System.Windows.MessageBox.Show("An error occurred while attaching the USB device. Please ensure usbipd is installed and run with administrator privileges.");
-            }
-        }
-        private void OnDetachUSBDevice()
-        {
-            if (SelectedUsbDevice == null)
-            {
-                System.Windows.MessageBox.Show("No USB device selected.");
-                return;
-            }
+                    Thread.Sleep(500);
 
-            string busId = SelectedUsbDevice.BusId;
-
-            try
-            {
-                var detachProcess = new ProcessStartInfo
-                {
-                    FileName = "usbipd",
-                    Arguments = $"detach --busid {busId}",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    StandardOutputEncoding = Encoding.UTF8
-                };
-
-                using (var proc = Process.Start(detachProcess))
-                {
-                    if (proc == null) { return; }
-                    string error = proc.StandardError.ReadToEnd();
-                    proc.WaitForExit();
-
-                    if (proc.ExitCode != 0)
+                    if (!ExecuteUsbipdCommand($"unbind --busid {busId}", out var unbindError))
                     {
-                        System.Windows.MessageBox.Show($"{error}");
+                        ShowMessage(unbindError, "USB Error Unbind");
                         return;
                     }
 
-                    System.Windows.MessageBox.Show($"USB device '{SelectedUsbDevice.DeviceName}' detached from WSL.");
+                    ShowMessage($"USB device '{SelectedUsbDevice.DeviceName}' detached from WSL.", "USB Success");
                 }
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show("An error occurred while detaching the USB device. Please ensure usbipd is installed and run with administrator privileges.");
-            }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Failed to detach USB device");
+                    ShowMessage("An error occurred while detaching the USB device. Please ensure usbipd is installed and run with administrator privileges.", "USB Error");
+                }
+            });
+
+            OnUpdateUSBList();
         }
 
 

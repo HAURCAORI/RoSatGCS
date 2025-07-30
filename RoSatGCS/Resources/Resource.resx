@@ -501,4 +501,22 @@
   <data name="sDetach" xml:space="preserve">
     <value>Detach</value>
   </data>
+  <data name="sOkSelect" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="sUpload" xml:space="preserve">
+    <value>Upload</value>
+  </data>
+  <data name="sDownload" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="sImport" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="sExport" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="sShared" xml:space="preserve">
+    <value>Shared</value>
+  </data>
 </root>

@@ -367,6 +367,15 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Download과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sDownload {
+            get {
+                return ResourceManager.GetString("sDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Edit과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sEdit {
@@ -426,6 +435,15 @@ namespace RoSatGCS.Resources {
         public static string sExecuteOnce {
             get {
                 return ResourceManager.GetString("sExecuteOnce", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Export과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sExport {
+            get {
+                return ResourceManager.GetString("sExport", resourceCulture);
             }
         }
         
@@ -547,6 +565,15 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Import과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sImport {
+            get {
+                return ResourceManager.GetString("sImport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Invalid과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sInvalid {
@@ -597,6 +624,15 @@ namespace RoSatGCS.Resources {
         public static string sOk {
             get {
                 return ResourceManager.GetString("sOk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ok과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sOkSelect {
+            get {
+                return ResourceManager.GetString("sOkSelect", resourceCulture);
             }
         }
         
@@ -853,6 +889,15 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Shared과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sShared {
+            get {
+                return ResourceManager.GetString("sShared", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Show과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sShow {
@@ -957,6 +1002,15 @@ namespace RoSatGCS.Resources {
         public static string sUplink {
             get {
                 return ResourceManager.GetString("sUplink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Upload과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sUpload {
+            get {
+                return ResourceManager.GetString("sUpload", resourceCulture);
             }
         }
         
