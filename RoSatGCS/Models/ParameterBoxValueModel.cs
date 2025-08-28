@@ -494,11 +494,13 @@ namespace RoSatGCS.Models
                 }
                 else if (item is float f)
                 {
-                    list.Add(BitConverter.ToSingle(BitConverter.GetBytes(f), 0).ToString("X8"));
+                    //list.Add(BitConverter.ToSingle(BitConverter.GetBytes(f), 0).ToString("X8"));
+                    list.Add(BitConverter.SingleToUInt32Bits(f).ToString("X8"));
                 }
                 else if (item is double d)
                 {
-                    list.Add(BitConverter.ToDouble(BitConverter.GetBytes(d), 0).ToString("X16"));
+                    //list.Add(BitConverter.ToDouble(BitConverter.GetBytes(d), 0).ToString("X16"));
+                    list.Add(BitConverter.DoubleToUInt64Bits(d).ToString("X16"));
                 }
                 else if (item is string str)
                 {

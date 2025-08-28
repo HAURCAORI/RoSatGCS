@@ -6,6 +6,7 @@ using NLog.Targets.Wrappers;
 using RoSatGCS.Behaviors;
 using RoSatGCS.Models;
 using System;
+using System.Buffers.Binary;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -370,6 +371,54 @@ namespace RoSatGCS.Controls
     #region Helper
     public class Helper
     {
+        static bool TryHexToFloat(string hex, out float value, bool inputIsBigEndian = true)
+        {
+            value = 0f;
+            if (hex == null) return false;
+
+            // Normalize (allow "0x" and underscores)
+            hex = hex.Trim();
+            if (hex.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) hex = hex[2..];
+            hex = hex.Replace("_", "");
+
+            if (hex.Length != 8) return false; // float = 4 bytes = 8 hex chars
+            if (!uint.TryParse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var bits))
+                return false;
+
+            // If the hex string is big-endian (network order) and the machine is little-endian (x86/x64),
+            // reverse to get the platform byte order. Flip this condition if your stored hex is little-endian.
+            if (BitConverter.IsLittleEndian == inputIsBigEndian)
+                bits = BinaryPrimitives.ReverseEndianness(bits);
+
+            value = BitConverter.UInt32BitsToSingle(bits);
+
+            return true;
+        }
+
+        static bool TryHexToDouble(string hex, out double value, bool inputIsBigEndian = true)
+        {
+            value = 0d;
+            if (hex == null) return false;
+
+            // Normalize (allow "0x" and underscores)
+            hex = hex.Trim();
+            if (hex.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) hex = hex[2..];
+            hex = hex.Replace("_", "");
+
+            if (hex.Length != 16) return false; // double = 8 bytes = 16 hex chars
+            if (!ulong.TryParse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var bits))
+                return false;
+
+            // Adjust for endian mismatch
+            if (BitConverter.IsLittleEndian == inputIsBigEndian)
+                bits = BinaryPrimitives.ReverseEndianness(bits);
+
+            value = BitConverter.UInt64BitsToDouble(bits);
+
+            return true;
+        }
+
+
         public static int GetBaseFromInputMode(InputMethod? mode)
         {
             var currentBase = 10;
@@ -423,6 +472,18 @@ namespace RoSatGCS.Controls
                     return ret;
                 case DataType.String:
                     ret = str;
+                    return ret;
+                case DataType.Float:
+                    if (!TryHexToFloat(str, out var f, inputIsBigEndian: false))
+                        throw new FormatException($"Invalid float hex: {str}");
+
+                    ret = f.ToString("R", CultureInfo.InvariantCulture);
+                    return ret;
+                case DataType.Double:
+                    if (!TryHexToDouble(str, out var d, inputIsBigEndian: false))
+                        throw new FormatException($"Invalid double hex: {str}");
+
+                    ret = d.ToString("R", CultureInfo.InvariantCulture);
                     return ret;
                 default:
                     break;
