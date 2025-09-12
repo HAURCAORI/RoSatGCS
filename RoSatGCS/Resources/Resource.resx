@@ -519,4 +519,13 @@
   <data name="sShared" xml:space="preserve">
     <value>Shared</value>
   </data>
+  <data name="sForward" xml:space="preserve">
+    <value>Forward</value>
+  </data>
+  <data name="sBackward" xml:space="preserve">
+    <value>Backward</value>
+  </data>
+  <data name="sOut" xml:space="preserve">
+    <value>Out</value>
+  </data>
 </root>

@@ -109,7 +109,7 @@ namespace RoSatGCS.ViewModels
             if (Parent == null) { return; }
             if(Command == null) { return; }
 
-            // Save Praameters
+            // Save Parameters
             var temp = Command.InputParameters;
             Command.InputParameters.Clear();
             foreach (var input in InputParameters)

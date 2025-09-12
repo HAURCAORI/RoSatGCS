@@ -102,7 +102,7 @@ namespace RoSatGCS.ViewModels
                     }
                 }
             }
-            
+
         }
 
         private void OnNavigationMessage(object recipient, NavigationMessage message)

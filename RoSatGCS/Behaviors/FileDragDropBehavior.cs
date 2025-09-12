@@ -1,4 +1,5 @@
-﻿using Microsoft.Xaml.Behaviors;
+﻿using FileListView.Interfaces;
+using Microsoft.Xaml.Behaviors;
 using RoSatGCS.Controls;
 using RoSatGCS.Models;
 using RoSatGCS.Utils.Localization;
@@ -17,32 +18,32 @@ using System.Windows.Media;
 
 namespace RoSatGCS.Behaviors
 {
-    public class CommandListRearrangeBehavior : Behavior<ListBox>
+    internal class FileDragDropBehavior : Behavior<ListBox>
     {
-       public static readonly DependencyProperty ParentProperty =
-       DependencyProperty.Register(
+        public static readonly DependencyProperty ParentProperty =
+        DependencyProperty.Register(
            "Parent",
-           typeof(PageCommandViewModel),
-           typeof(CommandListRearrangeBehavior),
+           typeof(PageFileShareViewModel),
+           typeof(FileDragDropBehavior),
            new PropertyMetadata(null));
-        public PageCommandViewModel Parent
+        public PageFileShareViewModel Parent
         {
-            get => (PageCommandViewModel)GetValue(ParentProperty);
+            get => (PageFileShareViewModel)GetValue(ParentProperty);
             set => SetValue(ParentProperty, value);
         }
 
-        private struct DragWrapper{
-            public SatelliteCommandModel Last;
-            public List<SatelliteCommandModel> Items;
+        internal struct FileDragWrapper
+        {
             public ListBox Source;
+            public List<ILVItemViewModel> Items;
         }
 
         private Point _dragStartPoint;
 
+        private UIElement? _adornerRoot;
         private DragAdorner? _dragAdorner;
-        private DropInsertionAdorner? _insertionAdorner;
         private AdornerLayer? _adornerLayer;
-        
+
 
         protected override void OnAttached()
         {
@@ -82,7 +83,7 @@ namespace RoSatGCS.Behaviors
             var item = FindParent<ListBoxItem>(sourceElement);
             Point mousePos = e.GetPosition(null);
 
-            if (item?.IsSelected == true && item?.DataContext is not SatelliteCommandGroupModel)
+            if (item?.IsSelected == true) // && item?.DataContext is not SatelliteCommandGroupModel
             {
                 Vector diff = _dragStartPoint - mousePos;
                 if (Math.Abs(diff.X) < SystemParameters.MinimumHorizontalDragDistance ||
@@ -110,8 +111,8 @@ namespace RoSatGCS.Behaviors
                 (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
                  Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
             {
-                
-                var selectedItems = listBox.SelectedItems.OfType<SatelliteCommandModel>().ToList();
+
+                var selectedItems = listBox.SelectedItems.OfType<ILVItemViewModel>().ToList();
                 if (selectedItems.Count == 0) return;
                 if (listBox.ItemsSource is not System.Collections.IList itemsSource) return;
 
@@ -124,17 +125,14 @@ namespace RoSatGCS.Behaviors
                 ClearAdorners();
 
                 _dragAdorner = new DragAdorner(root, container);
-                _insertionAdorner ??= new DropInsertionAdorner(root);
 
                 _adornerLayer?.Add(_dragAdorner);
-                _adornerLayer?.Add(_insertionAdorner);
 
                 // Start Drag
                 try
                 {
-                    var wrapper = new DragWrapper
+                    var wrapper = new FileDragWrapper
                     {
-                        Last = selectedItems.Last(),
                         Items = selectedItems.OrderBy(item => itemsSource.IndexOf(item)).ToList(),
                         Source = listBox
                     };
@@ -151,33 +149,6 @@ namespace RoSatGCS.Behaviors
         private void OnDragOver(object sender, DragEventArgs e)
         {
             _dragAdorner?.UpdatePosition(e.GetPosition((UIElement)sender));
-
-            if (_insertionAdorner == null) return;
-
-            if (e.OriginalSource is not UIElement sourceElement)
-                return;
-
-            var listBox = FindParent<ListBox>(sourceElement);
-            var listBoxItem = FindParent<ListBoxItem>(sourceElement);
-            if (listBox == null || listBoxItem == null)
-                return;
-
-            if(listBoxItem.DataContext is not SatelliteCommandModel)
-                return;
-
-            if (listBox.ItemsSource is not System.Collections.IList itemsSource)
-                return;
-
-            if (e.Data.GetData(typeof(DragWrapper)) is not DragWrapper wrapper)
-                return;
-
-            bool insertAbove = false;
-            if (listBox == wrapper.Source) {
-                int targetIndex = listBox.ItemContainerGenerator.IndexFromContainer(listBoxItem);
-                insertAbove = itemsSource.IndexOf(wrapper.Last) >= targetIndex;
-            }
-
-            _insertionAdorner.Show(listBoxItem, insertAbove);
         }
 
         private void OnDrop(object sender, DragEventArgs e)
@@ -192,13 +163,14 @@ namespace RoSatGCS.Behaviors
             if (listBox == null || listBoxItem == null)
                 return;
 
+            /*
             if (listBoxItem.DataContext is not SatelliteCommandModel || listBoxItem.IsSelected)
                 return;
 
-            if (listBox.ItemsSource is not System.Collections.IList itemsTarget) 
+            if (listBox.ItemsSource is not System.Collections.IList itemsTarget)
                 return;
 
-            if (e.Data.GetData(typeof(DragWrapper)) is not DragWrapper wrapper)
+            if (e.Data.GetData(typeof(FileDragWrapper)) is not FileDragWrapper wrapper)
                 return;
 
 
@@ -221,7 +193,7 @@ namespace RoSatGCS.Behaviors
                         MessageBoxButton.OK, MessageBoxImage.Warning));
                         return;
                     }
-                        
+
                 }
             }
 
@@ -260,11 +232,12 @@ namespace RoSatGCS.Behaviors
 
                     sourceGroupModel.DeleteCommandAndDispose(item);
 
-                    
+
                     targetGroupModel.Reorder(ret, targetIndex + 1);
                     targetIndex = listBox.ItemContainerGenerator.IndexFromContainer(listBoxItem);
                 }
             }
+            */
         }
 
         private static T? FindParent<T>(UIElement? child) where T : DependencyObject
@@ -298,11 +271,20 @@ namespace RoSatGCS.Behaviors
                 _adornerLayer?.Remove(_dragAdorner);
                 _dragAdorner = null;
             }
-            if (_insertionAdorner != null)
+        }
+
+        private static UIElement GetTopAdornerRoot(DependencyObject start)
+        {
+            // Prefer a top-level AdornerDecorator
+            DependencyObject? cur = start;
+            while (cur != null)
             {
-                _adornerLayer?.Remove(_insertionAdorner);
-                _insertionAdorner = null;
+                if (cur is AdornerDecorator ad) return ad;
+                cur = VisualTreeHelper.GetParent(cur);
             }
+            // Fallback: Window content
+            var win = Window.GetWindow(start as DependencyObject);
+            return (win?.Content as UIElement) ?? (start as UIElement)!;
         }
     }
 }

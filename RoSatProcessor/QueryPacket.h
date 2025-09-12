@@ -23,7 +23,8 @@ MSGPACK_ADD_ENUM(QueryType);
 enum class DispatcherType {
     NoResponse,
     ImmediateResponse,
-    Postpone
+    Postpone,
+    FileTransfer
 };
 MSGPACK_ADD_ENUM(DispatcherType);
 

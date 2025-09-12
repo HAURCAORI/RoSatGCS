@@ -51,7 +51,7 @@ void RoSatProcessor::TaskQueryRequestHandler::task()
 	try {
 		auto ret = QueryPacket::DeserializePacket(buffer);
 
-		if (ret.Dispatcher == DispatcherType::NoResponse || ret.Dispatcher == DispatcherType::Postpone) {
+		if (ret.Dispatcher == DispatcherType::NoResponse || ret.Dispatcher == DispatcherType::Postpone || ret.Dispatcher == DispatcherType::FileTransfer) {
 			ExecuteQueryAsync(ret);
 			msg << QueryPacket::SerializePacket(QueryPacket{ ret.Id, ret.Name, QueryType::ACK, ret.Dispatcher });
 		}

@@ -47,7 +47,12 @@ namespace RoSatGCS.Utils.Query
                         bytes.AddRange(BitConverter.GetBytes(d));
                     else if (value is string st)
                     {
+                        bytes.Add((byte)st.IndexOf('\0')); // NOTICE
                         bytes.AddRange(Encoding.Default.GetBytes(st));
+                    }
+                    else if (value is byte[] ba)
+                    {
+                        bytes.AddRange(ba);
                     }
                     else
                         throw new NotSupportedException($"Type is not supported.");

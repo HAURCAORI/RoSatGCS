@@ -1,4 +1,5 @@
-﻿using RoSatGCS.GCSTypes;
+﻿using FileListView.Interfaces;
+using RoSatGCS.GCSTypes;
 using RoSatGCS.Models;
 using RoSatGCS.Utils.Localization;
 using System;
@@ -14,6 +15,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.IO;
+using System.Runtime.InteropServices;
+using FileListView.ViewModels;
+
 
 namespace RoSatGCS.Utils.Converter
 {
@@ -286,6 +291,78 @@ namespace RoSatGCS.Utils.Converter
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return Binding.DoNothing;
+        }
+    }
+
+    class FileSizeHelper
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        private struct WIN32_FILE_ATTRIBUTE_DATA
+        {
+            public FileAttributes dwFileAttributes;
+            public System.Runtime.InteropServices.ComTypes.FILETIME ftCreationTime;
+            public System.Runtime.InteropServices.ComTypes.FILETIME ftLastAccessTime;
+            public System.Runtime.InteropServices.ComTypes.FILETIME ftLastWriteTime;
+            public uint nFileSizeHigh;
+            public uint nFileSizeLow;
+        }
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        private static extern bool GetFileAttributesEx(string lpFileName, int fInfoLevelId, out WIN32_FILE_ATTRIBUTE_DATA fileData);
+
+        public static bool TryGetFileSize(string path, out long size, out bool isDirectory)
+        {
+            if (GetFileAttributesEx(path, 0, out var data))
+            {
+                isDirectory = (data.dwFileAttributes & FileAttributes.Directory) != 0;
+                size = ((long)data.nFileSizeHigh << 32) + data.nFileSizeLow;
+                return true;
+            }
+
+            size = 0;
+            isDirectory = false;
+            return false;
+        }
+    }
+
+    public class FileToByteConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string path)
+            {
+                if (FileSizeHelper.TryGetFileSize(path, out long size, out bool isDirectory))
+                {
+                    if (!isDirectory)
+                    {
+                        return FormatSize(size);
+                    }
+                }
+            }
+            return Binding.DoNothing;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
+        }
+
+        private static string FormatSize(long bytes)
+        {
+            const long KB = 1024;
+            const long MB = KB * 1024;
+            const long GB = MB * 1024;
+            const long TB = GB * 1024;
+
+            if (bytes >= TB)
+                return $"{(double)bytes / TB:0.#} TB";
+            if (bytes >= GB)
+                return $"{(double)bytes / GB:0.#} GB";
+            if (bytes >= MB)
+                return $"{(double)bytes / MB:0.#} MB";
+            if (bytes >= KB * 50)
+                return $"{(double)bytes / KB:0.#} KB";
+
+            return $"{bytes} B";
         }
     }
 

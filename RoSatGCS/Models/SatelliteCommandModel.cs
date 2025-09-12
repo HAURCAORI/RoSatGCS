@@ -259,6 +259,7 @@ namespace RoSatGCS.Models
                 }
                 else
                 {
+                    // NOTICE: MAYBE STRING HANDLER NEEDED
                     ret.Add(ParameterModel.ConvertValue(output.DataType, Serialized.GetRange(index, output.ByteSize)));
                     index += output.ByteSize;
                 }

@@ -519,4 +519,13 @@
   <data name="sShared" xml:space="preserve">
     <value>공유</value>
   </data>
+  <data name="sForward" xml:space="preserve">
+    <value>앞으로 가기</value>
+  </data>
+  <data name="sBackward" xml:space="preserve">
+    <value>뒤로가기</value>
+  </data>
+  <data name="sOut" xml:space="preserve">
+    <value>나가기</value>
+  </data>
 </root>

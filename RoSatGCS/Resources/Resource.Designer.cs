@@ -169,6 +169,15 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Backward과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sBackward {
+            get {
+                return ResourceManager.GetString("sBackward", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Board Revision과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sBoardRevision {
@@ -475,6 +484,15 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Forward과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sForward {
+            get {
+                return ResourceManager.GetString("sForward", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Functions과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sFunctions {
@@ -642,6 +660,15 @@ namespace RoSatGCS.Resources {
         public static string sOrbitalElements {
             get {
                 return ResourceManager.GetString("sOrbitalElements", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Out과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sOut {
+            get {
+                return ResourceManager.GetString("sOut", resourceCulture);
             }
         }
         

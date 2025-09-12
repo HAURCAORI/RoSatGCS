@@ -1,4 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using FileListView.Interfaces;
+using FileSystemModels;
+using FileSystemModels.Browse;
+using FileSystemModels.Events;
+using FileSystemModels.Interfaces;
 using RoSatGCS.Models;
 using RoSatGCS.Utils.Localization;
 using RoSatGCS.Utils.Query;
@@ -6,6 +11,7 @@ using RoSatGCS.Utils.Satellites.TLE;
 using RoSatGCS.Views;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,8 +21,13 @@ using System.Windows.Input;
 
 namespace RoSatGCS.ViewModels
 {
-    public class PageFileShareViewModel : ViewModelPageBase
+    public class PageFileShareViewModel : FileTreeListControllerViewModel, IDisposable
     {
+        private readonly SemaphoreSlim _SlowStuffSemaphore;
+        private readonly OneTaskLimitedScheduler _OneTaskScheduler;
+        private readonly CancellationTokenSource _CancelTokenSource;
+        private bool _disposed = false;
+
 
         private ulong _satelliteId = 2;
         private byte _moduleMac = 0x33;
@@ -149,12 +160,15 @@ namespace RoSatGCS.ViewModels
 
         public string FwFilePath { get => _fwFilePath; set => SetProperty(ref _fwFilePath, value); }
 
+
         public ICommand OpenFile { get; }
         public ICommand FwUpdateCommand { get; }
         public ICommand FwUpdateBundleCommand { get; }
         public ICommand FileUploadCommand { get; }
         public ICommand FileDownload { get; }
-        public ICommand TEMP_OPEN_TLE { get; } // TODO: Remove this command
+        public ICommand Loaded { get; }
+        public ICommand RepositoryMouseUp { get; }
+
 
         public PageFileShareViewModel()
         {
@@ -163,27 +177,30 @@ namespace RoSatGCS.ViewModels
             FwUpdateBundleCommand = new RelayCommand(OnFWUpdateBundleCommand);
             FileUploadCommand = new RelayCommand(OnFileUploadCommand);
             FileDownload = new RelayCommand(OnFileDownloadCommand);
+            Loaded = new RelayCommand(OnLoaded);
+            RepositoryMouseUp = new RelayCommand<MouseButtonEventArgs>(OnRepoMouseUp);
 
-            // MUST BE REMOVED
-            TEMP_OPEN_TLE = new RelayCommand(ON_TEMP_OPEN_TLE);
-        }
 
-        static WindowTLE? _windowTLE = null;
-        TLE tle = new TLE("NOAA 1                  \r\n1 04793U 70106A   25196.89631242 -.00000037  00000+0  40365-4 0  9997\r\n2 04793 101.3876 240.5596 0030986 286.2886 247.2924 12.54043945498534", true);
-        private void ON_TEMP_OPEN_TLE()
-        {
-            if(_windowTLE == null)
-            {  
-                _windowTLE = new WindowTLE();
-                _windowTLE.Initialize(tle, update => { tle = update; });
-                _windowTLE.Closed += (s, e) => { _windowTLE = null; };
-                _windowTLE.Show();
-            }
-            else
-            {
-                _windowTLE.Initialize(tle, update => { tle = update; });
-                _windowTLE.Activate();
-            }
+            _SlowStuffSemaphore = new SemaphoreSlim(1, 1);
+            _OneTaskScheduler = new OneTaskLimitedScheduler();
+            _CancelTokenSource = new CancellationTokenSource();
+
+            FolderItemsView = FileListView.Factory.CreateFileListViewModel();
+            FolderTextPath = FolderControlsLib.Factory.CreateFolderComboBoxVM();
+            TreeBrowser = FolderBrowser.FolderBrowserFactory.CreateBrowserViewModel(false);
+
+            WeakEventManager<ICanNavigate, BrowsingEventArgs>
+                .AddHandler(FolderTextPath, "BrowseEvent", Control_BrowseEvent);
+
+            WeakEventManager<ICanNavigate, BrowsingEventArgs>
+                .AddHandler(FolderItemsView, "BrowseEvent", Control_BrowseEvent);
+
+            WeakEventManager<IFileOpenEventSource, FileOpenEventArgs>
+                .AddHandler(FolderItemsView, "OnFileOpen", FolderItemsView_OnFileOpen);
+
+            WeakEventManager<ICanNavigate, BrowsingEventArgs>
+                .AddHandler(TreeBrowser, "BrowseEvent", Control_BrowseEvent);
+
         }
 
         private async void OnSendFirmwareUpdate(bool isBundle, bool isFile)
@@ -206,7 +223,7 @@ namespace RoSatGCS.ViewModels
 
             try
             {
-                var ret = await ZeroMqQueryExecutor.Instance.ExecuteAsync(firmware, DispatcherType.Postpone);
+                var ret = await ZeroMqQueryExecutor.Instance.ExecuteAsync(firmware, DispatcherType.FileTransfer);
             }
             catch (Exception ex)
             {
@@ -261,13 +278,14 @@ namespace RoSatGCS.ViewModels
             string paddedString = fileFormat.PadRight(48, '\0');
 
             List<object> parameters = new List<object>();
-            parameters.Add(paddedString);
+            byte[] bytes = Encoding.Default.GetBytes(paddedString);
+            parameters.Add(bytes);
             _command.InputParameters.Add(parameters);
             _command.InputSerialized = QueryExecutorBase.Serializer(_command.InputParameters);
 
             try
             {
-                var ret = await ZeroMqQueryExecutor.Instance.ExecuteAsync(_command, DispatcherType.Postpone);
+                var ret = await ZeroMqQueryExecutor.Instance.ExecuteAsync(_command, DispatcherType.FileTransfer);
                 if (ret is byte[] b)
                 {
                     string outputPath = FileName;
@@ -280,5 +298,281 @@ namespace RoSatGCS.ViewModels
                 System.Windows.MessageBox.Show(ex.Message, TranslationSource.Instance["sError"], MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private void OnLoaded()
+        {
+            var path = PathFactory.SysDefault;
+            NavigateToFolder(path);
+        }
+
+        private void OnRepoMouseUp(MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.XButton1)
+            {
+                BackwardCommand.Execute(null);
+                e.Handled = true;
+            }
+            else if (e.ChangedButton == MouseButton.XButton2)
+            {
+                ForwardCommand.Execute(null);
+                e.Handled = true;
+            }
+        }
+
+        #region Folder method
+        /// <summary>
+        /// Master controller interface method to navigate all views
+        /// to the folder indicated in <paramref name="folder"/>
+        /// - updates all related viewmodels.
+        /// </summary>
+        /// <param name="itemPath"></param>
+        /// <param name="requestor"</param>
+        public override void NavigateToFolder(IPathModel itemPath)
+        {
+            try
+            {
+                // XXX Todo Keep task reference, support cancel, and remove on end?
+                var timeout = TimeSpan.FromSeconds(5);
+                var actualTask = new Task(() =>
+                {
+                    var request = new BrowseRequest(itemPath, _CancelTokenSource.Token);
+
+                    var t = Task.Factory.StartNew(() => NavigateToFolderAsync(request, null),
+                                                        request.CancelTok,
+                                                        TaskCreationOptions.LongRunning,
+                                                        _OneTaskScheduler);
+
+
+                    if (t.Wait(timeout) == true)
+                        return;
+
+                    _CancelTokenSource.Cancel();       // Task timed out so lets abort it
+                    return;                     // Signal timeout here...
+                });
+
+                actualTask.Start();
+                actualTask.Wait();
+            }
+            catch (System.AggregateException e)
+            {
+                Debug.WriteLine(e);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
+        }
+
+        /// <summary>
+		/// Master controler interface method to navigate all views
+		/// to the folder indicated in <paramref name="folder"/>
+		/// - updates all related viewmodels.
+		/// </summary>
+		/// <param name="request"></param>
+		/// <param name="requestor"</param>
+		private async Task<FinalBrowseResult> NavigateToFolderAsync(BrowseRequest request,
+                                                                    object sender)
+        {
+            // Make sure the task always processes the last input but is not started twice
+            await _SlowStuffSemaphore.WaitAsync();
+            try
+            {
+                var newPath = request.NewLocation;
+                var cancel = request.CancelTok;
+
+                if (cancel != null)
+                    cancel.ThrowIfCancellationRequested();
+
+                TreeBrowser.SetExternalBrowsingState(true);
+                FolderItemsView.SetExternalBrowsingState(true);
+                FolderTextPath.SetExternalBrowsingState(true);
+
+                FinalBrowseResult browseResult = null;
+
+                // Navigate TreeView to this file system location
+                if (TreeBrowser != sender)
+                {
+                    browseResult = await TreeBrowser.NavigateToAsync(request);
+
+                    if (cancel != null)
+                        cancel.ThrowIfCancellationRequested();
+
+                    if (browseResult.Result != BrowseResult.Complete)
+                        return FinalBrowseResult.FromRequest(request, BrowseResult.InComplete);
+                }
+
+                // Navigate Folder ComboBox to this folder
+                if (FolderTextPath != sender)
+                {
+                    browseResult = await FolderTextPath.NavigateToAsync(request);
+
+                    if (cancel != null)
+                        cancel.ThrowIfCancellationRequested();
+
+                    if (browseResult.Result != BrowseResult.Complete)
+                        return FinalBrowseResult.FromRequest(request, BrowseResult.InComplete);
+                }
+
+                if (cancel != null)
+                    cancel.ThrowIfCancellationRequested();
+
+                // Navigate Folder/File ListView to this folder
+                if (FolderItemsView != sender)
+                {
+                    browseResult = await FolderItemsView.NavigateToAsync(request);
+
+                    if (cancel != null)
+                        cancel.ThrowIfCancellationRequested();
+
+                    if (browseResult.Result != BrowseResult.Complete)
+                        return FinalBrowseResult.FromRequest(request, BrowseResult.InComplete);
+                }
+
+                if (browseResult != null)
+                {
+                    if (browseResult.Result == BrowseResult.Complete)
+                    {
+                        SelectedFolder = newPath.Path;
+
+                        // Log location into history of recent locations
+                        NaviHistory.Forward(newPath);
+                    }
+                }
+
+                return browseResult;
+            }
+            catch (Exception exp)
+            {
+                var result = FinalBrowseResult.FromRequest(request, BrowseResult.InComplete);
+                result.UnexpectedError = exp;
+                return result;
+            }
+            finally
+            {
+                TreeBrowser.SetExternalBrowsingState(true);
+                FolderItemsView.SetExternalBrowsingState(false);
+                FolderTextPath.SetExternalBrowsingState(false);
+
+                _SlowStuffSemaphore.Release();
+            }
+        }
+
+        /// <summary>
+		/// Executes when the file open event is fired and class was constructed with statndard constructor.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		protected override void FolderItemsView_OnFileOpen(object sender, FileOpenEventArgs e)
+        {
+            MessageBox.Show("File Open:" + e.FileName);
+        }
+
+        /// <summary>
+        /// A control has send an event that it has (been) browsing to a new location.
+        /// Lets sync this with all other controls.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Control_BrowseEvent(object sender,
+                                                FileSystemModels.Browse.BrowsingEventArgs e)
+        {
+            var location = e.Location;
+
+            SelectedFolder = location.Path;
+
+            if (e.IsBrowsing == false && e.Result == BrowseResult.Complete)
+            {
+                // XXX Todo Keep task reference, support cancel, and remove on end?
+                try
+                {
+                    var timeout = TimeSpan.FromSeconds(5);
+                    var actualTask = new Task(() =>
+                    {
+                        var request = new BrowseRequest(location, _CancelTokenSource.Token);
+
+                        var t = Task.Factory.StartNew(() => NavigateToFolderAsync(request, sender),
+                                                            request.CancelTok,
+                                                            TaskCreationOptions.LongRunning,
+                                                            _OneTaskScheduler);
+
+                        if (t.Wait(timeout) == true)
+                            return;
+
+                        _CancelTokenSource.Cancel();           // Task timed out so lets abort it
+                        return;                         // Signal timeout here...
+                    });
+
+                    actualTask.Start();
+                    actualTask.Wait();
+                }
+                catch (System.AggregateException ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+            }
+            else
+            {
+                if (e.IsBrowsing == true)
+                {
+                    // The sender has messaged: "I am changing location..."
+                    // So, we set this property to tell the others:
+                    // 1) Don't change your location now (eg.: Disable UI)
+                    // 2) We'll be back to tell you the location when we know it
+                    if (TreeBrowser != sender)
+                        TreeBrowser.SetExternalBrowsingState(true);
+
+                    if (FolderTextPath != sender)
+                        FolderTextPath.SetExternalBrowsingState(true);
+
+                    if (FolderItemsView != sender)
+                        FolderItemsView.SetExternalBrowsingState(true);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Disposable Interfaces
+        /// <summary>
+        /// Standard dispose method of the <seealso cref="IDisposable" /> interface.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        /// <summary>
+        /// Source: http://www.codeproject.com/Articles/15360/Implementing-IDisposable-and-the-Dispose-Pattern-P
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed == false)
+            {
+                if (disposing == true)
+                {
+                    // Dispose of the curently displayed content
+                    _OneTaskScheduler.Dispose();
+                    _SlowStuffSemaphore.Dispose();
+                    _CancelTokenSource.Dispose();
+                }
+
+                // There are no unmanaged resources to release, but
+                // if we add them, they need to be released here.
+            }
+
+            _disposed = true;
+
+            //// If it is available, make the call to the
+            //// base class's Dispose(Boolean) method
+            ////base.Dispose(disposing);
+        }
+        #endregion Disposable Interfaces
+
+        
     }
 }

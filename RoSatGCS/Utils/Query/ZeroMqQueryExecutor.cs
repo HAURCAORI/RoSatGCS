@@ -26,7 +26,8 @@ namespace RoSatGCS.Utils.Query
         private static readonly string _sendAddress = "tcp://127.0.0.1:50000"; // Send socket (Client)
         private static readonly string _receiveAddress = "tcp://127.0.0.1:50001"; // Receive socket (Server)
         private static readonly int _timeout = 5; // seconds
-        private static readonly int _postpone = 300; // seconds
+        private static readonly int _postpone = 10; // seconds
+        private static readonly int _fileTimeout = 600; // seconds for file transfer
 
         private ThreadLocal<RequestSocket?> _sendSocket;
         private ResponseSocket? _receiveSocket;
@@ -106,6 +107,18 @@ namespace RoSatGCS.Utils.Query
                             {
                                 Logger.Error("Timeout waiting for execution result.");
                                 throw new TimeoutException("Timeout waiting for execution result.");
+                            }
+                        }
+                        else if (packet.DispatcherType == DispatcherType.FileTransfer)
+                        {
+                            if(tcs.Task.Wait(TimeSpan.FromSeconds(_fileTimeout)))
+                            {
+                                return tcs.Task.Result as QueryPacket;
+                            }
+                            else
+                            {
+                                Logger.Error("Timeout waiting for file transfer result.");
+                                throw new TimeoutException("Timeout waiting for file transfer result.");
                             }
                         }
                         else if (packet.DispatcherType == DispatcherType.ImmediateResponse)

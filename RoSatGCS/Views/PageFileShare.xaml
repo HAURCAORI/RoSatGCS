@@ -3,15 +3,33 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
       xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
       xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
       xmlns:loc="clr-namespace:RoSatGCS.Utils.Localization"
       xmlns:bv="clr-namespace:RoSatGCS.Behaviors"
       xmlns:local="clr-namespace:RoSatGCS.Views"
+      xmlns:cvt="clr-namespace:RoSatGCS.Utils.Converter"
+      
+      
+      xmlns:view="clr-namespace:UserNotification.View;assembly=UserNotification"
+      xmlns:conv="clr-namespace:FileListView.Converters;assembly=FileListView"
+      xmlns:bindLocal="clr-namespace:FileListView.Views;assembly=FileListView"
+      xmlns:fvbehav="clr-namespace:FileListView.Views.Behavior;assembly=FileListView"
+      xmlns:fsconv="clr-namespace:FileSystemModels.Converters;assembly=FileSystemModels"
+      xmlns:EditInPlace="clr-namespace:InplaceEditBoxLib.Views;assembly=InplaceEditBoxLib"
+      xmlns:fvloc="clr-namespace:FileSystemModels.Local;assembly=FileSystemModels"
+      xmlns:fbviews="clr-namespace:FolderBrowser.Views;assembly=FolderBrowser"
+      
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="PageFiles">
     <Page.Resources>
+        <conv:UpdateBindingConverter x:Key="UpdateBindingConverter"/>
+        <fsconv:BrowseItemTypeToShellImageConverter x:Key="FolderBrowseItemTypeToShellImageConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <cvt:FileToByteConverter x:Key="FileToByteConverter"/>
+        
         <Style x:Key="labelHeader" TargetType="Label">
             <Setter Property="FontSize" Value="10"/>
         </Style>
@@ -21,7 +39,18 @@
             <Setter Property="Margin" Value="5,3,10,3"/>
             <Setter Property="Stroke" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"/>
         </Style>
+        <Style x:Key="Splitter" TargetType="Rectangle">
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Width" Value="1"/>
+            <Setter Property="Margin" Value="3,9,3,9"/>
+            <Setter Property="Stroke" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"/>
+        </Style>
     </Page.Resources>
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction Command="{Binding Loaded}"/>
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -29,8 +58,8 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="230"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         
         <!-- Left: Property Setting -->
@@ -73,6 +102,268 @@
 
         <!-- local files -->
         <Grid Grid.Row="0" Grid.Column="1" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}">
+            <b:Interaction.Triggers>
+                <b:EventTrigger EventName="PreviewMouseUp">
+                    <b:InvokeCommandAction Command="{Binding RepositoryMouseUp}" PassEventArgsToCommand="True"/>
+                </b:EventTrigger>
+            </b:Interaction.Triggers>
+            <Border Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}" BorderThickness="0.5"
+                BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" Margin="5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="28"/>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="105"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Margin="10,0,10,0" Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" BorderThickness="0,0,0,0.5">
+                        <TextBlock Margin="5,2,0,0" Text="Local Repository" FontWeight="Bold" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10,0,10,0">
+                        <Button Style="{DynamicResource PaneButton}" ToolTip="{loc:Localization sBackward}"
+                                Command="{Binding BackwardCommand}">
+                            <Rectangle Style="{DynamicResource Icon}" Height="10" Width="12">
+                                <Rectangle.OpacityMask>
+                                    <VisualBrush Stretch="Fill" Visual="{StaticResource IconArrowLeft}" />
+                                </Rectangle.OpacityMask>
+                            </Rectangle>
+                        </Button>
+
+                        <Button Style="{DynamicResource PaneButton}" ToolTip="{loc:Localization sForward}"
+                                Command="{Binding ForwardCommand}">
+                            <Rectangle Style="{DynamicResource Icon}" Height="10" Width="12">
+                                <Rectangle.OpacityMask>
+                                    <VisualBrush Stretch="Fill" Visual="{StaticResource IconArrowRight}" />
+                                </Rectangle.OpacityMask>
+                            </Rectangle>
+                        </Button>
+
+                        <Rectangle Style="{StaticResource Splitter}"/>
+
+                        <Button Style="{DynamicResource PaneButton}" ToolTip="{loc:Localization sOut}"
+                                Command="{Binding UpCommand}">
+                            <Rectangle Style="{DynamicResource Icon}" Height="9" Width="12">
+                                <Rectangle.OpacityMask>
+                                    <VisualBrush Stretch="Fill" Visual="{StaticResource IconOut}" />
+                                </Rectangle.OpacityMask>
+                            </Rectangle>
+                        </Button>
+
+                        <Rectangle Style="{StaticResource Splitter}"/>
+                    </StackPanel>
+                    <ComboBox
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        VerticalAlignment="Stretch"
+                        Height="24"
+                        Margin="0,0,10,0"
+                        Name="PathTextInput"
+                        fvbehav:SelectionChangedCommand.ChangedCommand="{Binding SelectionChanged}"
+                        fvbehav:SelectionChangedCommand.IsProcessing="{Binding IsBrowsing, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                        DataContext="{Binding FolderTextPath}"
+                        IsEditable="True"
+                        ItemsSource="{Binding CurrentItems, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                        SelectedItem="{Binding SelectedItem, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                        Text="{Binding CurrentFolder, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTip="{Binding CurrentFolderToolTip, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTipService.IsEnabled="True">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Image
+				                Width="16" Height="16" Margin="2,0" VerticalAlignment="Center" Focusable="False"
+				                Source="{Binding Path=., Converter={StaticResource FolderBrowseItemTypeToShellImageConverter}}" />
+
+                                    <TextBlock Grid.Column="1" Text="{Binding ItemPath}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Grid Grid.Row="2" Grid.ColumnSpan="2" Margin="10,0,10,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="5*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <fbviews:BrowseDirectoriesView
+                            Grid.Column="0" Margin="0,0,2,0" Padding="5"
+                            DataContext="{Binding Path=TreeBrowser, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" BorderThickness="0.3"/>
+                        
+                        
+                        <view:NotifyableContentControl
+                        DataContext="{Binding FolderItemsView}"
+                        Notification="{Binding Notification}"
+                        Grid.Column="1" Margin="2,0,0,0" Padding="5">
+                            <ListBox  BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" BorderThickness="0.3"
+                                    xmlns:bindLocal="clr-namespace:FileListView.Views;assembly=FileListView"
+                                    fvbehav:BringIntoViewListBoxItem.ScrollSelectedIntoView="True"
+                                    fvbehav:DoubleClickSelectorItem.DoubleClickItemCommand="{Binding Path=NavigateDownCommand}"
+                                    ScrollViewer.CanContentScroll="True"
+                                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                    SelectedItem="{Binding SelectedItem}"
+                                    VerticalAlignment="Stretch">
+                                <b:Interaction.Behaviors>
+                                    <bv:FileDragDropBehavior Parent="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Page}}"/>
+                                </b:Interaction.Behaviors>
+                                <ListBox.ItemsSource>
+                                    <MultiBinding Converter="{StaticResource UpdateBindingConverter}">
+                                        <!--  First & Second argument control update of binding on 3rd argument  -->
+                                        <Binding Path="IsLoaded" RelativeSource="{RelativeSource Self}" />
+                                        <Binding
+						            Mode="OneWay"
+						            Path="IsBrowsing"
+						            UpdateSourceTrigger="PropertyChanged" />
+                                        <Binding
+						            Mode="OneWay"
+						            Path="CurrentItems"
+						            UpdateSourceTrigger="PropertyChanged" />
+                                    </MultiBinding>
+                                </ListBox.ItemsSource>
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+
+                                <ListBox.Resources>
+                                    <BooleanToVisibilityConverter x:Key="boolToVis" />
+                                    <bindLocal:BindingProxy x:Key="DataContextProxy" Data="{Binding}" />
+                                </ListBox.Resources>
+
+                                <ListBox.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem
+						            Command="{Binding NavigateDownCommand}"
+						            CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}"
+						            Header="Open"/>
+
+                                        <MenuItem
+						            Command="{Binding OpenContainingFolderCommand}"
+						            CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}"
+						            Header="Open with explorer"/>
+
+                                        <MenuItem
+						            Command="{Binding CopyPathCommand}"
+						            CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}"
+						            Header="Copy path"/>
+
+                                        <Separator />
+
+                                        <MenuItem
+						            Command="{Binding Path=Data.CreateFolderCommand, Source={StaticResource DataContextProxy}}"
+						            CommandParameter="{Binding Path=Data.CurrentFolder, Source={StaticResource DataContextProxy}}"
+						            Header="New folder"/>
+
+                                        <MenuItem
+						            Command="{Binding Path=Data.StartRenameCommand, Source={StaticResource DataContextProxy}}"
+						            CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}"
+						            Header="Rename"/>
+                                    </ContextMenu>
+                                </ListBox.ContextMenu>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="90" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Image
+							            Grid.Column="0"
+							            Width="16"
+							            Height="16"
+							            Margin="3,0"
+							            SnapsToDevicePixels="True"
+							            Source="{Binding Path=., Converter={StaticResource FolderBrowseItemTypeToShellImageConverter}}"
+							            Visibility="{Binding Path=Data.ShowIcons, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Source={StaticResource DataContextProxy}, Converter={StaticResource boolToVis}}">
+                                                <Image.InputBindings>
+                                                    <MouseBinding
+									            Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ListBox}}, Path=DataContext.NavigateDownCommand}"
+									            CommandParameter="{Binding .}"
+									            MouseAction="LeftDoubleClick" />
+                                                </Image.InputBindings>
+                                            </Image>
+
+                                            <EditInPlace:EditBox
+							            Grid.Column="1"
+							            DisplayText="{Binding ItemDisplayString}"
+							            InvalidInputCharacters="{x:Static fvloc:Strings.ForbiddenRenameKeys}"
+							            InvalidInputCharactersErrorMessage="{x:Static fvloc:Strings.ForbiddenRenameKeysMessage}"
+							            InvalidInputCharactersErrorMessageTitle="{x:Static fvloc:Strings.ForbiddenRenameKeysTitle}"
+							            IsEditableOnDoubleClick="False"
+							            RenameCommand="{Binding Path=Data.RenameCommand, Source={StaticResource DataContextProxy}}"
+							            Text="{Binding ItemName}"
+							            ToolTip="{Binding ItemPath}"
+							            ToolTipService.ShowOnDisabled="True" />
+
+                                            <TextBlock Grid.Column="2" HorizontalAlignment="Right" Margin="0,0,5,0"
+                                                   Text="{Binding Path=ItemPath, Converter={StaticResource FileToByteConverter}}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </view:NotifyableContentControl>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+        
+        <!-- remote files-->
+        <Grid Grid.Row="0" Grid.Column="2" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}">
+            <Border Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}" BorderThickness="0.5"
+            BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" Margin="5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="28"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Margin="10,0,10,0" Grid.Row="0" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" BorderThickness="0,0,0,0.5">
+                        <TextBlock Margin="5,2,0,0" Text="Remote SD" FontWeight="Bold" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <ListView Grid.Row="1" VerticalAlignment="Stretch" Margin="10,5,10,10">
+                        <b:Interaction.Behaviors>
+                            <bv:FileLocalDragDropBehavior Parent="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Page}}"/>
+                        </b:Interaction.Behaviors>
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="40" Header="Name">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock TextTrimming="CharacterEllipsis"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Width="40" Header="Size">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock TextTrimming="CharacterEllipsis"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- bottom pane -->
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"  Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}">
             <Border Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}" BorderThickness="0.5"
                 BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" Margin="5">
                 <Grid>
@@ -83,25 +374,12 @@
                     <Button Content="FWUpdate" Command="{Binding FwUpdateCommand}" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,40,0,0" Width="140"/>
                     <Button Content="FWUpdateBundle" Command="{Binding FwUpdateBundleCommand}" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,70,0,0" Width="140"/>
                     <Button Content="FileUpload" Command="{Binding FileUploadCommand}" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,100,0,0" Width="140"/>
-                    <Label Content="{loc:Localization sFile}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,154,0,0"/>
-                    <TextBox Text="{Binding FileName}" Width="230" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50,150,0,0"/>
-                    <Button Content="FileDownload" Command="{Binding FileDownload}" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,180,0,0" Width="140"/>
-                    <Button Content="Open TLE" Command="{Binding TEMP_OPEN_TLE}" Height="24" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,220,0,0"/>
+                    
+                    <Label Content="{loc:Localization sFile}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="400,9,0,0"/>
+                    <TextBox Text="{Binding FileName}" Width="230" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="440,5,0,0"/>
+                    <Button Content="FileDownload" Command="{Binding FileDownload}" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="400,40,0,0" Width="140"/>
                 </Grid>
-            </Border>
-        </Grid>
-        
-        <!-- remote files-->
-        <Grid Grid.Row="0" Grid.Column="2" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}">
-            <Border Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}" BorderThickness="0.5"
-            BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" Margin="5">
-            </Border>
-        </Grid>
 
-        <!-- bottom pane -->
-        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"  Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}">
-            <Border Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}" BorderThickness="0.5"
-                BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" Margin="5">
             </Border>
         </Grid>
 

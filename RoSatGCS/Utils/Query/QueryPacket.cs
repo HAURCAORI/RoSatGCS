@@ -14,7 +14,8 @@ namespace RoSatGCS.Utils.Query
     {
         NoResponse,
         ImmediateResponse,
-        Postpone
+        Postpone,
+        FileTransfer
     }
 
     public enum QueryType
