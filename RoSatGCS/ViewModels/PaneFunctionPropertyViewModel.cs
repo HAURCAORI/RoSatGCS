@@ -32,9 +32,11 @@ namespace RoSatGCS.ViewModels
         private ObservableCollection<ParameterModel> _outParameters = [];
         private RelayCommand? _save;
         private RelayCommand? _execute;
+        private RelayCommand? _abort;
         #endregion
 
         #region Parameters
+        public bool IsCommandPage { get; set; } = false;
         public bool IsModified { get => _isModified; set { SetProperty(ref _isModified, value); UpdateTitle(); } }
         public bool IsParametersVisible { get => HasInput && _isParametersVisible; set => SetProperty(ref _isParametersVisible, value); }
         public bool IsResultsVisible { get => HasOutput && _isResultsVisible; set => SetProperty(ref _isResultsVisible, value); }
@@ -52,12 +54,14 @@ namespace RoSatGCS.ViewModels
         public ICommand ResultsClick { get; set; }
         public ICommand Save { get { return _save ??= new RelayCommand(OnSave, CanSave); } }
         public ICommand Execute { get { return _execute ??= new RelayCommand(OnExecute, CanExecute); } }
+        public ICommand Abort { get { return _abort ??= new RelayCommand(OnAbort); } }
 
         #endregion
 
 
-        public PaneFunctionPropertyViewModel(SatelliteCommandModel command)
+        public PaneFunctionPropertyViewModel(SatelliteCommandModel command, bool isCommandPage)
         {
+            IsCommandPage = isCommandPage;
             _command = command;
             _command.Received += OnReceived;
 
@@ -73,14 +77,22 @@ namespace RoSatGCS.ViewModels
         #region Implementations
         private void OnClose()
         {
-            var Parent = MainDataContext.Instance.GetPageCommandViewModel;
-            if (Parent == null)
-                return;
-            if (Command != null && Command.IsTemp)
-                Parent.RemoveTempCommand.Execute(Command);
-            Parent.CloseDocument(this);
-            
-            foreach(var input in InputParameters)
+            if (IsCommandPage) {
+                var Parent = MainDataContext.Instance.GetPageCommandViewModel;
+                if (Parent == null) return;
+                if (Command != null && Command.IsTemp)
+                    Parent.RemoveTempCommand.Execute(Command);
+                Parent.CloseDocument(this);
+            }
+            else
+            {
+                var Parent = App.Current.MainWindow?.DataContext as MainWindowViewModel;
+                if(Parent == null) return;
+                Parent.OnWindowClose("functionproperty");
+            }
+
+
+            foreach (var input in InputParameters)
             {
                 input.Dispose();
             }
@@ -174,15 +186,18 @@ namespace RoSatGCS.ViewModels
 
 
             // Add to Group
-            if (Command.GroupName == null)
+            if (IsCommandPage)
             {
-                string? groupName = null;
-                if (Parent.PaneFunctionList?.SelectedCommandGroup != null)
+                if (Command.GroupName == null)
                 {
-                    groupName = Parent.PaneFunctionList?.SelectedCommandGroup.Name;
+                    string? groupName = null;
+                    if (Parent.PaneFunctionList?.SelectedCommandGroup != null)
+                    {
+                        groupName = Parent.PaneFunctionList?.SelectedCommandGroup.Name;
+                    }
+                    Command.GroupName = groupName;
+                    Parent.AddCommand.Execute(Command);
                 }
-                Command.GroupName = groupName;
-                Parent.AddCommand.Execute(Command);
             }
         }
 
@@ -271,6 +286,12 @@ namespace RoSatGCS.ViewModels
             }
         }
 
+        private async void OnAbort()
+        {
+            if (Command == null) return;
+            await ZeroMqQueryExecutor.Instance.CancelAllQueryAsync();
+        }
+
         #endregion
 
         #region Functions
@@ -341,8 +362,15 @@ namespace RoSatGCS.ViewModels
         public void UpdateTitle()
         {
             if(Command == null) { return; }
-            string name = Command.Name + ((Command.GroupName != null && Command.GroupName != string.Empty) ? $"[{Command.GroupName}]" : "");
-            Title = IsModified ? $"{name} *" : name;
+            if (IsCommandPage)
+            {
+                string name = Command.Name + ((Command.GroupName != null && Command.GroupName != string.Empty) ? $"[{Command.GroupName}]" : "");
+                Title = IsModified ? $"{name} *" : name;
+            }
+            else
+            {
+                Title = IsModified ? $"{Command.File}.{Command.Name} *" : $"{Command.File}.{Command.Name}";
+            }
         }
 
         static string ToFixedSizeCString(string input, int size)

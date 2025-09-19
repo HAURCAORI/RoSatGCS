@@ -45,6 +45,7 @@ namespace RoSatGCS.ViewModels
         public ICommand AddToCommand { get; }
         public ICommand AddToCommandSelected { get; }
         public ICommand UpdateSelectedItems { get; }
+        public ICommand AddToOnboardScheduler { get; }  
 
         public PaneFunctionListViewModel()
         {
@@ -59,6 +60,7 @@ namespace RoSatGCS.ViewModels
             AddToCommand = new RelayCommand(OnAddToCommand);
             AddToCommandSelected = new RelayCommand(OnAddToCommandSelected);
             UpdateSelectedItems = new RelayCommand<object>(OnUpdateSelectedItems);
+            AddToOnboardScheduler = new RelayCommand(OnAddToOnboardScheduler);
         }
 
         private void OnApplyFilter()
@@ -167,6 +169,18 @@ namespace RoSatGCS.ViewModels
                     SelectedItems.Add(c);
                 }
                 OnPropertyChanged(nameof(IsSingleSelection));
+            }
+        }
+
+
+        static int _schedulerId = 0;
+        private void OnAddToOnboardScheduler()
+        {
+            foreach (var o in SelectedItems)
+            {
+                SatelliteCommandModel model = new SatelliteCommandModel(o);
+                model.GroupName = (_schedulerId++).ToString();
+                MainDataContext.Instance.AddSatelliteCommandToSchedule(model);
             }
         }
 

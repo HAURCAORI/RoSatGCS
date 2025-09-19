@@ -3,11 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:RoSatGCS"
              StartupUri="Views/MainWindow.xaml">
-    <!--TestWindow.xaml-->
+    <!--MainWindow.xaml-->
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/Light.xaml"/> <!-- Light -->
+                <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/Light.xaml"/>
+                <!-- Light -->
                 <ResourceDictionary Source="pack://application:,,,/AdonisUI.ClassicTheme;component/Resources.xaml"/>
 
                 <ResourceDictionary Source="/Styles/CheckBox.xaml"/>
@@ -17,7 +18,7 @@
                 <ResourceDictionary Source="/Fonts/Fonts.xaml"/>
                 <ResourceDictionary Source="/Styles/DockTheme.xaml"/>
                 <ResourceDictionary Source="/Styles/BasicStyle.xaml"/>
-                
+
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

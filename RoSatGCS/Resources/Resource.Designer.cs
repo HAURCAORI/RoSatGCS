@@ -124,11 +124,29 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Abort과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sAbort {
+            get {
+                return ResourceManager.GetString("sAbort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Add과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sAdd {
             get {
                 return ResourceManager.GetString("sAdd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Add Onboard Scheduler과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sAddOnboardScheduler {
+            get {
+                return ResourceManager.GetString("sAddOnboardScheduler", resourceCulture);
             }
         }
         
@@ -367,6 +385,15 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Down과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sDown {
+            get {
+                return ResourceManager.GetString("sDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Downlink과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sDownlink {
@@ -408,6 +435,15 @@ namespace RoSatGCS.Resources {
         public static string sEncryption {
             get {
                 return ResourceManager.GetString("sEncryption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Erase과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sErase {
+            get {
+                return ResourceManager.GetString("sErase", resourceCulture);
             }
         }
         
@@ -588,6 +624,15 @@ namespace RoSatGCS.Resources {
         public static string sImport {
             get {
                 return ResourceManager.GetString("sImport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Info과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sInfo {
+            get {
+                return ResourceManager.GetString("sInfo", resourceCulture);
             }
         }
         
@@ -943,6 +988,15 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Sort과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sSort {
+            get {
+                return ResourceManager.GetString("sSort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Start과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sStart {
@@ -1011,6 +1065,15 @@ namespace RoSatGCS.Resources {
         public static string sUnsavedChanges {
             get {
                 return ResourceManager.GetString("sUnsavedChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Up과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sUp {
+            get {
+                return ResourceManager.GetString("sUp", resourceCulture);
             }
         }
         
@@ -1182,6 +1245,15 @@ namespace RoSatGCS.Resources {
         public static string zFileNotFound {
             get {
                 return ResourceManager.GetString("zFileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Already transfering file.과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string zFileTransfering {
+            get {
+                return ResourceManager.GetString("zFileTransfering", resourceCulture);
             }
         }
         

@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.IO;
 using System.Runtime.InteropServices;
 using FileListView.ViewModels;
+using RoSatGCS.Utils.Files;
 
 
 namespace RoSatGCS.Utils.Converter
@@ -294,36 +295,7 @@ namespace RoSatGCS.Utils.Converter
         }
     }
 
-    class FileSizeHelper
-    {
-        [StructLayout(LayoutKind.Sequential)]
-        private struct WIN32_FILE_ATTRIBUTE_DATA
-        {
-            public FileAttributes dwFileAttributes;
-            public System.Runtime.InteropServices.ComTypes.FILETIME ftCreationTime;
-            public System.Runtime.InteropServices.ComTypes.FILETIME ftLastAccessTime;
-            public System.Runtime.InteropServices.ComTypes.FILETIME ftLastWriteTime;
-            public uint nFileSizeHigh;
-            public uint nFileSizeLow;
-        }
-
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern bool GetFileAttributesEx(string lpFileName, int fInfoLevelId, out WIN32_FILE_ATTRIBUTE_DATA fileData);
-
-        public static bool TryGetFileSize(string path, out long size, out bool isDirectory)
-        {
-            if (GetFileAttributesEx(path, 0, out var data))
-            {
-                isDirectory = (data.dwFileAttributes & FileAttributes.Directory) != 0;
-                size = ((long)data.nFileSizeHigh << 32) + data.nFileSizeLow;
-                return true;
-            }
-
-            size = 0;
-            isDirectory = false;
-            return false;
-        }
-    }
+    
 
     public class FileToByteConverter : IValueConverter
     {
@@ -366,4 +338,64 @@ namespace RoSatGCS.Utils.Converter
         }
     }
 
+    public class ListCreatedTimeToStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is DateTime dt)
+            {
+                return "Updated:" + dt.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+            return Binding.DoNothing;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
+        }
+    }
+
+    public class ByteToModuleName : IValueConverter
+    {
+        public object Convert(object value, Type t, object p, CultureInfo c) => value is byte b ? b switch
+        {
+            0x11 => "UHF",
+            0x33 => "OBC",
+            0x44 => "SBand",
+            0x66 => "EPS BP",
+            0x77 => "EPS PDM",
+            _ => $"0x{b:X2}"
+        } : "";
+        public object ConvertBack(object value, Type t, object p, CultureInfo c) => Binding.DoNothing;
+    }
+
+    public class IndexInViewConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            var item = values[0];
+            var view = values[1] as ListCollectionView;
+            if (item == null || view == null) return Binding.DoNothing;
+
+            int idx = view.IndexOf(item);
+            return (idx >= 0) ? (idx + 1).ToString() : "";
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+            => throw new NotSupportedException();
+    }
+
+    public class ByteListToString : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is List<byte> byteList)
+            {
+                return string.Join(" ", byteList.Select(b => b.ToString("X2")));
+            }
+            return Binding.DoNothing;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
+        }
+    }
 }

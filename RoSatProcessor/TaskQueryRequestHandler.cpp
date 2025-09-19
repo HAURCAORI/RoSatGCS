@@ -5,6 +5,7 @@
 #include "Helper.h"
 
 static std::unordered_map<int, std::vector<uint8_t>> commandLookup;
+std::queue<uint64_t> RoSatProcessor::TaskQueryRequestHandler::m_qid;
 
 RoSatProcessor::TaskQueryRequestHandler::TaskQueryRequestHandler(PCWSTR pszServiceName, PCWSTR pszTaskName) :
 	RoSatTask(pszServiceName, pszTaskName, TRUE, 50)
@@ -26,6 +27,17 @@ void RoSatProcessor::TaskQueryRequestHandler::stop()
 void RoSatProcessor::TaskQueryRequestHandler::Enqueue(const DataFrame& value)
 {
 
+}
+
+void RoSatProcessor::TaskQueryRequestHandler::Dequeue(uint64_t id)
+{
+	while(!m_qid.empty()) {
+		if (m_qid.front() == id) {
+			m_qid.pop();
+			return;
+		}
+		m_qid.pop();
+	}
 }
 
 BOOL RoSatProcessor::TaskQueryRequestHandler::initialize()
@@ -130,6 +142,7 @@ void RoSatProcessor::TaskQueryRequestHandler::ExecuteQueryAsync(const QueryPacke
 			return;
 		}
 		auto request = WebSocketPacket::CreateCPCommand(command);
+		m_qid.push(request.Id());
 		RoSatTaskManager::message(TEXT("WebSocketConnector"), std::move(request.Serialize()));
 	}
 	else if (packet.Type == QueryType::Radio) {
@@ -138,16 +151,19 @@ void RoSatProcessor::TaskQueryRequestHandler::ExecuteQueryAsync(const QueryPacke
 
 		if (command.RemoteRadioMac != 0) {
 			auto request = WebSocketPacket::CreateRadioConn(command);
+			m_qid.push(request.Id());
 			RoSatTaskManager::message(TEXT("WebSocketConnector"), std::move(request.Serialize()));
 		}
 
 		if (command.RFConfig != 0 && command.DownlinkFrequency != 0 && command.UplinkFrequency != 0) {
 			auto request = WebSocketPacket::CreateUpdateRadio(command);
+			m_qid.push(request.Id());
 			RoSatTaskManager::message(TEXT("WebSocketConnector"), std::move(request.Serialize()));
 		}
 
 		if (command.AES.IV != std::array<uint8_t, 16>{0}&& command.AES.Key != std::array<uint8_t, 32>{0}) {
 			auto request = WebSocketPacket::CreateUpdateAESKey(command);
+			m_qid.push(request.Id());
 			RoSatTaskManager::message(TEXT("WebSocketConnector"), std::move(request.Serialize()));
 		}
 	}
@@ -158,7 +174,7 @@ void RoSatProcessor::TaskQueryRequestHandler::ExecuteQueryAsync(const QueryPacke
 		Config::SetWebSocketHost(command.IP);
 		Config::SetWebSocketPort(std::to_string(command.Port));
 		Config::SetWebSocketTLS(command.TLS);
-		
+
 		RoSatTaskManager::restart(TEXT("WebSocketConnector"));
 	}
 	else if (packet.Type == QueryType::Data) {
@@ -174,20 +190,32 @@ void RoSatProcessor::TaskQueryRequestHandler::ExecuteQueryAsync(const QueryPacke
 	}
 	else if (packet.Type == QueryType::FwUpdate) {
 		auto command = FirmwareUpdatePacket::DeserializePacket(packet.Payload);
+		command.QueryId = packet.Id;
 		if (command.IsFile) {
 			auto request = WebSocketPacket::CreateFilePacket(command);
+			m_qid.push(request.Id());
 			RoSatTaskManager::message(TEXT("WebSocketConnector"), std::move(request.Serialize()));
 		}
 		else if (command.IsBundle) {
 			auto request = WebSocketPacket::CreateFWUpdBundle(command);
+			m_qid.push(request.Id());
 			RoSatTaskManager::message(TEXT("WebSocketConnector"), std::move(request.Serialize()));
 		}
 		else {
 			auto request = WebSocketPacket::CreateFWUpd(command);
+			m_qid.push(request.Id());
 			RoSatTaskManager::message(TEXT("WebSocketConnector"), std::move(request.Serialize()));
 		}
-		
-
+	}
+	else if (packet.Type == QueryType::Cancel) {
+		auto command = CancelPacket::DeserializePacket(packet.Payload);
+		command.QueryId = packet.Id;
+		while(!m_qid.empty()) {
+			command.CommandId = m_qid.front();
+			auto request = WebSocketPacket::CreateCancel(command);
+			RoSatTaskManager::message(TEXT("WebSocketConnector"), std::move(request.Serialize()));
+			m_qid.pop();
+		}
 	}
 	
 }

@@ -39,6 +39,7 @@ namespace RoSatGCS
             services.AddTransient(typeof(MainWindowViewModel)); // 종료까지 유지
             services.AddTransient(typeof(WindowSettingsViewModel));
             services.AddTransient(typeof(WindowTLEViewModel));
+            services.AddTransient(typeof(WindowOnboardSchedulerViewModel));
             services.AddTransient(typeof(PageArchiveViewModel));
             services.AddTransient(typeof(PageCommandViewModel));
             services.AddTransient(typeof(PageDashboardViewModel));

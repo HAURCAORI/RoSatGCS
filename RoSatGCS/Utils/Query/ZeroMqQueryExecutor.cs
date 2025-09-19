@@ -35,6 +35,8 @@ namespace RoSatGCS.Utils.Query
         private bool _disposed = false;
         private CancellationTokenSource? _cts;
 
+        private readonly Mutex _mutex = new();
+
         // Stores pending command tasks waiting for execution results
         private readonly ConcurrentDictionary<Guid, TaskCompletionSource<object>> _pendingResults = new();
 
@@ -60,7 +62,7 @@ namespace RoSatGCS.Utils.Query
             }
 
             var tcs = new TaskCompletionSource<object>();
-            if (packet.DispatcherType == DispatcherType.Postpone)
+            if (packet.DispatcherType == DispatcherType.Postpone || packet.DispatcherType == DispatcherType.FileTransfer)
             {
                 _pendingResults[packet.Id] = tcs; // Store result only if we expect a response later
             }
@@ -148,6 +150,19 @@ namespace RoSatGCS.Utils.Query
             });
         }
 
+        public override async Task CancelAllQueryAsync()
+        {
+            _mutex.WaitOne();
+            foreach (var tcs in _pendingResults.Values)
+            {
+                tcs.SetCanceled();
+            }
+            _mutex.ReleaseMutex();
+            _pendingResults.Clear();
+
+            await ExecuteAsync(new CancelPacket(), DispatcherType.NoResponse);
+        }
+
         /// <summary>
         /// Starts the receiving server on a background thread.
         /// </summary>
@@ -168,10 +183,14 @@ namespace RoSatGCS.Utils.Query
                             byte[] receivedMessage = _receiveSocket.ReceiveFrameBytes();
                             var result = QueryPacket.DeserializePacket(receivedMessage);
 
+                            _mutex.WaitOne();
+
                             if (result != null && _pendingResults.TryRemove(result.Id, out var tcs))
                             {
                                 tcs.SetResult(result);
                             }
+
+                            _mutex.ReleaseMutex();
 
                             _receiveSocket.SendFrame("ACK");
                         }

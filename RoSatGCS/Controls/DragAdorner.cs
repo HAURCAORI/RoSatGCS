@@ -30,8 +30,8 @@ namespace RoSatGCS.Controls
 
             if (dragElement is FrameworkElement element)
             {
-                element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                _adornerSize = element.DesiredSize;
+                //element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));//element.DesiredSize;
+                _adornerSize = new Size(element.ActualWidth, element.ActualHeight);
             }
             else
             {

@@ -5,19 +5,24 @@ using FileSystemModels.Browse;
 using FileSystemModels.Events;
 using FileSystemModels.Interfaces;
 using RoSatGCS.Models;
+using RoSatGCS.Utils.Files;
 using RoSatGCS.Utils.Localization;
 using RoSatGCS.Utils.Query;
 using RoSatGCS.Utils.Satellites.TLE;
 using RoSatGCS.Views;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
+using static RoSatGCS.Utils.Files.FileConvertHelper;
 
 namespace RoSatGCS.ViewModels
 {
@@ -28,7 +33,7 @@ namespace RoSatGCS.ViewModels
         private readonly CancellationTokenSource _CancelTokenSource;
         private bool _disposed = false;
 
-
+        #region FW Parameters
         private ulong _satelliteId = 2;
         private byte _moduleMac = 0x33;
         private ushort _boardRevision = 0;
@@ -39,146 +44,139 @@ namespace RoSatGCS.ViewModels
         private ushort _fwVerMin = 0;
         private ushort _moduleType = 0;
         private ushort _moduleConfig = 0;
-        private ulong _flags = 1024;
-        private string _fwFilePath = string.Empty;
-        private string _fileName = string.Empty;
 
+        private ulong _flags = 1024;
         public string SatId
         {
             get => _satelliteId.ToString();
-            set
-            {
-                if (UInt64.TryParse(value, out var ret))
-                    SetProperty(ref _satelliteId, ret);
-            }
+            set { if (UInt64.TryParse(value, out var ret)) SetProperty(ref _satelliteId, ret); }
         }
         public string ModuleMac
         {
             get => _moduleMac.ToString();
-            set
-            {
-                if (byte.TryParse(value, out var ret))
-                    SetProperty(ref _moduleMac, ret);
-            }
+            set { if (byte.TryParse(value, out var ret)) SetProperty(ref _moduleMac, ret); }
         }
 
         public string BoardRevision
         {
             get => _boardRevision.ToString();
-            set
-            {
-                if (UInt16.TryParse(value, out var ret))
-                    SetProperty(ref _boardRevision, ret);
-            }
+            set { if (UInt16.TryParse(value, out var ret)) SetProperty(ref _boardRevision, ret); }
         }
 
         public string CpuType
         {
             get => _cpuType.ToString();
-            set
-            {
-                if (UInt16.TryParse(value, out var ret))
-                    SetProperty(ref _cpuType, ret);
-            }
+            set { if (UInt16.TryParse(value, out var ret)) SetProperty(ref _cpuType, ret); }
         }
 
         public string SubModule
         {
             get => _subModule.ToString();
-            set
-            {
-                if (UInt16.TryParse(value, out var ret))
-                    SetProperty(ref _subModule, ret);
-            }
+            set { if (UInt16.TryParse(value, out var ret)) SetProperty(ref _subModule, ret); }
         }
 
         public string FwType
         {
             get => _fwType.ToString();
-            set
-            {
-                if (UInt16.TryParse(value, out var ret))
-                    SetProperty(ref _fwType, ret);
-            }
+            set { if (UInt16.TryParse(value, out var ret)) SetProperty(ref _fwType, ret); }
         }
 
         public string FwVerMaj
         {
             get => _fwVerMaj.ToString();
-            set
-            {
-                if (UInt16.TryParse(value, out var ret))
-                    SetProperty(ref _fwVerMaj, ret);
-            }
+            set { if (UInt16.TryParse(value, out var ret)) SetProperty(ref _fwVerMaj, ret); }
         }
 
         public string FwVerMin
         {
             get => _fwVerMin.ToString();
-            set
-            {
-                if (UInt16.TryParse(value, out var ret))
-                    SetProperty(ref _fwVerMin, ret);
-            }
+            set { if (UInt16.TryParse(value, out var ret)) SetProperty(ref _fwVerMin, ret); }
         }
 
         public string ModuleType
         {
             get => _moduleType.ToString();
-            set
-            {
-                if (UInt16.TryParse(value, out var ret))
-                    SetProperty(ref _moduleType, ret);
-            }
+            set { if (UInt16.TryParse(value, out var ret)) SetProperty(ref _moduleType, ret); }
         }
 
         public string ModuleConfig
         {
             get => _moduleConfig.ToString();
-            set
-            {
-                if (UInt16.TryParse(value, out var ret))
-                    SetProperty(ref _moduleConfig, ret);
-            }
+            set { if (UInt16.TryParse(value, out var ret)) SetProperty(ref _moduleConfig, ret); }
         }
 
         public string Flags
         {
             get => _flags.ToString();
-            set
-            {
-                if (UInt64.TryParse(value, out var ret))
-                    SetProperty(ref _flags, ret);
+            set { if (UInt64.TryParse(value, out var ret)) SetProperty(ref _flags, ret); }
+        }
+
+        #endregion
+
+        private bool _isFileTransfering = false;
+
+        public bool IsFileTransfering
+        {
+            get => _isFileTransfering;
+            set {
+                SetProperty(ref _isFileTransfering, value);
+                FwUpdateCommand.NotifyCanExecuteChanged();
+                FwUpdateBundleCommand.NotifyCanExecuteChanged();
+                FileUploadCommand.NotifyCanExecuteChanged();
+                FileDownload.NotifyCanExecuteChanged();
+                RemoteRefreshCommand.NotifyCanExecuteChanged();
+                RemoteEraseCommand.NotifyCanExecuteChanged();
+                RemoteCancel.NotifyCanExecuteChanged();
+                RemoteSelectedEraseCommand.NotifyCanExecuteChanged();
+                RemoteSelectedDownloadCommand.NotifyCanExecuteChanged();
             }
         }
 
-        public string FileName
-        {
-            get => _fileName;
-            set => SetProperty(ref _fileName, value);
-        }
+        public DateTime ListCreatedTime => File.Exists("DirList.txt") ? File.GetLastWriteTime("DirList.txt") : DateTime.MinValue;
 
-        public string FwFilePath { get => _fwFilePath; set => SetProperty(ref _fwFilePath, value); }
+        private ObservableCollection<RemoteFileModel> _remoteFiles = [];
+        public ObservableCollection<RemoteFileModel> RemoteFiles { get => _remoteFiles; }
 
+        private ListCollectionView _remoteFilesView;
+        public ListCollectionView RemoteFilesView { get => _remoteFilesView; }
 
-        public ICommand OpenFile { get; }
-        public ICommand FwUpdateCommand { get; }
-        public ICommand FwUpdateBundleCommand { get; }
-        public ICommand FileUploadCommand { get; }
-        public ICommand FileDownload { get; }
+        private ObservableCollection<RemoteFileModel> _selectedRemoteFiles = [];
+        public ObservableCollection<RemoteFileModel> SelectedRemoteFiles { get => _selectedRemoteFiles; set => SetProperty(ref _selectedRemoteFiles, value); }
+
+        public RelayCommand<string> FwUpdateCommand { get; }
+        public RelayCommand<string> FwUpdateBundleCommand { get; }
+        public RelayCommand<string> FileUploadCommand { get; }
+        public RelayCommand<string> FileDownload { get; }
         public ICommand Loaded { get; }
+        public ICommand UpdateSelectedItems { get; }
         public ICommand RepositoryMouseUp { get; }
+        public RelayCommand RemoteRefreshCommand { get; }
+        public RelayCommand<string> RemoteEraseCommand { get; }
+        public ICommand RemoteSortCommand { get; }
+        public RelayCommand RemoteCancel { get; }
+        public RelayCommand RemoteSelectedEraseCommand { get; }
+        public RelayCommand RemoteSelectedDownloadCommand { get; }
+        public ICommand RefreshExplorer { get; }
 
 
         public PageFileShareViewModel()
         {
-            OpenFile = new RelayCommand(OnOpenFile);
-            FwUpdateCommand = new RelayCommand(OnFWUpdateCommand);
-            FwUpdateBundleCommand = new RelayCommand(OnFWUpdateBundleCommand);
-            FileUploadCommand = new RelayCommand(OnFileUploadCommand);
-            FileDownload = new RelayCommand(OnFileDownloadCommand);
+            _remoteFilesView = new ListCollectionView(RemoteFiles);
+
+            FwUpdateCommand = new RelayCommand<string>(OnFWUpdateCommand, (o)=>!IsFileTransfering);
+            FwUpdateBundleCommand = new RelayCommand<string>(OnFWUpdateBundleCommand, (o)=>!IsFileTransfering);
+            FileUploadCommand = new RelayCommand<string>(OnFileUploadCommand, (o)=>!IsFileTransfering);
+            FileDownload = new RelayCommand<string>(OnFileDownloadCommand, (o)=>!IsFileTransfering);
             Loaded = new RelayCommand(OnLoaded);
+            UpdateSelectedItems = new RelayCommand<object>(OnUpdateSelectedItems);
             RepositoryMouseUp = new RelayCommand<MouseButtonEventArgs>(OnRepoMouseUp);
+            RemoteRefreshCommand = new RelayCommand(OnRemoteRefreshCommand, ()=>!IsFileTransfering);
+            RemoteEraseCommand = new RelayCommand<string>(OnRemoteEraseCommand, (o)=>!IsFileTransfering);
+            RemoteSortCommand = new RelayCommand(OnRemotesSortCommand);
+            RemoteCancel = new RelayCommand( async () => { await ZeroMqQueryExecutor.Instance.CancelAllQueryAsync(); IsFileTransfering = false; }, () => IsFileTransfering);
+            RemoteSelectedEraseCommand = new RelayCommand(OnRemoteSelectedEraseCommand);
+            RemoteSelectedDownloadCommand = new RelayCommand(OnRemoteSelectedDownloadCommand);
+            RefreshExplorer = new RelayCommand(OnRefreshExplorer);
 
 
             _SlowStuffSemaphore = new SemaphoreSlim(1, 1);
@@ -200,11 +198,19 @@ namespace RoSatGCS.ViewModels
 
             WeakEventManager<ICanNavigate, BrowsingEventArgs>
                 .AddHandler(TreeBrowser, "BrowseEvent", Control_BrowseEvent);
-
         }
 
-        private async void OnSendFirmwareUpdate(bool isBundle, bool isFile)
+        private async void OnSendFirmwareUpdate(string path, bool isBundle, bool isFile)
         {
+            if (IsFileTransfering == true)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    System.Windows.MessageBox.Show(TranslationSource.Instance["zFileTransfering"], TranslationSource.Instance["sWarning"], MessageBoxButton.OK, MessageBoxImage.Warning);
+                });
+                return;
+            }
+
             FirmwareUpdatePacket firmware = new FirmwareUpdatePacket();
             firmware.SatelliteId = _satelliteId.ToString();
             firmware.ModuleMac = _moduleMac;
@@ -216,65 +222,155 @@ namespace RoSatGCS.ViewModels
             firmware.FWVerMin = _fwVerMin;
             firmware.ModuleType = _moduleType;
             firmware.ModuleConfig = _moduleConfig;
-            firmware.FilePath = _fwFilePath;
+
+            firmware.FilePath = path;
             firmware.Flags = _flags;
             firmware.IsBundle = isBundle;
             firmware.IsFile = isFile;
 
             try
             {
+                IsFileTransfering = true;
                 var ret = await ZeroMqQueryExecutor.Instance.ExecuteAsync(firmware, DispatcherType.FileTransfer);
+                // TODO: Handle return value
+                IsFileTransfering = false;
+                RemoteRefreshCommand.Execute(null);
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message, TranslationSource.Instance["sError"], MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    System.Windows.MessageBox.Show(ex.Message, TranslationSource.Instance["sError"], MessageBoxButton.OK, MessageBoxImage.Error);
+                });
+            }
+            finally
+            {
+                IsFileTransfering = false;
             }
         }
 
-        private void OnOpenFile()
-        {
-            var dialogue = new WindowFileSearch(["*"]);
-            if (dialogue.ShowDialog() == true)
-            {
-                this.FwFilePath = dialogue.Path;
-            }
-        }
 
-        private void OnFWUpdateCommand()
+        private void OnFWUpdateCommand(string? path)
         {
-            if (string.IsNullOrEmpty(FwFilePath))
+            if (!File.Exists(path))
             {
-                System.Windows.MessageBox.Show(TranslationSource.Instance["zNullArgument"], TranslationSource.Instance["sWarning"], MessageBoxButton.OK, MessageBoxImage.Warning);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    System.Windows.MessageBox.Show(TranslationSource.Instance["zNoSuchFile"], TranslationSource.Instance["sWarning"], MessageBoxButton.OK, MessageBoxImage.Warning);
+                });
                 return;
             }
-            OnSendFirmwareUpdate(false, false);
+            OnSendFirmwareUpdate(path, false, false);
         }
 
-        private void OnFWUpdateBundleCommand()
+        private void OnFWUpdateBundleCommand(string? path)
         {
-            if (string.IsNullOrEmpty(FwFilePath))
+            if (!File.Exists(path))
             {
-                System.Windows.MessageBox.Show(TranslationSource.Instance["zNullArgument"], TranslationSource.Instance["sWarning"], MessageBoxButton.OK, MessageBoxImage.Warning);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    System.Windows.MessageBox.Show(TranslationSource.Instance["zNoSuchFile"], TranslationSource.Instance["sWarning"], MessageBoxButton.OK, MessageBoxImage.Warning);
+                });
                 return;
             }
-            OnSendFirmwareUpdate(true, false);
+            OnSendFirmwareUpdate(path, true, false);
         }
 
-        private void OnFileUploadCommand()
+        private void OnFileUploadCommand(string? path)
         {
-            if (string.IsNullOrEmpty(FwFilePath))
+            if (!File.Exists(path))
             {
-                System.Windows.MessageBox.Show(TranslationSource.Instance["zNullArgument"], TranslationSource.Instance["sWarning"], MessageBoxButton.OK, MessageBoxImage.Warning);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    System.Windows.MessageBox.Show(TranslationSource.Instance["zNoSuchFile"], TranslationSource.Instance["sWarning"], MessageBoxButton.OK, MessageBoxImage.Warning);
+                });
                 return;
             }
-            OnSendFirmwareUpdate(false, true);
+            OnSendFirmwareUpdate(path, false, true);
         }
 
-        private async void OnFileDownloadCommand()
+        private async Task<bool> FileEraseAsync(string path)
         {
+            if (IsFileTransfering == true)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    System.Windows.MessageBox.Show(TranslationSource.Instance["zFileTransfering"], TranslationSource.Instance["sWarning"], MessageBoxButton.OK, MessageBoxImage.Warning);
+                });
+                return false;
+            }
+
+            IsFileTransfering = true;
+
+            SatelliteMethodModel _method = new SatelliteMethodModel(4, false, "obc_file_erase", "obc_file_erase", "eraseFile", 15);
+            SatelliteCommandModel _command = new SatelliteCommandModel(_method);
+
+            var filePath = FileConvertHelper.ToFixedAscii(path, 48);
+            List<object> parameters = new List<object>();
+            parameters.Add(filePath);
+            _command.InputParameters.Add(parameters);
+            _command.InputSerialized = QueryExecutorBase.Serializer(_command.InputParameters);
+
+            try
+            {
+                var ret = await ZeroMqQueryExecutor.Instance.ExecuteAsync(_command, DispatcherType.Postpone);
+                if (ret is byte[] b)
+                {
+                    if (b.Length >= 9)
+                    {
+                        var fidl = BitConverter.ToUInt16(b, 0);
+                        var func = BitConverter.ToUInt32(b, 2);
+                        var seq = BitConverter.ToUInt16(b, 6);
+                        var err = b[8];
+                        b = b[9..];
+                    }
+                    var result = b[0];
+                    string name = Enum.GetName(typeof(FManOpResult), result) ?? $"Unknown (0x{result:X2})";
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        System.Windows.MessageBox.Show(name, TranslationSource.Instance["sInfo"], MessageBoxButton.OK, MessageBoxImage.Information);
+                    });
+
+                    IsFileTransfering = false;
+                    return true;
+                }
+                else if (ret is string retStr)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        System.Windows.MessageBox.Show(retStr, TranslationSource.Instance["sInfo"], MessageBoxButton.OK, MessageBoxImage.Information);
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    System.Windows.MessageBox.Show(ex.Message, TranslationSource.Instance["sError"], MessageBoxButton.OK, MessageBoxImage.Error);
+                });
+            }
+            IsFileTransfering = false;
+            return false;
+        }
+
+        private async Task<bool> FileDownloadAsync(string path, bool local_save = false)
+        {
+            if (IsFileTransfering == true)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    System.Windows.MessageBox.Show(TranslationSource.Instance["zFileTransfering"], TranslationSource.Instance["sWarning"], MessageBoxButton.OK, MessageBoxImage.Warning);
+                });
+                return false;
+            }
+
+            // Expected path: /sd/...
+            IsFileTransfering = true;
+            
             SatelliteMethodModel _method = new SatelliteMethodModel(1450, false, "filedownload_cp", "filedownload_cp", "download", 0);
             SatelliteCommandModel _command = new SatelliteCommandModel(_method);
-            string fileFormat = "/sd/" + FileName;
+            string fileFormat = path;
             string paddedString = fileFormat.PadRight(48, '\0');
 
             List<object> parameters = new List<object>();
@@ -288,25 +384,92 @@ namespace RoSatGCS.ViewModels
                 var ret = await ZeroMqQueryExecutor.Instance.ExecuteAsync(_command, DispatcherType.FileTransfer);
                 if (ret is byte[] b)
                 {
-                    string outputPath = FileName;
+                    string outputPath;
+                    string dir = FolderTextPath.CurrentFolder;
+                    if (local_save || string.IsNullOrWhiteSpace(dir))
+                    {
+                        outputPath = path.Split('/').Last();
+                    }
+                    else
+                    {
+                        string full = Path.GetFullPath(Environment.ExpandEnvironmentVariables(dir));
+                        Directory.CreateDirectory(full);
+                        outputPath = Path.Combine(full, path.Split('/').Last());
+                    }
+
                     await File.WriteAllBytesAsync(outputPath, b);
-                    MessageBox.Show(outputPath + ": Saved(" + b.Length + ")", TranslationSource.Instance["sInfo"], MessageBoxButton.OK, MessageBoxImage.Information);
+                    IsFileTransfering = false;
+                    return true;
+                }
+                else if (ret is string retStr)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        System.Windows.MessageBox.Show(retStr, TranslationSource.Instance["sInfo"], MessageBoxButton.OK, MessageBoxImage.Information);
+                    });
                 }
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message, TranslationSource.Instance["sError"], MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    System.Windows.MessageBox.Show(ex.Message, TranslationSource.Instance["sError"], MessageBoxButton.OK, MessageBoxImage.Error);
+                });
+            }
+            IsFileTransfering = false;
+            return false;
+        }
+
+
+        private async void OnFileDownloadCommand(string? path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    System.Windows.MessageBox.Show(TranslationSource.Instance["zNullArgument"], TranslationSource.Instance["sWarning"], MessageBoxButton.OK, MessageBoxImage.Warning);
+                });
+                return;
+            }
+
+            if(await FileDownloadAsync(path))
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    var file = path.Split(Path.DirectorySeparatorChar).Last();
+                    MessageBox.Show("Saved: " + file, TranslationSource.Instance["sInfo"], MessageBoxButton.OK, MessageBoxImage.Information);
+                });
             }
         }
 
-        private void OnLoaded()
+        private async void OnLoaded()
         {
-            var path = PathFactory.SysDefault;
-            NavigateToFolder(path);
+            if (string.Empty == FolderTextPath.CurrentFolder)
+            {
+                NavigateToFolder(PathFactory.SysDefault);
+            }
+ 
+            await UpdateDirListAsync();
         }
 
-        private void OnRepoMouseUp(MouseButtonEventArgs e)
+        private void OnUpdateSelectedItems(object? obj)
         {
+            if (obj is IList<object> list)
+            {
+                SelectedRemoteFiles.Clear();
+                foreach (var item in list)
+                {
+                    if (item is RemoteFileModel model)
+                    {
+                        SelectedRemoteFiles.Add(model);
+                    }
+                }
+            }
+        }
+
+        private void OnRepoMouseUp(MouseButtonEventArgs? e)
+        {
+            if (e == null) { return; }
             if (e.ChangedButton == MouseButton.XButton1)
             {
                 BackwardCommand.Execute(null);
@@ -316,6 +479,212 @@ namespace RoSatGCS.ViewModels
             {
                 ForwardCommand.Execute(null);
                 e.Handled = true;
+            }
+        }
+
+        private async Task UpdateDirListAsync()
+        {
+            try
+            {
+                RemoteFiles.Clear();
+                using (var reader = new StreamReader("DirList.txt"))
+                {
+                    var header = await reader.ReadLineAsync();
+                    if (header == null || !header.StartsWith("file_name"))
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            System.Windows.MessageBox.Show("Invalid directory list file.", TranslationSource.Instance["sError"], MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
+                        return;
+                    }
+                    while (!reader.EndOfStream)
+                    {
+                        //file_name,size(in bytes),attributes,timestamp
+                        var line = await reader.ReadLineAsync();
+                        if (line == null) { continue; }
+                        var parts = line.Split(',');
+                        if (parts.Length != 4) { continue; }
+
+
+                        var name = parts[0].Split('/').Last();
+                        var path = parts[0];
+                        long size = 0;
+                        if (!long.TryParse(parts[1], out size)) { continue; }
+                        var attr = parts[2];
+                        long time = 0;
+                        if (!long.TryParse(parts[3], out time)) { continue; }
+
+                        if (attr == "f")
+                        {
+                            RemoteFileModel model = new RemoteFileModel(name, path, size, time);
+                            await Application.Current.Dispatcher.InvokeAsync(() =>
+                            {
+                                RemoteFiles.Add(model);
+                            });
+                        }
+                    }
+                }
+            } catch (Exception ex)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    System.Windows.MessageBox.Show(ex.Message, TranslationSource.Instance["sError"], MessageBoxButton.OK, MessageBoxImage.Error);
+                });
+            }
+        }
+
+        
+
+
+        private async void OnRemoteRefreshCommand()
+        {
+            if (IsFileTransfering == true) { return; }
+
+            IsFileTransfering = true;
+            bool success = true;
+            
+            // Send Directory List Command
+            SatelliteMethodModel _method = new SatelliteMethodModel(9, false, "obc_filelist", "obc_filelist", "updateFileList", 15);
+            SatelliteCommandModel _command = new SatelliteCommandModel(_method);
+
+            var filePath = FileConvertHelper.ToFixedAscii("/sd/DirList.txt", 48);
+            var pattern = FileConvertHelper.ToFixedAscii("*", 48);
+
+            List<object> parameters = new List<object>();
+            parameters.Add(filePath);
+            parameters.Add(pattern);
+            _command.InputParameters.Add(parameters);
+            _command.InputSerialized = QueryExecutorBase.Serializer(_command.InputParameters);
+            
+            try
+            {
+                var ret = await ZeroMqQueryExecutor.Instance.ExecuteAsync(_command, DispatcherType.Postpone);
+                if (ret is byte[] b)
+                {
+                    if (b.Length >= 9)
+                    {
+                        var fidl = BitConverter.ToUInt16(b, 0);
+                        var func = BitConverter.ToUInt32(b, 2);
+                        var seq = BitConverter.ToUInt16(b, 6);
+                        var err = b[8];
+                        b = b[9..];
+                    }
+                    var result = b[0];
+                    string name = Enum.GetName(typeof(FManOpResult), result) ?? $"Unknown (0x{result:X2})";
+
+                    if (result != 0)
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            System.Windows.MessageBox.Show(name, TranslationSource.Instance["sInfo"], MessageBoxButton.OK, MessageBoxImage.Information);
+                        });
+                        success = false;
+                    }
+                }
+                else if (ret is string retStr)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        System.Windows.MessageBox.Show(retStr, TranslationSource.Instance["sInfo"], MessageBoxButton.OK, MessageBoxImage.Information);
+                    });
+                    success = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    System.Windows.MessageBox.Show(ex.Message, TranslationSource.Instance["sError"], MessageBoxButton.OK, MessageBoxImage.Error);
+                });
+                success = false;
+            }
+
+            IsFileTransfering = false;
+
+            // Download the file list
+            if (success && !await FileDownloadAsync("/sd/DirList.txt", true))
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    System.Windows.MessageBox.Show("Failed to download directory list.", TranslationSource.Instance["sError"], MessageBoxButton.OK, MessageBoxImage.Error);
+                });
+            }
+
+            // Update the list
+            await UpdateDirListAsync();
+        }
+
+        private async void OnRemoteEraseCommand(string? path)
+        {
+            if(path == null || path.Length == 0) { return; }
+            if (await FileEraseAsync(path))
+            {
+                RemoteRefreshCommand.Execute(null);
+            }
+        }
+
+
+        static bool _sortToggle = false;
+        private void OnRemotesSortCommand()
+        {
+            _sortToggle = !_sortToggle;
+            _remoteFilesView.CustomSort = Comparer<RemoteFileModel>.Create((x, y) =>
+            {
+                if (x == null || y == null) return 0;
+
+                int depthX = x.Path.Count(c => c == '/');
+                int depthY = y.Path.Count(c => c == '/');
+
+                int cmp = depthX.CompareTo(depthY);
+                if (cmp != 0)
+                    return cmp * (_sortToggle ? 1 : -1);
+
+                return string.Compare(x.Path, y.Path, StringComparison.Ordinal) * (_sortToggle ? 1 : -1);
+
+            });
+        }
+
+        private async void OnRemoteSelectedEraseCommand()
+        {
+            foreach(var file in SelectedRemoteFiles)
+            {
+                if(!await FileEraseAsync(file.Path))
+                {
+                    break;
+                }
+            }
+
+            if (!await FileDownloadAsync("/sd/DirList.txt", true))
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    System.Windows.MessageBox.Show("Failed to download directory list.", TranslationSource.Instance["sError"], MessageBoxButton.OK, MessageBoxImage.Error);
+                });
+            }
+
+            await UpdateDirListAsync();
+        }
+        private async void OnRemoteSelectedDownloadCommand()
+        {
+            foreach (var file in SelectedRemoteFiles)
+            {
+                if(!await FileDownloadAsync(file.Path))
+                {
+                    break;
+                }
+            }
+        }
+
+        private void OnRefreshExplorer()
+        {
+            if (string.Empty == FolderTextPath.CurrentFolder)
+            {
+                NavigateToFolder(PathFactory.SysDefault);
+            }
+            else
+            {
+                NavigateToFolder(PathFactory.Create(FolderTextPath.CurrentFolder));
             }
         }
 
@@ -371,7 +740,7 @@ namespace RoSatGCS.ViewModels
 		/// <param name="request"></param>
 		/// <param name="requestor"</param>
 		private async Task<FinalBrowseResult> NavigateToFolderAsync(BrowseRequest request,
-                                                                    object sender)
+                                                                    object? sender)
         {
             // Make sure the task always processes the last input but is not started twice
             await _SlowStuffSemaphore.WaitAsync();
@@ -473,8 +842,7 @@ namespace RoSatGCS.ViewModels
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Control_BrowseEvent(object sender,
-                                                FileSystemModels.Browse.BrowsingEventArgs e)
+        private void Control_BrowseEvent(object sender, FileSystemModels.Browse.BrowsingEventArgs e)
         {
             var location = e.Location;
 

@@ -542,7 +542,7 @@ namespace RoSatGCS.ViewModels
             var command = new SatelliteCommandModel(model);
             command.IsTemp = true;
             _satCommandTemp.Add(command);
-            var pane = new PaneFunctionPropertyViewModel(command);
+            var pane = new PaneFunctionPropertyViewModel(command, true);
             DocumentPane.Add(pane);
         }
 
@@ -551,7 +551,7 @@ namespace RoSatGCS.ViewModels
             var item = FindFunctionPropertyPane(model);
             if (item == null)
             {
-                var pane = new PaneFunctionPropertyViewModel(model);
+                var pane = new PaneFunctionPropertyViewModel(model, true);
                 DocumentPane.Add(pane);
                 ActiveDocument = pane;
             }

@@ -56,7 +56,7 @@ namespace RoSatProcessor {
 		static WebSocketPacket CreateRadioConn(const CommandRadioPacket& packet);
 		static WebSocketPacket CreateRotatorSetPosition(const CommandRotatorPacket& packet);
 		static WebSocketPacket CreateBeaconListen(const CommandBeaconPacket& packet);
-		static WebSocketPacket CreateCancel(const CommandStatePacket& packet);
+		static WebSocketPacket CreateCancel(const CancelPacket& packet);
 
 		static std::string GetType(std::string_view packet);
 		static uint64_t GetRequestId(std::string_view packet);

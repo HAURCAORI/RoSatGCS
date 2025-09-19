@@ -6,6 +6,8 @@
 #include <condition_variable>
 #include <boost/bind.hpp>
 
+#include "TaskQueryRequestHandler.h"
+
 
 void printHex(const std::array<uint8_t, 16>& queryId) {
 	std::ostringstream oss;
@@ -140,10 +142,12 @@ void RoSatProcessor::TaskWebSocketConnector::onReceived(const std::string& str)
 			spdlog::error("Exception: {}", e.what());
 			return;
 		}
+
+		RoSatProcessor::TaskQueryRequestHandler::Dequeue(id);
 		
 		auto it = std::find_if(m_executed.begin(), m_executed.end(), [id](const auto& t) { return t.first.Id() == id; });
 
-		if (it != m_executed.end() && type != "CPCommandPartResult") {
+		if (it != m_executed.end() && type != "CPCommandPartResult" && type != "UploadPartResult") {
 			queryId = it->first.QueryId();
 			m_executed.erase(it);
 		}
@@ -184,6 +188,10 @@ void RoSatProcessor::TaskWebSocketConnector::onReceived(const std::string& str)
 			auto fwUpdateResult = WebSocketPacket::ParseFwUpdateResult(str);
 			queryPacket.Type = QueryType::FwUpdate;
 			queryPacket.Payload = FirmwareUpdateResultPacket::SerializePacket(fwUpdateResult).toVector();
+		}
+		else if (type == "CancelResult") {
+			// TODO: Not implemented
+			return;
 		}
 		else {
 			queryPacket.Type = QueryType::Error;

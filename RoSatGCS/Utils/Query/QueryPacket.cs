@@ -30,7 +30,8 @@ namespace RoSatGCS.Utils.Query
         Service,
         Config,
         Debug,
-        FwUpdate
+        FwUpdate,
+        Cancel
     }
 
     public class PacketBase<T>
@@ -95,6 +96,13 @@ namespace RoSatGCS.Utils.Query
     {
         [Key(0)] public bool Debug = false;
     }
+
+    [MessagePackObject]
+    public class CancelPacket : PacketBase<CancelPacket>
+    {
+        [Key(0)] public ulong CommandId;
+    }
+
 
     #region Command
     [MessagePackObject]
@@ -206,4 +214,5 @@ namespace RoSatGCS.Utils.Query
     }
 
     #endregion
+
 }

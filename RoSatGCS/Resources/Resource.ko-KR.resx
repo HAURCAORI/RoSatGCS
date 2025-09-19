@@ -528,4 +528,28 @@
   <data name="sOut" xml:space="preserve">
     <value>나가기</value>
   </data>
+  <data name="zFileTransfering" xml:space="preserve">
+    <value>파일을 전송하고 있습니다.</value>
+  </data>
+  <data name="sInfo" xml:space="preserve">
+    <value>정보</value>
+  </data>
+  <data name="sSort" xml:space="preserve">
+    <value>정렬</value>
+  </data>
+  <data name="sErase" xml:space="preserve">
+    <value>지우기</value>
+  </data>
+  <data name="sUp" xml:space="preserve">
+    <value>위로</value>
+  </data>
+  <data name="sDown" xml:space="preserve">
+    <value>아래로</value>
+  </data>
+  <data name="sAddOnboardScheduler" xml:space="preserve">
+    <value>온보드 스케줄 추가</value>
+  </data>
+  <data name="sAbort" xml:space="preserve">
+    <value>취소</value>
+  </data>
 </root>

@@ -16,7 +16,8 @@ enum class QueryType {
     Service,
     Config,
     Debug,
-    FwUpdate
+    FwUpdate,
+    Cancel
 };
 MSGPACK_ADD_ENUM(QueryType);
 
@@ -97,6 +98,15 @@ namespace RoSatProcessor {
 		ProcessorDebugPacket(bool debug) : Debug(debug) {}
 		MSGPACK_DEFINE(Debug);
     };
+
+    struct CancelPacket : PacketBase<CancelPacket> {
+        std::array<uint8_t, 16> QueryId = {};
+        uint64_t CommandId = 0;
+        CancelPacket() = default;
+        CancelPacket(uint64_t commandId) : CommandId(commandId) {}
+        MSGPACK_DEFINE(CommandId);
+	};
+
 
 #pragma region Command Packet
     struct CommandCpPacket : PacketBase<CommandCpPacket> {
@@ -252,13 +262,13 @@ namespace RoSatProcessor {
         FirmwareUpdatePacket(const std::string& filePath, const std::string& satelliteId, uint8_t moduleMac,
             uint16_t boardRevision, uint16_t cpuType, uint16_t submodule, uint16_t fwType,
             uint16_t fwVerMaj, uint16_t fwVerMin, uint16_t moduleType, uint16_t moduleConfig,
-			uint64_t flags, uint64_t commandId, bool isbundle) : FilePath(filePath), SatelliteId(satelliteId), ModuleMac(moduleMac), BoardRevision(boardRevision),
+			uint64_t flags, uint64_t commandId, bool isbundle, bool isfile) : FilePath(filePath), SatelliteId(satelliteId), ModuleMac(moduleMac), BoardRevision(boardRevision),
 			CpuType(cpuType), Submodule(submodule), FWType(fwType), FWVerMaj(fwVerMaj), FWVerMin(fwVerMin),
-			ModuleType(moduleType), ModuleConfig(moduleConfig), Flags(flags), CommandId(commandId), IsBundle(isbundle) {
+			ModuleType(moduleType), ModuleConfig(moduleConfig), Flags(flags), CommandId(commandId), IsBundle(isbundle), IsFile(isfile) {
 		}
 
 		MSGPACK_DEFINE(FilePath, SatelliteId, ModuleMac, BoardRevision, CpuType, Submodule,
-			FWType, FWVerMaj, FWVerMin, ModuleType, ModuleConfig, Flags, CommandId, IsBundle);
+			FWType, FWVerMaj, FWVerMin, ModuleType, ModuleConfig, Flags, CommandId, IsBundle, IsFile);
     };
 
 

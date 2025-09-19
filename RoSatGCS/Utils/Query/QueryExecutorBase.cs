@@ -77,6 +77,8 @@ namespace RoSatGCS.Utils.Query
 
         protected abstract Task<QueryPacket?> ExecuteQueryAsync(QueryPacket packet);
 
+        public abstract Task CancelAllQueryAsync();
+
         protected static object? ParseResult(object data, QueryPacket packet)
         {
 
@@ -129,9 +131,10 @@ namespace RoSatGCS.Utils.Query
 
                 AssignPayloadByGateway(commandPacket, c);
 
+#if DEBUG
                 string hex = string.Join(" ", commandPacket.Payload.Select(b => b.ToString("X2")));
-
-                Application.Current.Dispatcher.Invoke(() => MessageBox.Show("Data: " + hex, "Hex Data"));
+                //Application.Current.Dispatcher.Invoke(() => MessageBox.Show("Data: " + hex, "Hex Data"));
+#endif
 
                 packet.Payload = CommandCpPacket.SerializePacket(commandPacket);
             }
@@ -183,6 +186,17 @@ namespace RoSatGCS.Utils.Query
 
                 packet.Payload = FirmwareUpdatePacket.SerializePacket(fwupd);
             }
+            else if (data is CancelPacket cancel)
+            {
+                packet = new QueryPacket
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Cancel",
+                    Type = QueryType.Cancel,
+                    DispatcherType = dispatcher
+                };
+                packet.Payload = CancelPacket.SerializePacket(cancel);
+            }
 
             return packet;
         }
@@ -208,7 +222,6 @@ namespace RoSatGCS.Utils.Query
                                 .ToArray();
                         }
                     }
-                    
                     break;
                 case 1202:
                     break;

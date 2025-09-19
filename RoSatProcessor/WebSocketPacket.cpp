@@ -532,7 +532,7 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateBeaconLis
 	return ret;
 }
 
-RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateCancel(const CommandStatePacket& packet)
+RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateCancel(const RoSatProcessor::CancelPacket& packet)
 {
 	WebSocketPacket ret;
 	rapidjson::Document d;
@@ -540,11 +540,11 @@ RoSatProcessor::WebSocketPacket RoSatProcessor::WebSocketPacket::CreateCancel(co
 
 	rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
 
-	AddMember(d, "id", id, allocator);										// required
+	AddMember(d, "id", packet.CommandId, allocator);						// required
 	AddMember(d, "type", "Cancel", allocator);								// required
 
 	ret.m_query_id = packet.QueryId;
-	ret.m_id = id++;
+	ret.m_id = packet.CommandId;
 
 	rapidjson::StringBuffer buffer;
 	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);

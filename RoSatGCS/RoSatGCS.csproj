@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <None Remove="Dependency\abseil_dll.dll" />
+    <None Remove="Dependency\FIDLParser.py" />
     <None Remove="Dependency\gnuradio-pmt.dll" />
     <None Remove="Dependency\gtest.pdb" />
     <None Remove="Dependency\gtest_main.pdb" />
@@ -213,6 +214,9 @@
     <Resource Include="Images\icon_setting.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Content Include="Dependency\FIDLParser.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\ground_station.ico" />
     <Content Include="Images\map.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -283,6 +287,7 @@
     <PackageReference Include="NetMQ" Version="4.0.1.13" />
     <PackageReference Include="NLog" Version="5.3.4" />
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="9.0.2" />
+    <PackageReference Include="WPFHexaEditor" Version="2.1.7" />
   </ItemGroup>
 
   <ItemGroup>
@@ -290,6 +295,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Controls\DateTimePickerSecond.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Resources\Resource.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

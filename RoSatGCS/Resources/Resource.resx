@@ -528,4 +528,28 @@
   <data name="sOut" xml:space="preserve">
     <value>Out</value>
   </data>
+  <data name="zFileTransfering" xml:space="preserve">
+    <value>Already transfering file.</value>
+  </data>
+  <data name="sInfo" xml:space="preserve">
+    <value>Info</value>
+  </data>
+  <data name="sSort" xml:space="preserve">
+    <value>Sort</value>
+  </data>
+  <data name="sErase" xml:space="preserve">
+    <value>Erase</value>
+  </data>
+  <data name="sUp" xml:space="preserve">
+    <value>Up</value>
+  </data>
+  <data name="sDown" xml:space="preserve">
+    <value>Down</value>
+  </data>
+  <data name="sAddOnboardScheduler" xml:space="preserve">
+    <value>Add Onboard Scheduler</value>
+  </data>
+  <data name="sAbort" xml:space="preserve">
+    <value>Abort</value>
+  </data>
 </root>

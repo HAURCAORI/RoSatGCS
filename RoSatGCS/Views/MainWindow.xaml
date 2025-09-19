@@ -36,19 +36,19 @@
                     HorizontalAlignment="Left">
             <Menu DockPanel.Dock="Top" Margin="10,0,0,0">
                 <MenuItem Header="{loc:Localization MenuFile}" Style="{DynamicResource MainMenuStyle}">
-                    <MenuItem Header="Item" Style="{DynamicResource SubMenuStyle}"/>
+                    <MenuItem Header="TBD" Style="{DynamicResource SubMenuStyle}"/>
                 </MenuItem>
                 <MenuItem Header="{loc:Localization MenuView}" Style="{DynamicResource MainMenuStyle}">
-                    <MenuItem Header="Item" Style="{DynamicResource SubMenuStyle}" IsEnabled="False"/>
+                    <MenuItem Header="TBD" Style="{DynamicResource SubMenuStyle}" IsEnabled="False"/>
                 </MenuItem>
                 <MenuItem Header="{loc:Localization MenuTool}" Style="{DynamicResource MainMenuStyle}">
-                    <MenuItem Header="Item" Style="{DynamicResource SubMenuStyle}"/>
+                    <MenuItem Header="TBD" Style="{DynamicResource SubMenuStyle}"/>
                 </MenuItem>
                 <MenuItem Header="{loc:Localization MenuWindow}" Style="{DynamicResource MainMenuStyle}">
-                    <MenuItem Header="Item" Style="{DynamicResource SubMenuStyle}"/>
+                    <MenuItem Header="Onboard Scheduler" Style="{DynamicResource SubMenuStyle}" Command="{Binding OpenOnboardScheduler}"/>
                 </MenuItem>
                 <MenuItem Header="{loc:Localization MenuHelp}" Style="{DynamicResource MainMenuStyle}">
-                    <MenuItem Header="Item" Style="{DynamicResource SubMenuStyle}"/>
+                    <MenuItem Header="TBD" Style="{DynamicResource SubMenuStyle}"/>
                 </MenuItem>
             </Menu>
         </StackPanel>

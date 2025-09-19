@@ -31,6 +31,8 @@ namespace RoSatGCS.ViewModels
         public MainDataContext MainDataContext => MainDataContext.Instance;
         
         private WindowSettings? windowSettings;
+        private WindowOnboardScheduler? windowOnboardScheduler;
+        private WindowFunctionProperty? windowFunctionProperty;
         private ServiceManager? _serviceManager;
 
         private Page? _navigationSource;
@@ -52,6 +54,7 @@ namespace RoSatGCS.ViewModels
         public ICommand StartService { get; }
         public ICommand StopService { get; }
         public ICommand RestartService { get; }
+        public ICommand OpenOnboardScheduler { get; }
 
         public MainWindowViewModel()
         {
@@ -64,7 +67,7 @@ namespace RoSatGCS.ViewModels
 
             // Pages
 #if DEBUG
-            NavigationSource = MainDataContext.PageScheduler;
+            NavigationSource = MainDataContext.PageCommand;
 #else
             NavigationSource = MainDataContext.PageCommand;
 #endif
@@ -74,12 +77,13 @@ namespace RoSatGCS.ViewModels
             WeakReferenceMessenger.Default.Register<NavigationMessage>(this, OnNavigationMessage);
             
             // Commands
-            OpenWindowCommand = new RelayCommand<string>(OnWindowOpen);
+            OpenWindowCommand = new RelayCommand<object>(OnWindowOpen);
             ClosingCommand = new RelayCommand(OnClosing);
             ClosedCommand = new RelayCommand(OnClosed);
             StartService = new RelayCommand(OnStartService);
             StopService = new RelayCommand(OnStopService);
             RestartService = new RelayCommand(OnRestartService);
+            OpenOnboardScheduler = new RelayCommand(() => OnWindowOpen("onboardscheduler"));
 
             _serviceManager = ServiceManager.Instance;
             _serviceManager.Start();
@@ -102,7 +106,6 @@ namespace RoSatGCS.ViewModels
                     }
                 }
             }
-
         }
 
         private void OnNavigationMessage(object recipient, NavigationMessage message)
@@ -138,8 +141,11 @@ namespace RoSatGCS.ViewModels
             }
         }
         
-        private void OnWindowOpen(string? uri)
+        public void OnWindowOpen(object? arg)
         {
+            if(arg == null) return;
+            string uri = arg as string ?? string.Empty;
+
             switch (uri)
             {
                 case "settings":
@@ -151,6 +157,67 @@ namespace RoSatGCS.ViewModels
                     windowSettings.ShowInTaskbar = false;
                     windowSettings.Show();
                     windowSettings.Focus();
+                    break;
+                case "onboardscheduler":
+                    if (windowOnboardScheduler == null)
+                    {
+                        windowOnboardScheduler = new WindowOnboardScheduler();
+                        windowOnboardScheduler.Closed += (a, b) => windowOnboardScheduler = null;
+                    }
+                    windowOnboardScheduler.ShowInTaskbar = false;
+                    windowOnboardScheduler.Show();
+                    windowOnboardScheduler.Focus();
+                    break;
+                default:
+                    break;
+            }
+        }
+        
+        public void OnWindowOpenFunctionProperty(SatelliteCommandModel cmd, EventHandler handler)
+        {
+            if (cmd == null) return;
+            if (windowFunctionProperty == null)
+            {
+                windowFunctionProperty = new WindowFunctionProperty(cmd);
+                windowFunctionProperty.Closed += (a, b) => windowFunctionProperty = null;
+                windowFunctionProperty.Closed += handler;
+            }
+            windowFunctionProperty.ShowInTaskbar = false;
+            windowFunctionProperty.Show();
+            windowFunctionProperty.Focus();
+        }
+
+        private void WindowFunctionProperty_Closed(object? sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OnWindowClose(object? arg)
+        {
+            if (arg == null) return;
+            string uri = arg as string ?? string.Empty;
+            switch (uri)
+            {
+                case "settings":
+                    if (windowSettings != null)
+                    {
+                        windowSettings.Close();
+                        windowSettings = null;
+                    }
+                    break;
+                case "onboardscheduler":
+                    if (windowOnboardScheduler != null)
+                    {
+                        windowOnboardScheduler.Close();
+                        windowOnboardScheduler = null;
+                    }
+                    break;
+                case "functionproperty":
+                    if (windowFunctionProperty != null)
+                    {
+                        windowFunctionProperty.Close();
+                        windowFunctionProperty = null;
+                    }
                     break;
                 default:
                     break;

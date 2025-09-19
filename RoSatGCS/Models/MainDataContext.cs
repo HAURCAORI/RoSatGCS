@@ -78,6 +78,11 @@ namespace RoSatGCS.Models
         private ListCollectionView _satCommandGroupView;
         public ListCollectionView SatelliteCommandGroupView { get => _satCommandGroupView; }
 
+        // Satellite Schedule Command
+        private ObservableCollection<SatelliteCommandModel> _satScheduleCommand = [];
+        public ObservableCollection<SatelliteCommandModel> SatelliteScheduleCommand { get => _satScheduleCommand; }
+
+        
 
         private MainDataContext()
         {
@@ -88,8 +93,6 @@ namespace RoSatGCS.Models
             _satFuncTypeView = new ListCollectionView(_satFuncType);
             _satMethodView = new ListCollectionView(_satMethod);
             _satCommandGroupView = new ListCollectionView(SatelliteCommandGroup);
-
-            
 
             _satFuncFileView.SortDescriptions.Add(new SortDescription(nameof(SatelliteFunctionFileModel.Name), ListSortDirection.Ascending));
 
@@ -219,6 +222,12 @@ namespace RoSatGCS.Models
                 _satCommandGroup.Remove(group);
                 //_satCommandGroupView.Refresh();
             }
+        }
+        // Add Satellite Command to Schedule
+        public void AddSatelliteCommandToSchedule(SatelliteCommandModel command)
+        {
+            if (command == null) return;
+            _satScheduleCommand.Add(command);
         }
     }
 }

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,6 +21,26 @@ namespace RoSatGCS.Behaviors
 {
     internal class FileDragDropBehavior : Behavior<ListBox>
     {
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetCursorPos(ref Win32Point pt);
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct Win32Point
+        {
+            public Int32 X;
+            public Int32 Y;
+        };
+        public static Point GetMousePosition()
+        {
+            var w32Mouse = new Win32Point();
+            GetCursorPos(ref w32Mouse);
+
+            return new Point(w32Mouse.X, w32Mouse.Y);
+        }
+
+
         public static readonly DependencyProperty ParentProperty =
         DependencyProperty.Register(
            "Parent",
@@ -40,7 +61,7 @@ namespace RoSatGCS.Behaviors
 
         private Point _dragStartPoint;
 
-        private UIElement? _adornerRoot;
+        private Page? _adornerRoot => FindParent<Page>(AssociatedObject);
         private DragAdorner? _dragAdorner;
         private AdornerLayer? _adornerLayer;
 
@@ -73,6 +94,13 @@ namespace RoSatGCS.Behaviors
                 _adornerLayer.Visibility = Visibility.Hidden;
             else if (e.Effects == DragDropEffects.Move)
                 _adornerLayer.Visibility = Visibility.Visible;
+
+            if(_adornerRoot != null && _dragAdorner != null)
+            {
+                var p = GetMousePosition();
+                var p_l = _adornerRoot.PointFromScreen(p);
+                _dragAdorner.UpdatePosition(p_l);
+            }
         }
 
         private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -82,16 +110,6 @@ namespace RoSatGCS.Behaviors
 
             var item = FindParent<ListBoxItem>(sourceElement);
             Point mousePos = e.GetPosition(null);
-
-            if (item?.IsSelected == true) // && item?.DataContext is not SatelliteCommandGroupModel
-            {
-                Vector diff = _dragStartPoint - mousePos;
-                if (Math.Abs(diff.X) < SystemParameters.MinimumHorizontalDragDistance ||
-                    Math.Abs(diff.Y) < SystemParameters.MinimumVerticalDragDistance)
-                {
-                    e.Handled = true;
-                }
-            }
 
             _dragStartPoint = mousePos;
         }
@@ -117,14 +135,15 @@ namespace RoSatGCS.Behaviors
                 if (listBox.ItemsSource is not System.Collections.IList itemsSource) return;
 
                 // Draw Adorner
-                _adornerLayer ??= AdornerLayer.GetAdornerLayer(root);
+                if(_adornerRoot == null) { return; }
+                _adornerLayer ??= AdornerLayer.GetAdornerLayer(_adornerRoot);
 
                 var container = FindParent<ListBoxItem>(sourceElement);
                 if (container == null) return;
 
                 ClearAdorners();
 
-                _dragAdorner = new DragAdorner(root, container);
+                _dragAdorner = new DragAdorner(_adornerRoot, container);
 
                 _adornerLayer?.Add(_dragAdorner);
 
@@ -148,7 +167,7 @@ namespace RoSatGCS.Behaviors
 
         private void OnDragOver(object sender, DragEventArgs e)
         {
-            _dragAdorner?.UpdatePosition(e.GetPosition((UIElement)sender));
+            //_dragAdorner?.UpdatePosition(e.GetPosition((UIElement)sender));
         }
 
         private void OnDrop(object sender, DragEventArgs e)
@@ -271,20 +290,6 @@ namespace RoSatGCS.Behaviors
                 _adornerLayer?.Remove(_dragAdorner);
                 _dragAdorner = null;
             }
-        }
-
-        private static UIElement GetTopAdornerRoot(DependencyObject start)
-        {
-            // Prefer a top-level AdornerDecorator
-            DependencyObject? cur = start;
-            while (cur != null)
-            {
-                if (cur is AdornerDecorator ad) return ad;
-                cur = VisualTreeHelper.GetParent(cur);
-            }
-            // Fallback: Window content
-            var win = Window.GetWindow(start as DependencyObject);
-            return (win?.Content as UIElement) ?? (start as UIElement)!;
         }
     }
 }

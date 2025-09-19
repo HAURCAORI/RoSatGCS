@@ -21,43 +21,8 @@ using System.Windows.Input;
 
 namespace RoSatGCS.ViewModels
 {
-    public abstract class FileTreeListControllerViewModel : ViewModelPageBase, IConfigExplorerSettings, INotifyPropertyChanged
+    public abstract class FileTreeListControllerViewModel : ViewModelPageBase, IConfigExplorerSettings
     {
-        #region notify
-        protected virtual void RaisePropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// Tell bound controls (via WPF binding) to refresh their display.
-        /// 
-        /// Sample call: this.NotifyPropertyChanged(() => this.IsSelected);
-        /// where 'this' is derived from <seealso cref="BaseViewModel"/>
-        /// and IsSelected is a property.
-        /// </summary>
-        /// <typeparam name="TProperty"></typeparam>
-        /// <param name="property"></param>
-        public void NotifyPropertyChanged<TProperty>(Expression<Func<TProperty>> property)
-        {
-            var lambda = (LambdaExpression)property;
-            MemberExpression memberExpression;
-
-            if (lambda.Body is UnaryExpression)
-            {
-                var unaryExpression = (UnaryExpression)lambda.Body;
-                memberExpression = (MemberExpression)unaryExpression.Operand;
-            }
-            else
-                memberExpression = (MemberExpression)lambda.Body;
-
-            this.RaisePropertyChanged(memberExpression.Member.Name);
-        }
-        #endregion
 
         #region fields
         private string _SelectedFolder = string.Empty;
@@ -320,8 +285,7 @@ namespace RoSatGCS.ViewModels
             {
                 if (this._SelectedFolder != value)
                 {
-                    this._SelectedFolder = value;
-                    this.NotifyPropertyChanged(() => this.SelectedFolder);
+                    SetProperty(ref _SelectedFolder, value);
 
                     _ = Application.Current.Dispatcher.InvokeAsync(async () =>
                     {

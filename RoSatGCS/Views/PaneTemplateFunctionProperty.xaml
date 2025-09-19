@@ -173,6 +173,7 @@
             </Border>
 
             <StackPanel Grid.Row="2" HorizontalAlignment="Right" Orientation="Horizontal" VerticalAlignment="Bottom">
+                <Button Content="{loc:Localization sAbort}" VerticalAlignment="Center" Width="80" Height="24" Margin="2" Command="{Binding Abort}"/>
                 <Button Content="{loc:Localization sExecute}" VerticalAlignment="Center" Width="80" Height="24" Margin="2" Command="{Binding Execute}"/>
                 <Button Content="{loc:Localization sSave}" VerticalAlignment="Center" Width="80" Height="24" Margin="2" Command="{Binding Save}"/>
                 <Button Content="{loc:Localization sClose}" VerticalAlignment="Center" Width="80" Height="24" Margin="2" Command="{Binding Close}"/>

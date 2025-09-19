@@ -88,6 +88,7 @@
                 <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="{loc:Localization sAdd}" Command="{Binding AddToCommandSelected}"/>
+                        <MenuItem Header="{loc:Localization sAddOnboardScheduler}" Command="{Binding AddToOnboardScheduler}"/>
                         <Separator/>
                         <MenuItem Header="{loc:Localization sSelect}" Command="{Binding Select}"/>
                         <MenuItem Header="{loc:Localization sDeselect}" Command="{Binding Deselect}"/>
@@ -121,7 +122,7 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="ID" Width="35" x:Name="flp_col2" ap:GridViewSort.PropertyName="Id">
+                        <GridViewColumn Header="ID" Width="40" x:Name="flp_col2" ap:GridViewSort.PropertyName="Id">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Id}"/>

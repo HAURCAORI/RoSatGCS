@@ -58,11 +58,15 @@ namespace RoSatGCS.Models
         private ushort _gateway = 0;
         [Key("module")]
         private byte _module = 0;
+        [Key("cp")]
+        private bool _isCp = false;
+        [Key("time")]
+        private UInt32 _timestamp = 0;
         #endregion
 
         #region Properties
         [IgnoreMember]
-        public List<byte> InputSerialized { get => _inputSerialized; internal set => _inputSerialized = value; }
+        public List<byte> InputSerialized { get => _inputSerialized; internal set => SetProperty(ref _inputSerialized, value); }
         [IgnoreMember]
         public List<List<object>> InputParameters { get => _inputParameters; internal set => _inputParameters = value; }
         [IgnoreMember]
@@ -95,7 +99,11 @@ namespace RoSatGCS.Models
         [IgnoreMember]
         public ushort Gateway { get => _gateway; internal set => SetProperty(ref _gateway, value); }
         [IgnoreMember]
-        public byte Module { get => _module; internal set => SetProperty(ref _module, value); }
+        public byte Module { get => _module; set => SetProperty(ref _module, value); }
+        [IgnoreMember]
+        public bool IsCP { get => _isCp; set => SetProperty(ref _isCp, value); }   
+        [IgnoreMember]
+        public UInt32 Timestamp { get => _timestamp; set => SetProperty(ref _timestamp, value); }
         #endregion
 
         #region Commands
@@ -106,7 +114,7 @@ namespace RoSatGCS.Models
         #endregion
 
         #region Constructors
-        private SatelliteCommandModel() : base() { }
+        protected SatelliteCommandModel() : base() { }
         public SatelliteCommandModel(SatelliteMethodModel method) : base(method.Id, method.Visibility, method.File, method.Name, method.Description, method.FIDLId)
         {
             var copy = (SatelliteMethodModel)method.Clone();
@@ -143,6 +151,7 @@ namespace RoSatGCS.Models
             {
                 Module = 0x33;
                 Gateway = 1450;
+                IsCP = true;
             }
             else
             {
@@ -153,6 +162,7 @@ namespace RoSatGCS.Models
             if (method.File.ToLower().Contains("cp"))
             {
                 Gateway = (ushort)method.Id;
+                IsCP = true;
             }
 
 
