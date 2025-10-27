@@ -544,14 +544,18 @@ namespace RoSatGCS.Controls
                 param.ValueModels.Add(v);
                 return;
             }
+
+            /*
             if (param.Parameter.ByteSize % 1 != 0 || (!param.Parameter.IsArray && param.Parameter.ByteSize != 1))
             {
                 param.Error = "Invalid Enumeration Size";
                 var v = new ParameterBoxValueModel(param, param.Parameter.DataType, false, 1, 1, param.Parameter.IsReadOnly);
                 param.ValueModels.Add(v);
                 return;
-            }
+            }*/
+
             param.Length = param.Parameter.IsArray ? param.Parameter.ByteSize : 1;
+            int paramSize = param.Parameter.IsArray ? 1 : param.Parameter.ByteSize;
 
             param.BoxType = BoxType.Enumeration;
 
@@ -559,7 +563,7 @@ namespace RoSatGCS.Controls
             for (int i = 0; i < param.Length; i++)
             {
                 // Create Enumeration
-                var v = new ParameterBoxValueModel(param, param.Parameter.DataType, false, 1, 1, param.Parameter.IsReadOnly, param.Length > 1 ? id++ : -1);
+                var v = new ParameterBoxValueModel(param, param.Parameter.DataType, false, 1, paramSize, param.Parameter.IsReadOnly, param.Length > 1 ? id++ : -1);
 
                 var str = param.Parameter.DataTypeString;
                 if (str.EndsWith("[]"))

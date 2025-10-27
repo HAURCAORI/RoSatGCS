@@ -82,7 +82,9 @@ namespace RoSatGCS.Models
         private ObservableCollection<SatelliteCommandModel> _satScheduleCommand = [];
         public ObservableCollection<SatelliteCommandModel> SatelliteScheduleCommand { get => _satScheduleCommand; }
 
-        
+        // Plot Data Container
+        private PlotDataContainer _plotDataContainer = new PlotDataContainer();
+        public PlotDataContainer PlotDataContainer { get => _plotDataContainer; }
 
         private MainDataContext()
         {

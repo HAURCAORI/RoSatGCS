@@ -270,6 +270,19 @@ namespace RoSatGCS.Models
                 else
                 {
                     // NOTICE: MAYBE STRING HANDLER NEEDED
+                    if (output.DataType == SatelliteFunctionFileModel.DataType.String)
+                    {
+                        // output.ByteSize is max size
+                        // compare serialized size and ByteSize
+                        int strLen = output.ByteSize;
+                        if ((index + strLen) > Serialized.Count)
+                            strLen = Serialized.Count - index;
+
+                        ret.Add(ParameterModel.ConvertValue(output.DataType, Serialized.GetRange(index, strLen)));
+                        index += output.ByteSize;
+                        continue;
+                    }
+                    
                     ret.Add(ParameterModel.ConvertValue(output.DataType, Serialized.GetRange(index, output.ByteSize)));
                     index += output.ByteSize;
                 }
@@ -288,6 +301,9 @@ namespace RoSatGCS.Models
                 if (result != MessageBoxResult.OK)
                     return;
             }
+
+            string byte_hex = string.Join(" ", InputSerialized.Select(b => b.ToString("X2")));
+            ShowMessageOnce(() => MessageBox.Show(byte_hex, "Info", MessageBoxButton.OK));
 
             IsExecuting = true;
             try

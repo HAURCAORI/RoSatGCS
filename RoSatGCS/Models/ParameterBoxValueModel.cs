@@ -1,4 +1,5 @@
-﻿using RoSatGCS.Controls;
+﻿using Newtonsoft.Json.Converters;
+using RoSatGCS.Controls;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -410,7 +411,24 @@ namespace RoSatGCS.Models
                         break;
                     case DataType.Enumeration:
                         if (SelectedEnumItem != null)
-                            ret.Add((byte)SelectedEnumItem.Id);
+                            switch (this.ByteSize)
+                            {
+                                case 1:
+                                    ret.Add((byte)SelectedEnumItem.Id);
+                                    break;
+                                case 2:
+                                    ret.Add((ushort)SelectedEnumItem.Id);
+                                    break;
+                                case 4:
+                                    ret.Add((uint)SelectedEnumItem.Id);
+                                    break;
+                                case 8:
+                                    ret.Add((ulong)SelectedEnumItem.Id);
+                                    break;
+                                default:
+                                    ret.Add((byte)SelectedEnumItem.Id);
+                                    break;
+                            }
                         break;
                     case DataType.String:
                         ret.Add(item);
@@ -439,7 +457,40 @@ namespace RoSatGCS.Models
                 {
                     continue;
                 }
-                else if (item is byte b)
+                
+                
+                if(DataType == DataType.Enumeration)
+                {
+                    if (EnumerationValues != null)
+                    {
+                        if (item is byte eb)
+                        {
+                            var e = EnumerationValues.FirstOrDefault(o => (byte)o.Id == eb);
+                            SelectedEnumItem = e;
+                        }
+                        else if (item is ulong e) {
+                            var ev = EnumerationValues.FirstOrDefault(o => (ulong)o.Id == e);
+                            SelectedEnumItem = ev;
+                        }
+                        else if (item is int i) {
+                            var ev = EnumerationValues.FirstOrDefault(o => (int)o.Id == i);
+                            SelectedEnumItem = ev;
+                        }
+                        else if (item is long l) {
+                            var ev = EnumerationValues.FirstOrDefault(o => (long)o.Id == l);
+                            SelectedEnumItem = ev;
+                        }
+                        else if (item is uint ui) {
+                            var ev = EnumerationValues.FirstOrDefault(o => (uint)o.Id == ui);
+                            SelectedEnumItem = ev;
+                        }
+
+
+                        continue;
+                    }
+                }
+                
+                if (item is byte b)
                 {
                     if(DataType == DataType.Enumeration)
                     {

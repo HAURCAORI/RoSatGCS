@@ -1,18 +1,20 @@
-﻿using RoSatGCS.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GMap.NET.MapProviders;
+using MessagePack;
+using MessagePack.Resolvers;
 using NetMQ;
 using NetMQ.Sockets;
+using RoSatGCS.Models;
+using System;
 using System.Collections.Concurrent;
-using MessagePack;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
-using System.Windows.Threading;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
-using MessagePack.Resolvers;
-using GMap.NET.MapProviders;
+using System.Windows.Threading;
 
 namespace RoSatGCS.Utils.Query
 {
@@ -185,7 +187,38 @@ namespace RoSatGCS.Utils.Query
 
                             _mutex.WaitOne();
 
-                            if (result != null && _pendingResults.TryRemove(result.Id, out var tcs))
+                            if (result is { Type: QueryType.Data })
+                            {
+                                var data = BeaconDataPacket.DeserializePacket(result.Payload);
+                                if (data != null && data.Timestamps.Length == data.Count && data.Data.Length == data.Count * DataTypeInfo.SizeOf(data.Type))
+                                {
+                                    int elemSize = DataTypeInfo.SizeOf(data.Type);
+
+                                    var list = new List<PlotData>(data.Count);
+                                    var src = data.Data.AsSpan();
+
+                                    for (int i = 0; i < data.Count; i++)
+                                    {
+                                        var slice = src.Slice(i * elemSize, elemSize).ToArray();
+
+                                        var ts = data.Timestamps[i];
+                                        long subTicks = (long)ts.SubTicks * 1000L; // 0.1 ms = 100 μs = 1,000 ticks
+                                        var dtUtc = DateTimeOffset.FromUnixTimeSeconds(ts.Unix).AddTicks(subTicks).UtcDateTime;
+
+                                        var pd = new PlotData
+                                        {
+                                            DateTime = dtUtc,
+                                            PlotDataType = data.Type,
+                                            Data = slice
+                                        };
+
+                                        list.Add(pd);
+                                    }
+
+                                    MainDataContext.Instance?.PlotDataContainer.Add(data.DataID, CollectionsMarshal.AsSpan(list));
+                                }
+                            }
+                            else if (result != null && _pendingResults.TryRemove(result.Id, out var tcs))
                             {
                                 tcs.SetResult(result);
                             }

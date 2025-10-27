@@ -60,6 +60,8 @@ namespace RoSatGCS.Models
             public string Description { get; set; }
             [Key("EValues")]
             public List<EnumerationValue> Values { get; set; }
+            [Key("ESize")]
+            public int Size { get; set; }
         }
 
         [MessagePackObject]

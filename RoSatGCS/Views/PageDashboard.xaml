@@ -3,23 +3,87 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
       xmlns:local="clr-namespace:RoSatGCS.Views"
+      xmlns:cvt="clr-namespace:RoSatGCS.Utils.Converter"
+      xmlns:loc="clr-namespace:RoSatGCS.Utils.Localization"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="PageDashboard">
-
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Views/PaneTemplatePlotWindow.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
     <Grid>
-        <DockingManager AllowMixedOrientation="True" AutoWindowSizeWhenOpened="True" IsVirtualizingAnchorable="True" IsVirtualizingDocument="True">
+        <Grid.Resources>
+            <cvt:SeriesSelectorConverter x:Key="SeriesSelectorConverter"/>
+            
+        </Grid.Resources>
+        
+        <DockingManager x:Name="dockManager" AnchorablesSource="{Binding Anchorable}" DocumentsSource="{Binding DocumentPane}" ActiveContent="{Binding ActiveDocument, Mode=TwoWay}"
+                        ShowNavigator="False">
+            <DockingManager.LayoutItemTemplateSelector>
+                <local:PanesTemplateSelector PlotWindowPaneTemplate="{StaticResource PaneTemplatePlotWindow}"/>
+            </DockingManager.LayoutItemTemplateSelector>
+            <DockingManager.LayoutItemContainerStyleSelector>
+                <local:PanesStyleSelector>
+                    <local:PanesStyleSelector.PlotWindowPaneStyle>
+                        <Style TargetType="{x:Type LayoutAnchorableItem}">
+                            <Setter Property="Title" Value="{loc:Localization sCommandFile}"/>
+                            <Setter Property="CanMove" Value="False"/>
+                            <Setter Property="CanFloat" Value="False"/>
+                            <Setter Property="CanClose" Value="False"/>
+                            <Setter Property="CanHide" Value="False"/>
+                        </Style>
+                    </local:PanesStyleSelector.PlotWindowPaneStyle>
+                </local:PanesStyleSelector>
+            </DockingManager.LayoutItemContainerStyleSelector>
+            <DockingManager.LayoutUpdateStrategy>
+                <local:PanesLayoutInitializer/>
+            </DockingManager.LayoutUpdateStrategy>
+
             <LayoutRoot>
-                <LayoutPanel>
-                    <LayoutDocumentPane>
-                        <LayoutDocument Title="1234">
-                            <Label> Sample</Label>
-                        </LayoutDocument>
-                        
-                    </LayoutDocumentPane>
+                <LayoutPanel Orientation="Horizontal">
+                    
                 </LayoutPanel>
             </LayoutRoot>
         </DockingManager>
+      
+        
+
+        <lvc:CartesianChart>
+            <lvc:CartesianChart.Title>
+                <lvc:XamlDrawnLabelVisual
+                Text="EPS Battery Voltage"
+                Paint="#303030"
+                TextSize="25"
+                Padding="15"/>
+            </lvc:CartesianChart.Title>
+
+            <lvc:CartesianChart.Series>
+                <lvc:SeriesCollection>
+                    <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=0}"
+                                        GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+                                        Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                </lvc:SeriesCollection>
+            </lvc:CartesianChart.Series>
+
+            <lvc:CartesianChart.XAxes>
+                <lvc:AxesCollection>
+                    <lvc:XamlDateTimeAxis
+                    Interval="0.00:00:01"
+                    DateFormatter="{Binding Formatter}"/>
+                </lvc:AxesCollection>
+            </lvc:CartesianChart.XAxes>
+
+        </lvc:CartesianChart>
+
+        <!--
+        <Button Height="20" Width="20" Command="{Binding Test}"/>
+        -->
     </Grid>
 </Page>

@@ -184,6 +184,7 @@
     <ClCompile Include="ServiceBase.cpp" />
     <ClCompile Include="ServiceImpl.cpp" />
     <ClCompile Include="ServiceInstaller.cpp" />
+    <ClCompile Include="TaskBeaconData.cpp" />
     <ClCompile Include="TaskPacketProcess.cpp" />
     <ClCompile Include="TaskPacketTransmitQueue.cpp" />
     <ClCompile Include="TaskPrint.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="ServiceBase.h" />
     <ClInclude Include="ServiceImpl.h" />
     <ClInclude Include="ServiceInstaller.h" />
+    <ClInclude Include="TaskBeaconData.h" />
     <ClInclude Include="TaskPacketProcess.h" />
     <ClInclude Include="TaskPacketTransmitQueue.h" />
     <ClInclude Include="TaskPrint.h" />

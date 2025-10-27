@@ -23,15 +23,32 @@ namespace RoSatGCS.Utils.Query
         None,
         ACK,
         Error,
-        Command,
-        Radio,
-        Data,
+        Command, // SpaceComms Command
+        Radio,   // SpaceComms Radio
+        Data,    // Beacon Data
         Schedule,
         Service,
-        Config,
-        Debug,
-        FwUpdate,
-        Cancel
+        Config,  // SpaceComms Config
+        Debug,   // Processor Debug Mode
+        FwUpdate,// Firmware Update
+        Cancel   // Cancel Command
+    }
+
+    public enum DataType
+    {
+        Int8,
+        UInt8,
+        Int16,
+        UInt16,
+        Int32,
+        UInt32,
+        Int64,
+        UInt64,
+        Float,
+        Double,
+        String,
+        ByteArray,
+        Boolean
     }
 
     public class PacketBase<T>
@@ -212,7 +229,25 @@ namespace RoSatGCS.Utils.Query
     {
         [Key(0)] public ulong CommandId;
     }
+    #endregion
 
+    #region Beacon Data
+    [MessagePackObject]
+    public class BeaconTimestampPacket : PacketBase<BeaconTimestampPacket>
+    {
+        [Key(0)] public uint Unix;       // Unix time
+        [Key(1)] public ushort SubTicks; // 0.1ms
+    }
+
+    [MessagePackObject]
+    public class BeaconDataPacket : PacketBase<BeaconDataPacket>
+    {
+        [Key(0)] public ushort DataID = 0;
+        [Key(1)] public DataType Type = DataType.UInt8;
+        [Key(2)] public ushort Count = 1;
+        [Key(3)] public BeaconTimestampPacket[] Timestamps = []; // Array of timestamps
+        [Key(4)] public byte[] Data = []; // Raw data
+    }
     #endregion
 
 }

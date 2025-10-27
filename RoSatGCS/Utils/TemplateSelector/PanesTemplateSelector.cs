@@ -27,7 +27,7 @@ namespace RoSatGCS.Views
         public DataTemplate? PassQueuePaneTemplate { get; set; }
         public DataTemplate? PassSchedulePaneTemplate { get; set; }
         public DataTemplate? PassTimelinePaneTemplate { get; set; }
-
+        public DataTemplate? PlotWindowPaneTemplate { get; set; }
 
         public override System.Windows.DataTemplate SelectTemplate(object item, System.Windows.DependencyObject container)
         {
@@ -57,6 +57,8 @@ namespace RoSatGCS.Views
                 return PassSchedulePaneTemplate ?? new DataTemplate();
             else if (item is PanePassTimelineViewModel)
                 return PassTimelinePaneTemplate ?? new DataTemplate();
+            else if (item is PanePlotWindowViewModel)
+                return PlotWindowPaneTemplate ?? new DataTemplate();
 
             return base.SelectTemplate(item, container);
         }

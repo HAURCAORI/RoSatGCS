@@ -147,7 +147,7 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="65"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBox Grid.Column="0" MinWidth="110" KeyboardNavigation.TabIndex="0" Focusable="{Binding IsEnabled}">
+                                            <TextBox Grid.Column="0" MinWidth="110" KeyboardNavigation.TabIndex="0">
                                                 <TextBox.Text>
                                                     <Binding Path="Value" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" ValidatesOnNotifyDataErrors="True"
                                                              NotifyOnSourceUpdated="True"

@@ -12,6 +12,8 @@
 #include "TaskQueryRequestHandler.h"
 #include "TaskQueryResponseSender.h"
 #include "TaskWebSocketConnector.h"
+#include "TaskBeaconData.h"
+
 #include "RoSatTaskManager.h"
 
 #include "ServiceImpl.h"
@@ -54,7 +56,8 @@ void TaskDefinition() {
 	auto taskWebSocketConnector = RoSatProcessor::TaskWebSocketConnector(SERVICE_NAME, TEXT("WebSocketConnector"));
 	RoSatProcessor::RoSatTaskManager::addTask(taskWebSocketConnector);
 
-
+    auto taskBeaconData = RoSatProcessor::TaskBeaconData(SERVICE_NAME, TEXT("BeaconData"));
+	RoSatProcessor::RoSatTaskManager::addTask(taskBeaconData);
 }
 
 int wmain(int argc, TCHAR* argv[])

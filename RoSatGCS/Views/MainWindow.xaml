@@ -212,7 +212,6 @@
         <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}" BorderThickness="0.5" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
             <StackPanel x:Name="Sidebar" Orientation="Vertical" Cursor="">
                 <!-- Dashboard -->
-                <!--
                 <Button Style="{DynamicResource SidebarButton}" ToolTip="{loc:Localization sDashboard}" Command="{Binding NavigateCommand}" CommandParameter="dashboard">
                     <Rectangle Style="{DynamicResource SidebarIcon}">
                         <Rectangle.OpacityMask>
@@ -220,7 +219,6 @@
                         </Rectangle.OpacityMask>
                     </Rectangle>
                 </Button>
-                -->
                 <!-- Scheduler -->
 
                 <Button Style="{DynamicResource SidebarButton}" ToolTip="{loc:Localization sScheduler}" Command="{Binding NavigateCommand}" CommandParameter="scheduler">

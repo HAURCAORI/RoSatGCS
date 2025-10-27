@@ -20,7 +20,7 @@ namespace RoSatGCS.Views
         public Style? PassQueuePaneStyle { get; set; }
         public Style? PassSchedulePaneStyle { get; set; }
         public Style? PassTimelinePaneStyle { get; set; }
-
+        public Style? PlotWindowPaneStyle { get; set; }
 
         public override Style SelectStyle(object item, DependencyObject container)
         {
@@ -48,6 +48,8 @@ namespace RoSatGCS.Views
                 return PassSchedulePaneStyle ?? new Style();
             else if (item is PanePassTimelineViewModel)
                 return PassTimelinePaneStyle ?? new Style();
+            else if (item is PanePlotWindowViewModel)
+                return PlotWindowPaneStyle ?? new Style();
 
             return base.SelectStyle(item, container);
         }

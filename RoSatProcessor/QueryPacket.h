@@ -29,6 +29,23 @@ enum class DispatcherType {
 };
 MSGPACK_ADD_ENUM(DispatcherType);
 
+enum class DataType {
+    Int8,
+    UInt8,
+    Int16,
+    UInt16,
+    Int32,
+    UInt32,
+    Int64,
+    UInt64,
+    Float,
+    Double,
+    String,
+    ByteArray,
+    Boolean
+};
+MSGPACK_ADD_ENUM(DataType);
+
 #pragma endregion
 
 namespace RoSatProcessor {
@@ -284,6 +301,37 @@ namespace RoSatProcessor {
         MSGPACK_DEFINE(CommandId);
     };
 #pragma endregion
+
+
+#pragma region Data Packet
+    struct BeaconTimestampPacket : PacketBase<BeaconTimestampPacket> {
+		std::array<uint8_t, 16> QueryId = {};
+		uint32_t Unix = 0;       // Unix time
+        uint16_t SubTicks = 0; // 0.1ms
+        BeaconTimestampPacket() = default;
+		BeaconTimestampPacket(uint32_t unix, uint16_t subTicks)
+			: Unix(unix), SubTicks(subTicks) {
+		}
+		MSGPACK_DEFINE(Unix, SubTicks);
+	};
+
+
+    struct BeaconDataPacket : PacketBase<BeaconDataPacket> {
+        std::array<uint8_t, 16> QueryId = {};
+		uint16_t DataID = 0;
+		DataType Type = DataType::UInt8;
+		uint16_t Count = 1;
+		std::vector<BeaconTimestampPacket> Timestamps = {}; // Array of timestamps
+        std::vector<uint8_t> Data = {}; // Raw data
+        BeaconDataPacket() = default;
+        BeaconDataPacket(uint16_t dataID, DataType type, uint16_t count, const std::vector<BeaconTimestampPacket>& timestamps, const std::vector<uint8_t>& data)
+			: DataID(dataID), Type(type), Count(count), Timestamps(timestamps), Data(data) {
+		}
+		MSGPACK_DEFINE(DataID, Type, Count, Timestamps, Data);
+	};
+
+#pragma endregion
+
 #pragma region Service
 
 #pragma endregion

@@ -398,4 +398,16 @@ namespace RoSatGCS.Utils.Converter
             return Binding.DoNothing;
         }
     }
+
+    public sealed class SeriesSelectorConverter : IValueConverter
+    {
+        public object Convert(object value, Type t, object parameter, CultureInfo c)
+        {
+            if (value is PlotDataContainer ctn && parameter is string s &&
+                ushort.TryParse(s, out var id))
+                return ctn[id];
+            return Binding.DoNothing;
+        }
+        public object ConvertBack(object v, Type t, object p, CultureInfo c) => throw new NotSupportedException();
+    }
 }

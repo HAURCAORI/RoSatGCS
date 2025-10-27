@@ -5,6 +5,7 @@ using MessagePack;
 using NLog;
 using RoSatGCS.Models;
 using RoSatGCS.Utils.Navigation;
+using RoSatGCS.Utils.Query;
 using RoSatGCS.Utils.ServiceManager;
 using RoSatGCS.Views;
 using System;
@@ -106,6 +107,10 @@ namespace RoSatGCS.ViewModels
                     }
                 }
             }
+
+
+            // Initialize ZeroMqQueryExecutor
+            var tmp = ZeroMqQueryExecutor.Instance;
         }
 
         private void OnNavigationMessage(object recipient, NavigationMessage message)

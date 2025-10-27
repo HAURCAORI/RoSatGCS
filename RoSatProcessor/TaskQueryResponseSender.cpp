@@ -36,8 +36,6 @@ BOOL RoSatProcessor::TaskQueryResponseSender::initialize()
 	return TRUE;
 }
 
-
-
 void RoSatProcessor::TaskQueryResponseSender::task()
 {
 	std::unique_lock<std::mutex> l(_m);
@@ -60,7 +58,8 @@ void RoSatProcessor::TaskQueryResponseSender::task()
 	if (rc > 0 && (items[0].revents & ZMQ_POLLIN)) {
 		zmq::message_t rep;
 		auto ret = m_socket.recv(rep);
-		spdlog::info("Received response: {}", std::string(static_cast<char*>(rep.data()), rep.size()));
+		std::string response(static_cast<char*>(rep.data()), rep.size());
+		//spdlog::info("Received response: {}", response);
 	}
 	else {
 		spdlog::warn("Response timeout for request");
