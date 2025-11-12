@@ -7,6 +7,7 @@
       xmlns:local="clr-namespace:RoSatGCS.Views"
       xmlns:cvt="clr-namespace:RoSatGCS.Utils.Converter"
       xmlns:loc="clr-namespace:RoSatGCS.Utils.Localization"
+      xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="PageDashboard">
@@ -20,40 +21,657 @@
     <Grid>
         <Grid.Resources>
             <cvt:SeriesSelectorConverter x:Key="SeriesSelectorConverter"/>
-            
+            <Style TargetType="GroupBox">
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+
+            <Style x:Key="Splitter" TargetType="Rectangle">
+                <Setter Property="VerticalAlignment" Value="Top"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="Height" Value="14"/>
+                <Setter Property="Width" Value="1"/>
+                <Setter Property="Stroke" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"/>
+            </Style>
+
+            <Style x:Key="ContentTextBlock" TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Top"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="FontFamily" Value="Arial"/>
+                <Setter Property="FontSize" Value="12"/>
+            </Style>
         </Grid.Resources>
-        
-        <DockingManager x:Name="dockManager" AnchorablesSource="{Binding Anchorable}" DocumentsSource="{Binding DocumentPane}" ActiveContent="{Binding ActiveDocument, Mode=TwoWay}"
-                        ShowNavigator="False">
-            <DockingManager.LayoutItemTemplateSelector>
-                <local:PanesTemplateSelector PlotWindowPaneTemplate="{StaticResource PaneTemplatePlotWindow}"/>
-            </DockingManager.LayoutItemTemplateSelector>
-            <DockingManager.LayoutItemContainerStyleSelector>
-                <local:PanesStyleSelector>
-                    <local:PanesStyleSelector.PlotWindowPaneStyle>
-                        <Style TargetType="{x:Type LayoutAnchorableItem}">
-                            <Setter Property="Title" Value="{loc:Localization sCommandFile}"/>
-                            <Setter Property="CanMove" Value="False"/>
-                            <Setter Property="CanFloat" Value="False"/>
-                            <Setter Property="CanClose" Value="False"/>
-                            <Setter Property="CanHide" Value="False"/>
-                        </Style>
-                    </local:PanesStyleSelector.PlotWindowPaneStyle>
-                </local:PanesStyleSelector>
-            </DockingManager.LayoutItemContainerStyleSelector>
-            <DockingManager.LayoutUpdateStrategy>
-                <local:PanesLayoutInitializer/>
-            </DockingManager.LayoutUpdateStrategy>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="320"/>
+            <ColumnDefinition Width="1.5"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-            <LayoutRoot>
-                <LayoutPanel Orientation="Horizontal">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="190"/>
+            <RowDefinition Height="1.5"/>
+            <RowDefinition Height="190"/>
+            <RowDefinition Height="1.5"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="5" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"/>
+        <GridSplitter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="1" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"/>
+        <GridSplitter Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="1" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"/>
+        
+        <GroupBox Grid.Row="0" Grid.Column="0" >
+            <GroupBox.Header>
+                <TextBlock Text="UHF Module" FontWeight="Bold" FontFamily="Arial"/>
+            </GroupBox.Header>
+            <ScrollViewer>
+                <Grid Margin="0,10,0,0">
+                    <TextBlock Text="UHF_1_SCW_B1" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,0,0,0"/>
+                    <TextBlock Text="0b00000000" Style="{StaticResource ContentTextBlock}"  Margin="190,0,0,0"/>
+
+                    <TextBlock Text="UHF_1_SCW_B2" Style="{StaticResource ContentTextBlock}" Margin="10,30,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,30,0,0"/>
+                    <TextBlock Text="0b00000000" Style="{StaticResource ContentTextBlock}"  Margin="190,30,0,0"/>
+
+                    <TextBlock Text="UHF_3_ANTENNA" Style="{StaticResource ContentTextBlock}" Margin="10,60,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,60,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,60,0,0"/>
+
+                    <TextBlock Text="UHF_4_UL_PACKET" Style="{StaticResource ContentTextBlock}" Margin="10,90,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,90,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,90,0,0"/>
+
+                    <TextBlock Text="UHF_4_UL_ERR_PACKET" Style="{StaticResource ContentTextBlock}" Margin="10,120,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,120,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,120,0,0"/>
+                </Grid>
+            </ScrollViewer>
+        </GroupBox>
+
+        <GroupBox Grid.Row="2" Grid.Column="0" >
+            <GroupBox.Header>
+                <TextBlock Text="OBC" FontWeight="Bold" FontFamily="Arial"/>
+            </GroupBox.Header>
+            <ScrollViewer>
+                <Grid Margin="0,10,0,0">
+                    <TextBlock Text="OBC_UPTIME" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,0,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,0,0,0"/>
+
+                    <TextBlock Text="OBC_RESET_COUNT" Style="{StaticResource ContentTextBlock}" Margin="10,30,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,30,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,30,0,0"/>
+
+                    <TextBlock Text="OBC_RESET_FLAG" Style="{StaticResource ContentTextBlock}" Margin="10,60,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,60,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,60,0,0"/>
+
+                    <TextBlock Text="OBC_GNSS_TIME" Style="{StaticResource ContentTextBlock}" Margin="10,90,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,90,0,0"/>
+                    <TextBlock Text="25-01-01 00:00:00" Style="{StaticResource ContentTextBlock}"  Margin="190,90,0,0"/>
+
+                    <TextBlock Text="OBC_GNSS_SAT" Style="{StaticResource ContentTextBlock}" Margin="10,120,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,120,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,120,0,0"/>
+                </Grid>
+            </ScrollViewer>
+        </GroupBox>
+
+        <GroupBox Grid.Row="4" Grid.Column="0" >
+            <GroupBox.Resources>
+                <BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+            </GroupBox.Resources>
+            <GroupBox.Header>
+                <TextBlock Text="OPS MODE" FontWeight="Bold" FontFamily="Arial" />
+            </GroupBox.Header>
+            <ScrollViewer>
+                <Grid Margin="0,10,0,0">
+                    <TextBlock Text="OBC_OPS_MODE" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,0,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,0,0,0"/>
+
+                    <TextBlock Text="OBC_OPS_MODE_FLAG" Style="{StaticResource ContentTextBlock}" Margin="10,30,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,30,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,30,0,0"/>
+
+                    <TextBlock Text="OPS_LEOP_STATE" Style="{StaticResource ContentTextBlock}" Margin="10,60,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,60,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,60,0,0"/>
+
+                    <TextBlock Text="OPS_LEOP_CONTEXT" Style="{StaticResource ContentTextBlock}" Margin="10,90,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,90,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,90,0,0"/>
+
+                    <TextBlock Text="OPS_CMS_STATE" Style="{StaticResource ContentTextBlock}" Margin="10,120,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,120,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,120,0,0"/>
+
+                    <TextBlock Text="OPS_CMS_CONTEXT" Style="{StaticResource ContentTextBlock}" Margin="10,150,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,150,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,150,0,0"/>
+
+                    <TextBlock Text="OPS_EMG_STATE" Style="{StaticResource ContentTextBlock}" Margin="10,180,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,180,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,180,0,0"/>
+
+                    <TextBlock Text="OPS_EMG_CONTEXT" Style="{StaticResource ContentTextBlock}" Margin="10,210,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,210,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,210,0,0"/>
+
+                    <TextBlock Text="OPS_PS_STATE" Style="{StaticResource ContentTextBlock}" Margin="10,240,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,240,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,240,0,0"/>
+
+                    <TextBlock Text="OPS_PS_CONTEXT" Style="{StaticResource ContentTextBlock}" Margin="10,270,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,270,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,270,0,0"/>
+
+                    <TextBlock Text="OPS_MISSON_STATE" Style="{StaticResource ContentTextBlock}" Margin="10,300,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,300,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,300,0,0"/>
+
+                    <TextBlock Text="OPS_MISSON_CONTEXT" Style="{StaticResource ContentTextBlock}" Margin="10,330,0,0"/>
+                    <Rectangle Style="{StaticResource Splitter}" Margin="180,330,0,0"/>
+                    <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,330,0,0"/>
+
+                    <StackPanel Margin="0,355,0,0">
+                        <DockPanel>
+                            <Expander DockPanel.Dock="Right" x:Name="MissionExpander" IsExpanded="False" Margin="0,0,5,0"/>
+                            <TextBlock Margin="10,4,0,0" Text="OPS_MISSION_STATUS[ ]" Style="{StaticResource ContentTextBlock}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentInteractionBrush}}"/>
+                        </DockPanel>
+                        
+                        <Grid Visibility="{Binding IsExpanded, ElementName=MissionExpander, Converter={StaticResource BoolToVisibility}}" FlowDirection="LeftToRight"
+                              Margin="0,10,0,0">
+                            <TextBlock Text=" └ OPS_MISSION_STATUS[0]" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                            <Rectangle Style="{StaticResource Splitter}" Margin="180,0,0,0"/>
+                            <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,0,0,0"/>
+
+                            <TextBlock Text=" └ OPS_MISSION_STATUS[1]" Style="{StaticResource ContentTextBlock}" Margin="10,30,0,0"/>
+                            <Rectangle Style="{StaticResource Splitter}" Margin="180,30,0,0"/>
+                            <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,30,0,0"/>
+
+                            <TextBlock Text=" └ OPS_MISSION_STATUS[2]" Style="{StaticResource ContentTextBlock}" Margin="10,60,0,0"/>
+                            <Rectangle Style="{StaticResource Splitter}" Margin="180,60,0,0"/>
+                            <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,60,0,0"/>
+
+                            <TextBlock Text=" └ OPS_MISSION_STATUS[3]" Style="{StaticResource ContentTextBlock}" Margin="10,90,0,0"/>
+                            <Rectangle Style="{StaticResource Splitter}" Margin="180,90,0,0"/>
+                            <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,90,0,0"/>
+
+                            <TextBlock Text=" └ OPS_MISSION_STATUS[4]" Style="{StaticResource ContentTextBlock}" Margin="10,120,0,0"/>
+                            <Rectangle Style="{StaticResource Splitter}" Margin="180,120,0,0"/>
+                            <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,120,0,0"/>
+
+                            <TextBlock Text=" └ OPS_MISSION_STATUS[5]" Style="{StaticResource ContentTextBlock}" Margin="10,150,0,0"/>
+                            <Rectangle Style="{StaticResource Splitter}" Margin="180,150,0,0"/>
+                            <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="190,150,0,0"/>
+                        </Grid>
+                    </StackPanel>
+
                     
-                </LayoutPanel>
-            </LayoutRoot>
-        </DockingManager>
-      
-        
+                </Grid>
+            </ScrollViewer>
+        </GroupBox>
 
+
+        <Grid Grid.Row="0" Grid.RowSpan="5" Grid.Column="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="1.5"/>
+                <ColumnDefinition Width="360"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="160"/>
+                <RowDefinition Height="1.5"/>
+                <RowDefinition Height="460"/>
+                <RowDefinition Height="1.5"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="5" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"/>
+            <GridSplitter Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="1" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"/>
+            <GridSplitter Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="1" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"/>
+
+            <GroupBox Grid.Column="3" Grid.Row="0">
+                <GroupBox.Header>
+                    <TextBlock Text="EPS" FontWeight="Bold" FontFamily="Arial"/>
+                </GroupBox.Header>
+                <ScrollViewer>
+                    <Grid Margin="0,10,0,0">
+                        <TextBlock Text="EPS_BP_MODE" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                        
+                        <TextBlock Text="EPS_VOLTAGE" Style="{StaticResource ContentTextBlock}" Margin="10,30,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,30,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,30,0,0"/>
+
+                        <TextBlock Text="EPS_CURRENT" Style="{StaticResource ContentTextBlock}" Margin="10,60,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,60,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,60,0,0"/>
+
+                        <TextBlock Text="EPS_TEMPERATURE" Style="{StaticResource ContentTextBlock}" Margin="10,90,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,90,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,90,0,0"/>
+                    </Grid>
+                </ScrollViewer>
+            </GroupBox>
+
+            <GroupBox Grid.Column="3" Grid.Row="2">
+                <GroupBox.Resources>
+                    <BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+                </GroupBox.Resources>
+                <GroupBox.Header>
+                    <TextBlock Text="FDIR" FontWeight="Bold" FontFamily="Arial"/>
+                </GroupBox.Header>
+                <ScrollViewer>
+                    <Grid Margin="0,10,0,0">
+                        <TextBlock Text="UHF_CMD_EXEC" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                        <TextBlock Text="FALSE" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+
+                        <TextBlock Text="GNSS_CMD_EXEC" Style="{StaticResource ContentTextBlock}" Margin="10,30,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,30,0,0"/>
+                        <TextBlock Text="FALSE" Style="{StaticResource ContentTextBlock}"  Margin="220,30,0,0"/>
+
+                        <TextBlock Text="S_X_BAND_CMD_EXEC" Style="{StaticResource ContentTextBlock}" Margin="10,60,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,60,0,0"/>
+                        <TextBlock Text="FALSE" Style="{StaticResource ContentTextBlock}"  Margin="220,60,0,0"/>
+
+                        <TextBlock Text="PDM_POWER_DISTRIBUTION" Style="{StaticResource ContentTextBlock}" Margin="10,90,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,90,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,90,0,0"/>
+
+                        <TextBlock Text="PDM_DEVICE_HEALTH" Style="{StaticResource ContentTextBlock}" Margin="10,120,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,120,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,120,0,0"/>
+
+                        <TextBlock Text="PDM_RAW_SENSORS_1" Style="{StaticResource ContentTextBlock}" Margin="10,150,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,150,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,150,0,0"/>
+
+                        <TextBlock Text="PDM_RAW_SENSORS_2" Style="{StaticResource ContentTextBlock}" Margin="10,180,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,180,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,180,0,0"/>
+
+                        <TextBlock Text="PDM_GET_BASIC_SETTING" Style="{StaticResource ContentTextBlock}" Margin="10,210,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,210,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,210,0,0"/>
+
+                        <TextBlock Text="PDM_SET_BASIC_SETTING" Style="{StaticResource ContentTextBlock}" Margin="10,240,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,240,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,240,0,0"/>
+
+                        <TextBlock Text="BP_BATTERY_INFO" Style="{StaticResource ContentTextBlock}" Margin="10,270,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,270,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,270,0,0"/>
+
+                        <TextBlock Text="BP_DEVICE_HEALTH" Style="{StaticResource ContentTextBlock}" Margin="10,300,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,300,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,300,0,0"/>
+
+                        <TextBlock Text="BP_RAW_SENSORS_1" Style="{StaticResource ContentTextBlock}" Margin="10,330,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,330,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,330,0,0"/>
+
+                        <TextBlock Text="BP_RAW_SENSORS_2" Style="{StaticResource ContentTextBlock}" Margin="10,360,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,360,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,360,0,0"/>
+
+                        <TextBlock Text="BP_RAW_SENSORS_3" Style="{StaticResource ContentTextBlock}" Margin="10,390,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,390,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,390,0,0"/>
+                    </Grid>
+                </ScrollViewer>
+            </GroupBox>
+
+            <GroupBox Grid.Column="5" Grid.Row="4">
+                <GroupBox.Resources>
+                    <BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+                </GroupBox.Resources>
+                <GroupBox.Header>
+                    <TextBlock Text="ADCS" FontWeight="Bold" FontFamily="Arial"/>
+                </GroupBox.Header>
+                <ScrollViewer>
+                    <Grid Margin="0,10,0,0">
+                        <TextBlock Text="ADCS_MODE" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+
+                        <TextBlock Text="ADCS_AD" Style="{StaticResource ContentTextBlock}" Margin="10,30,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,30,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,30,0,0"/>
+
+                        <TextBlock Text="ADCS_AC" Style="{StaticResource ContentTextBlock}" Margin="10,60,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,60,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,60,0,0"/>
+
+                        <TextBlock Text="ADCS_SUN_FLAG" Style="{StaticResource ContentTextBlock}" Margin="10,90,0,0"/>
+                        <Rectangle Style="{StaticResource Splitter}" Margin="210,90,0,0"/>
+                        <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,90,0,0"/>
+
+                        <StackPanel Margin="0,115,0,0">
+                            <DockPanel>
+                                <Expander DockPanel.Dock="Right" x:Name="ADCS_HW_Expander" IsExpanded="False" Margin="0,0,5,0"/>
+                                <TextBlock Margin="10,4,0,0" Text="ADCS_HW[ ]" Style="{StaticResource ContentTextBlock}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.AccentInteractionBrush}}"/>
+                            </DockPanel>
+
+                            <Grid Visibility="{Binding IsExpanded, ElementName=ADCS_HW_Expander, Converter={StaticResource BoolToVisibility}}" FlowDirection="LeftToRight" Margin="0,10,0,0">
+                                <TextBlock Text=" └ ADCS_HW_MAG_STATUS" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+
+                                <TextBlock Text=" └ ADCS_HW_SUN_STATUS" Style="{StaticResource ContentTextBlock}" Margin="10,30,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="210,30,0,0"/>
+                                <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,30,0,0"/>
+
+                                <TextBlock Text=" └ ADCS_HW_IMU_STATUS" Style="{StaticResource ContentTextBlock}" Margin="10,60,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="210,60,0,0"/>
+                                <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,60,0,0"/>
+
+                                <TextBlock Text=" └ ADCS_HW_GNSS_STATUS" Style="{StaticResource ContentTextBlock}" Margin="10,90,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="210,90,0,0"/>
+                                <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,90,0,0"/>
+
+                                <TextBlock Text=" └ ADCS_HW_MTQ_STATUS" Style="{StaticResource ContentTextBlock}" Margin="10,120,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="210,120,0,0"/>
+                                <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,120,0,0"/>
+
+                                <TextBlock Text=" └ ADCS_HW_RWX_STATUS" Style="{StaticResource ContentTextBlock}" Margin="10,150,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="210,150,0,0"/>
+                                <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,150,0,0"/>
+
+                                <TextBlock Text=" └ ADCS_HW_RWY_STATUS" Style="{StaticResource ContentTextBlock}" Margin="10,180,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="210,180,0,0"/>
+                                <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,180,0,0"/>
+
+                                <TextBlock Text=" └ ADCS_BRF_W1" Style="{StaticResource ContentTextBlock}" Margin="10,210,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="210,210,0,0"/>
+                                <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,210,0,0"/>
+
+                                <TextBlock Text=" └ ADCS_BRF_W2" Style="{StaticResource ContentTextBlock}" Margin="10,240,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="210,240,0,0"/>
+                                <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,240,0,0"/>
+
+                                <TextBlock Text=" └ ADCS_BRF_W3" Style="{StaticResource ContentTextBlock}" Margin="10,270,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="210,270,0,0"/>
+                                <TextBlock Text="0" Style="{StaticResource ContentTextBlock}"  Margin="220,270,0,0"/>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </GroupBox>
+
+            <Grid Grid.Column="0" Grid.Row="0" Grid.RowSpan="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="1.5"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <GridSplitter Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"/>
+
+                <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3">
+                    <Border CornerRadius="4" BorderThickness="0.5" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"  Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}" Padding="5"  Margin="5">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Auto">
+                            <ItemsControl >
+                                <!-- ItemsSource="{Binding LogEntries}"-->
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}"
+                                   FontFamily="Consolas"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+    
+                <!-- PLOT: GNSS POSITION X-->
+                <Border BorderThickness="0.5" Grid.Row="0" Grid.Column="0" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                    <lvc:CartesianChart Margin="5">
+                        <lvc:CartesianChart.Title>
+                            <lvc:XamlDrawnLabelVisual Text="GNSS Px" Paint="#303030" TextSize="14" Padding="15"/>
+                        </lvc:CartesianChart.Title>
+
+                        <lvc:CartesianChart.Series>
+                            <lvc:SeriesCollection>
+                                <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=0}"
+                                 GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+                                 Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                            </lvc:SeriesCollection>
+                        </lvc:CartesianChart.Series>
+
+                        <lvc:CartesianChart.XAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.XAxes>
+
+                    </lvc:CartesianChart>
+                </Border>
+
+                <!-- PLOT: GNSS POSITION Y-->
+                <Border BorderThickness="0.5" Grid.Row="0" Grid.Column="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                    <lvc:CartesianChart Margin="5">
+                        <lvc:CartesianChart.Title>
+                            <lvc:XamlDrawnLabelVisual Text="GNSS Py" Paint="#303030" TextSize="14" Padding="15"/>
+                        </lvc:CartesianChart.Title>
+
+                        <lvc:CartesianChart.Series>
+                            <lvc:SeriesCollection>
+                                <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=0}"
+                 GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+                 Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                            </lvc:SeriesCollection>
+                        </lvc:CartesianChart.Series>
+
+                        <lvc:CartesianChart.XAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.XAxes>
+
+                    </lvc:CartesianChart>
+                </Border>
+
+                <!-- PLOT: GNSS POSITION Z-->
+                <Border BorderThickness="0.5" Grid.Row="0" Grid.Column="2" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                    <lvc:CartesianChart Margin="5">
+                        <lvc:CartesianChart.Title>
+                            <lvc:XamlDrawnLabelVisual Text="GNSS Pz" Paint="#303030" TextSize="14" Padding="15"/>
+                        </lvc:CartesianChart.Title>
+
+                        <lvc:CartesianChart.Series>
+                            <lvc:SeriesCollection>
+                                <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=0}"
+                 GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+                 Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                            </lvc:SeriesCollection>
+                        </lvc:CartesianChart.Series>
+
+                        <lvc:CartesianChart.XAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.XAxes>
+
+                    </lvc:CartesianChart>
+                </Border>
+
+                <!-- PLOT: IMU Yaw-->
+                <Border BorderThickness="0.5" Grid.Row="1" Grid.Column="0" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                    <lvc:CartesianChart Margin="5">
+                        <lvc:CartesianChart.Title>
+                            <lvc:XamlDrawnLabelVisual Text="IMU Yaw" Paint="#303030" TextSize="14" Padding="15"/>
+                        </lvc:CartesianChart.Title>
+
+                        <lvc:CartesianChart.Series>
+                            <lvc:SeriesCollection>
+                                <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=0}"
+                 GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+                 Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                            </lvc:SeriesCollection>
+                        </lvc:CartesianChart.Series>
+
+                        <lvc:CartesianChart.XAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.XAxes>
+
+                    </lvc:CartesianChart>
+                </Border>
+
+                <!-- PLOT: IMU Pitch-->
+                <Border BorderThickness="0.5" Grid.Row="1" Grid.Column="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                    <lvc:CartesianChart Margin="5">
+                        <lvc:CartesianChart.Title>
+                            <lvc:XamlDrawnLabelVisual Text="IMU Pitch" Paint="#303030" TextSize="14" Padding="15"/>
+                        </lvc:CartesianChart.Title>
+
+                        <lvc:CartesianChart.Series>
+                            <lvc:SeriesCollection>
+                                <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=0}"
+ GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+ Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                            </lvc:SeriesCollection>
+                        </lvc:CartesianChart.Series>
+
+                        <lvc:CartesianChart.XAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.XAxes>
+
+                    </lvc:CartesianChart>
+                </Border>
+
+                <!-- PLOT: IMU Roll-->
+                <Border BorderThickness="0.5" Grid.Row="1" Grid.Column="2" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                    <lvc:CartesianChart Margin="5">
+                        <lvc:CartesianChart.Title>
+                            <lvc:XamlDrawnLabelVisual Text="IMU Roll" Paint="#303030" TextSize="14" Padding="15"/>
+                        </lvc:CartesianChart.Title>
+
+                        <lvc:CartesianChart.Series>
+                            <lvc:SeriesCollection>
+                                <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=0}"
+ GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+ Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                            </lvc:SeriesCollection>
+                        </lvc:CartesianChart.Series>
+
+                        <lvc:CartesianChart.XAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.XAxes>
+
+                    </lvc:CartesianChart>
+                </Border>
+
+                <!-- PLOT: EPS Voltage-->
+                <Border BorderThickness="0.5" Grid.Row="2" Grid.Column="0" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                    <lvc:CartesianChart Margin="5">
+                        <lvc:CartesianChart.Title>
+                            <lvc:XamlDrawnLabelVisual Text="EPS Voltage" Paint="#303030" TextSize="14" Padding="15"/>
+                        </lvc:CartesianChart.Title>
+
+                        <lvc:CartesianChart.Series>
+                            <lvc:SeriesCollection>
+                                <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=0}"
+                 GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+                 Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                            </lvc:SeriesCollection>
+                        </lvc:CartesianChart.Series>
+
+                        <lvc:CartesianChart.XAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.XAxes>
+
+                    </lvc:CartesianChart>
+                </Border>
+
+                <!-- PLOT: EPS Current-->
+                <Border BorderThickness="0.5" Grid.Row="2" Grid.Column="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                    <lvc:CartesianChart Margin="5">
+                        <lvc:CartesianChart.Title>
+                            <lvc:XamlDrawnLabelVisual Text="EPS Current" Paint="#303030" TextSize="14" Padding="15"/>
+                        </lvc:CartesianChart.Title>
+
+                        <lvc:CartesianChart.Series>
+                            <lvc:SeriesCollection>
+                                <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=0}"
+ GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+ Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                            </lvc:SeriesCollection>
+                        </lvc:CartesianChart.Series>
+
+                        <lvc:CartesianChart.XAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.XAxes>
+
+                    </lvc:CartesianChart>
+                </Border>
+
+                <!-- PLOT: EPS Temperature-->
+                <Border BorderThickness="0.5" Grid.Row="2" Grid.Column="2" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                    <lvc:CartesianChart Margin="5">
+                        <lvc:CartesianChart.Title>
+                            <lvc:XamlDrawnLabelVisual Text="EPS Temperature" Paint="#303030" TextSize="14" Padding="15"/>
+                        </lvc:CartesianChart.Title>
+
+                        <lvc:CartesianChart.Series>
+                            <lvc:SeriesCollection>
+                                <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=0}"
+ GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+ Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                            </lvc:SeriesCollection>
+                        </lvc:CartesianChart.Series>
+
+                        <lvc:CartesianChart.XAxes>
+                            <lvc:AxesCollection>
+                                <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                            </lvc:AxesCollection>
+                        </lvc:CartesianChart.XAxes>
+
+                    </lvc:CartesianChart>
+                </Border>
+            </Grid>
+        </Grid>
+
+
+        <!--
         <lvc:CartesianChart>
             <lvc:CartesianChart.Title>
                 <lvc:XamlDrawnLabelVisual
@@ -81,7 +699,7 @@
             </lvc:CartesianChart.XAxes>
 
         </lvc:CartesianChart>
-
+-->
         <!--
         <Button Height="20" Width="20" Command="{Binding Test}"/>
         -->

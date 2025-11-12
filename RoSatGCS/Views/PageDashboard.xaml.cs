@@ -22,12 +22,9 @@ namespace RoSatGCS.Views
     /// </summary>
     public partial class PageDashboard : Page
     {
-        public static DockingManager DockingManager { get; private set; }
-
         public PageDashboard()
         {
             InitializeComponent();
-            DockingManager = dockManager;
             DataContext = App.Current.Services.GetService(typeof(PageDashboardViewModel));
         }
     }
