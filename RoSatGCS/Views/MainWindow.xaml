@@ -46,6 +46,8 @@
                 </MenuItem>
                 <MenuItem Header="{loc:Localization MenuWindow}" Style="{DynamicResource MainMenuStyle}">
                     <MenuItem Header="Onboard Scheduler" Style="{DynamicResource SubMenuStyle}" Command="{Binding OpenOnboardScheduler}"/>
+                    <MenuItem Header="{loc:Localization sDashboard}" Style="{DynamicResource SubMenuStyle}" Command="{Binding OpenDashboard}"/>
+                    <MenuItem Header="{loc:Localization sLog}" Style="{DynamicResource SubMenuStyle}" Command="{Binding OpenLogWindow}"/>
                 </MenuItem>
                 <MenuItem Header="{loc:Localization MenuHelp}" Style="{DynamicResource MainMenuStyle}">
                     <MenuItem Header="TBD" Style="{DynamicResource SubMenuStyle}"/>
@@ -108,7 +110,6 @@
                         </Rectangle.OpacityMask>
                     </Rectangle>
                 </Button>
-
 
                 <Rectangle Style="{DynamicResource Splitter}"/>
                 <Label Content="{loc:Localization TopBarSchedule}"  Margin="5,0,0,0"/>
@@ -211,14 +212,6 @@
         <!-- Sidebar Definition-->
         <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}" BorderThickness="0.5" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
             <StackPanel x:Name="Sidebar" Orientation="Vertical" Cursor="">
-                <!-- Dashboard -->
-                <Button Style="{DynamicResource SidebarButton}" ToolTip="{loc:Localization sDashboard}" Command="{Binding NavigateCommand}" CommandParameter="dashboard">
-                    <Rectangle Style="{DynamicResource SidebarIcon}">
-                        <Rectangle.OpacityMask>
-                            <VisualBrush Stretch="Fill" Visual="{StaticResource IconDashboard}" />
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                </Button>
                 <!-- Scheduler -->
 
                 <Button Style="{DynamicResource SidebarButton}" ToolTip="{loc:Localization sScheduler}" Command="{Binding NavigateCommand}" CommandParameter="scheduler">

@@ -23,24 +23,20 @@ namespace RoSatGCS.Models
         // Pages
         private Page? pageArchive;
         private Page? pageCommand;
-        private Page? pageDashboard;
         private Page? pageGroundTrack;
         private Page? pageScheduler;
         private Page? pageFileShare;
 
         public Page PageArchive { get { if (pageArchive == null) pageArchive = new PageArchive(); return pageArchive; } }
         public Page PageCommand { get { if (pageCommand == null) pageCommand = new PageCommand(); return pageCommand; } }
-        public Page PageDashboard { get { if (pageDashboard == null) pageDashboard = new PageDashboard(); return pageDashboard; } }
         public Page PageGroundTrack { get { if (pageGroundTrack == null) pageGroundTrack = new PageGroundTrack(); return pageGroundTrack; } }
         public Page PageScheduler { get { if (pageScheduler == null) pageScheduler = new PageScheduler(); return pageScheduler; } }
         public Page PageFileShare { get { if (pageFileShare == null) pageFileShare = new PageFileShare(); return pageFileShare; } }
 
         public PageArchiveViewModel? GetPageArchiveViewModel
-        {  get => pageArchive?.DataContext as PageArchiveViewModel; }
+        { get => pageArchive?.DataContext as PageArchiveViewModel; }
         public PageCommandViewModel? GetPageCommandViewModel
         { get => pageCommand?.DataContext as PageCommandViewModel; }
-        public PageDashboardViewModel? GetPageDashboardViewModel
-        { get => pageDashboard?.DataContext as PageDashboardViewModel; }
         public PageGroundTrackViewModel? GetPageGroundTrackViewModel
         { get => pageGroundTrack?.DataContext as PageGroundTrackViewModel; }
         public PageSchedulerViewModel? GetPageSchedulerViewModel
@@ -86,6 +82,12 @@ namespace RoSatGCS.Models
         private PlotDataContainer _plotDataContainer = new PlotDataContainer();
         public PlotDataContainer PlotDataContainer { get => _plotDataContainer; }
 
+        // Beacon Data Container
+        private ObservableCollection<BeaconModel> _beaconModelCollection = [];
+        public ObservableCollection<BeaconModel> BeaconModelCollection { get => _beaconModelCollection; }
+        private ListCollectionView _beaconModelView;
+        public ListCollectionView BeaconModelView { get => _beaconModelView; }
+
         private MainDataContext()
         {
             SatFuncFile = new ReadOnlyObservableCollection<SatelliteFunctionFileModel>(_satFuncFile);
@@ -95,9 +97,10 @@ namespace RoSatGCS.Models
             _satFuncTypeView = new ListCollectionView(_satFuncType);
             _satMethodView = new ListCollectionView(_satMethod);
             _satCommandGroupView = new ListCollectionView(SatelliteCommandGroup);
+            _beaconModelView = new ListCollectionView(BeaconModelCollection);
 
             _satFuncFileView.SortDescriptions.Add(new SortDescription(nameof(SatelliteFunctionFileModel.Name), ListSortDirection.Ascending));
-
+            _beaconModelView.SortDescriptions.Add(new SortDescription(nameof(BeaconModel.Timestamp), ListSortDirection.Descending));
         }
 
         private static Lazy<MainDataContext> _instance = new(() => new MainDataContext());
@@ -183,6 +186,43 @@ namespace RoSatGCS.Models
             }
         }
 
+        public void LoadBeacon(string path)
+        {
+            if (string.IsNullOrEmpty(path)) return;
+            if (!File.Exists(path)) return;
+            using (var fileStream = File.OpenRead(path))
+            {
+                try
+                {
+                    _beaconModelCollection = MessagePackSerializer.Deserialize<ObservableCollection<BeaconModel>>(fileStream);
+                    _beaconModelView = new ListCollectionView(_beaconModelCollection);
+                    _beaconModelView.SortDescriptions.Add(new SortDescription(nameof(BeaconModel.Timestamp), ListSortDirection.Ascending));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn(ex);
+                }
+            }
+        }
+
+        public void SaveBeacon(string path)
+        {
+            if (string.IsNullOrEmpty(path)) return;
+            using (var fileStream = File.OpenWrite(path))
+            {
+                try
+                {
+                    MessagePackSerializer.Serialize(fileStream, _beaconModelCollection);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn(ex);
+                }
+            }
+        }
+
+
+
         // Add Satellite Function File
         public void AddSatelliteFunctionFile(SatelliteFunctionFileModel file)
         {
@@ -230,6 +270,20 @@ namespace RoSatGCS.Models
         {
             if (command == null) return;
             _satScheduleCommand.Add(command);
+        }
+
+        // Add Beacon Model
+        public void AddBeaconModel(BeaconModel beacon)
+        {
+            if (beacon == null) return;
+            _beaconModelCollection.Add(beacon);
+        }
+
+        // Remove Beacon Model
+        public void RemoveBeaconModel(BeaconModel beacon)
+        {
+            if (beacon == null) return;
+            _beaconModelCollection.Remove(beacon);
         }
     }
 }

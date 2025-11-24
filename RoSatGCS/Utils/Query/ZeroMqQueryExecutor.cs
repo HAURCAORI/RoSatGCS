@@ -11,6 +11,7 @@ using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -216,6 +217,37 @@ namespace RoSatGCS.Utils.Query
                                     }
 
                                     MainDataContext.Instance?.PlotDataContainer.Add(data.DataID, CollectionsMarshal.AsSpan(list));
+                                }
+                            }
+                            else if (result is { Type: QueryType.Info })
+                            {
+                                var info = InfoPacket.DeserializePacket(result.Payload);
+                                if (info != null)
+                                {
+                                    switch (info.Type)
+                                    {
+                                        case InfoType.None:
+                                            RoSatGCS.Utils.Logger.Logger.LogInfo(info.Info);
+                                            break;
+                                        case InfoType.Send:
+                                            RoSatGCS.Utils.Logger.Logger.LogInfo(info.Info);
+                                            break;
+                                        case InfoType.Receive:
+                                            RoSatGCS.Utils.Logger.Logger.LogInfo(info.Info);
+                                            break;
+                                        case InfoType.Status:
+                                            RoSatGCS.Utils.Logger.Logger.LogInfo(info.Info);
+                                            break;
+                                        case InfoType.Warning:
+                                            RoSatGCS.Utils.Logger.Logger.LogWarning(info.Info);
+                                            break;
+                                        case InfoType.Error:
+                                            RoSatGCS.Utils.Logger.Logger.LogError(info.Info);
+                                            break;
+                                        default:
+                                            RoSatGCS.Utils.Logger.Logger.LogInfo(info.Info);
+                                            break;
+                                    }
                                 }
                             }
                             else if (result != null && _pendingResults.TryRemove(result.Id, out var tcs))

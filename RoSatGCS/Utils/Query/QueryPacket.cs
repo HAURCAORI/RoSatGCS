@@ -31,7 +31,8 @@ namespace RoSatGCS.Utils.Query
         Config,  // SpaceComms Config
         Debug,   // Processor Debug Mode
         FwUpdate,// Firmware Update
-        Cancel   // Cancel Command
+        Cancel,  // Cancel Command
+        Info
     }
 
     public enum DataType
@@ -49,6 +50,16 @@ namespace RoSatGCS.Utils.Query
         String,
         ByteArray,
         Boolean
+    }
+
+    public enum InfoType
+    {
+        None,
+        Send,
+        Receive,
+        Status,
+        Warning,
+        Error
     }
 
     public class PacketBase<T>
@@ -118,6 +129,13 @@ namespace RoSatGCS.Utils.Query
     public class CancelPacket : PacketBase<CancelPacket>
     {
         [Key(0)] public ulong CommandId;
+    }
+
+    [MessagePackObject]
+    public class InfoPacket : PacketBase<InfoPacket>
+    {
+        [Key(0)] public string Info = "";
+        [Key(1)] public InfoType Type = InfoType.None;
     }
 
 

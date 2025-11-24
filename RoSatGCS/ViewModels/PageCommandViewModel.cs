@@ -542,6 +542,9 @@ namespace RoSatGCS.ViewModels
             var command = new SatelliteCommandModel(model);
             command.IsTemp = true;
             _satCommandTemp.Add(command);
+
+            SatelliteCommandModel.ApplyDefaultInputValues(command);
+
             var pane = new PaneFunctionPropertyViewModel(command, true);
             DocumentPane.Add(pane);
         }

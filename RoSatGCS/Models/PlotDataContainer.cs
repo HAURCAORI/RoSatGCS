@@ -87,7 +87,7 @@ namespace RoSatGCS.Models
 
     public class PlotDataContainer : INotifyPropertyChanged
     {
-        private static readonly int DefaultCapacity = 10;
+        private static readonly int DefaultCapacity = 100;
         private readonly ConcurrentDictionary<ushort, BoundedSortedObservableCollection<PlotData>> _map
         = new();
 
@@ -104,7 +104,14 @@ namespace RoSatGCS.Models
         }
 
         public void Clear()
-            => _map.Clear();
+        {
+            foreach (var series in _map.Values)
+            {
+                series.Clear();
+            }
+            _map.Clear();
+            OnPropertyChanged(nameof(this.Count));
+        }
 
 
         public int Count => _map.Count;

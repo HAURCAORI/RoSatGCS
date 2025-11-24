@@ -267,6 +267,17 @@ namespace RoSatGCS.Models
 
                     for (int i = 0; i < len; i++)
                     {
+                        if(len > 1)
+                        {
+                            var subHeader = new ParameterModel(SatelliteFunctionTypeModel.ArgumentType.Struct, type.File, type.Name + "[" + (i + 1).ToString() + "]", type.Description)
+                            {
+                                CommandModel = param.CommandModel,
+                                ByteSize = type.Size,
+                                DataType = SatelliteFunctionFileModel.DataType.None,
+                                Sequence = param.Sequence
+                            };
+                            list.Add(subHeader);
+                        }
 
                         var index = 1;
                         foreach (var p in type.Parameters)
@@ -285,6 +296,11 @@ namespace RoSatGCS.Models
                                 list.Add(p_copy);
                             }
                         }
+                        // param.Sequence string to int
+
+                        int param_sequence = 0;
+                        Int32.TryParse(param.Sequence, out param_sequence);
+                        param.Sequence = (param_sequence + 1).ToString();
                     }
                 }
                 else if (type.Type == SatelliteFunctionTypeModel.ArgumentType.Enum)

@@ -65,6 +65,8 @@ namespace RoSatGCS.ViewModels
             _command = command;
             _command.Received += OnReceived;
 
+
+
             UpdateTitle();
 
             Application.Current.Dispatcher.Invoke(() => { InitializeMethod(); InitializeValues(); });  

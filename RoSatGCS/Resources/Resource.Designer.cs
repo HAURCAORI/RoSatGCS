@@ -304,6 +304,15 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Current과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sCurrent {
+            get {
+                return ResourceManager.GetString("sCurrent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Dashboard과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sDashboard {
@@ -642,6 +651,24 @@ namespace RoSatGCS.Resources {
         public static string sInvalid {
             get {
                 return ResourceManager.GetString("sInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Latest과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sLatest {
+            get {
+                return ResourceManager.GetString("sLatest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Log과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sLog {
+            get {
+                return ResourceManager.GetString("sLog", resourceCulture);
             }
         }
         
@@ -997,6 +1024,15 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Source과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sSource {
+            get {
+                return ResourceManager.GetString("sSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Start과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sStart {
@@ -1024,11 +1060,29 @@ namespace RoSatGCS.Resources {
         }
         
         /// <summary>
+        ///   Time과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sTime {
+            get {
+                return ResourceManager.GetString("sTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   TLE List과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         public static string sTLEList {
             get {
                 return ResourceManager.GetString("sTLEList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   TopMost과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string sTopMost {
+            get {
+                return ResourceManager.GetString("sTopMost", resourceCulture);
             }
         }
         

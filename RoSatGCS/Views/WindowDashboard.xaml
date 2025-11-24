@@ -1,0 +1,1051 @@
+﻿<Window x:Class="RoSatGCS.Views.WindowDashboard"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RoSatGCS.Views"
+        xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+        xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+        xmlns:loc="clr-namespace:RoSatGCS.Utils.Localization"
+        xmlns:cvt="clr-namespace:RoSatGCS.Utils.Converter"
+        xmlns:ctr="clr-namespace:RoSatGCS.Controls"
+        xmlns:bv="clr-namespace:RoSatGCS.Behaviors"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterOwner"
+        Title="WindowDashboard" Height="900" Width="1400" Topmost="{Binding TopMost}">
+    <Window.Resources>
+        <cvt:SeriesSelectorConverter x:Key="SeriesSelectorConverter"/>
+        <cvt:ServiceStatusConverter x:Key="ServiceStatusConverter"/>
+        <cvt:FrequencyConverter x:Key="FrequencyConverter"/>
+        <cvt:EnumConverter x:Key="EnumConverter"/>
+        <cvt:BoolColorConverter x:Key="BoolColorConverter"/>
+        <cvt:BoolShortConverter x:Key="BoolShortConverter"/>
+        <cvt:PlotTitleConverter x:Key="PlotTitleConverter"/>
+        <cvt:ConOpsConverter x:Key="ConOpsConverter"/>
+
+        <Style TargetType="GroupBox">
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+
+        <Style x:Key="Splitter" TargetType="Rectangle">
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Height" Value="14"/>
+            <Setter Property="Width" Value="1"/>
+            <Setter Property="Stroke" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"/>
+        </Style>
+
+        <Style x:Key="ContentTextBlock" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
+
+            <!-- Top Bar -->
+            <StackPanel Orientation="Horizontal" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}">
+                <StackPanel.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                    </Style>
+                    <Style TargetType="Label">
+                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                    </Style>
+                    <Style x:Key="Splitter" TargetType="Rectangle">
+                        <Setter Property="VerticalAlignment" Value="Stretch"/>
+                        <Setter Property="Width" Value="1"/>
+                        <Setter Property="Margin" Value="3,6,3,6"/>
+                        <Setter Property="Stroke" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"/>
+                    </Style>
+                </StackPanel.Resources>
+                
+                <Label Content="{loc:Localization TopBarTime}" FontSize="12" Margin="8,0,0,0"/>
+                <TextBlock Text="{Binding Parent.CurrentTime, StringFormat=HH:mm:ss}" FontSize="18" Width="75" Margin="2,0,2,2"/>
+                <Rectangle Style="{DynamicResource Splitter}"/>
+                
+                <Label Content="{loc:Localization TopBarSchedule}"  Margin="5,0,0,0"/>
+                <TextBlock Text="12:00:00" FontSize="18" Width="75" Margin="2,0,8,2"/>
+                <Border BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BackgroundBrush}}" BorderThickness="0.5" Height="26" CornerRadius="2" Margin="0,0,2,0">
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Style="{DynamicResource Icon}" Margin="10,0,5,0" >
+                            <Rectangle.OpacityMask>
+                                <VisualBrush Stretch="Fill" Visual="{StaticResource IconDownLink}" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                        <TextBlock Text="{Binding Parent.SettingsModel.DownlinkFreq, Converter={StaticResource FrequencyConverter}}" FontSize="12" Margin="2,0,10,0"/>
+                    </StackPanel>
+                </Border>
+                <Border BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BackgroundBrush}}" BorderThickness="0.5" Height="26" CornerRadius="2" Margin="0,0,5,0">
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Style="{DynamicResource Icon}" Margin="10,0,5,0">
+                            <Rectangle.OpacityMask>
+                                <VisualBrush Stretch="Fill" Visual="{StaticResource IconUpLink}" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                        <TextBlock  Text="{Binding Parent.SettingsModel.UplinkFreq, Converter={StaticResource FrequencyConverter}}" FontSize="12" Margin="2,0,10,0"/>
+                    </StackPanel>
+                </Border>
+                <Rectangle Style="{DynamicResource Splitter}"/>
+
+                <Label Content="{loc:Localization TopBarStatus}"  Margin="5,0,4,0"/>
+                <Border BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BackgroundBrush}}" BorderThickness="0.5" Height="26" CornerRadius="2" Margin="0,0,2,0">
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Style="{DynamicResource Icon}" Margin="10,3,2,0">
+                            <Rectangle.OpacityMask>
+                                <VisualBrush Stretch="Fill" Visual="{StaticResource IconSerial}" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                        <Label Content="{loc:Localization sSerial}"/>
+                        <ctr:StatusIndicator x:Name="SerialStatus" Margin="2,2,8,0"/>
+                    </StackPanel>
+                </Border>
+                <Border BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BackgroundBrush}}" BorderThickness="0.5" Height="26" CornerRadius="2" Margin="0,0,2,0">
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Style="{DynamicResource Icon}" Margin="10,3,2,0">
+                            <Rectangle.OpacityMask>
+                                <VisualBrush Stretch="Fill" Visual="{StaticResource IconDatabase}" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                        <Label Content="{loc:Localization sDatabase}"/>
+                        <ctr:StatusIndicator x:Name="DatabaseStatus" Margin="2,2,8,0"/>
+                    </StackPanel>
+                </Border>
+                <Border BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer3BorderBrush}}" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer3BackgroundBrush}}"
+                        BorderThickness="0.5" Height="26" CornerRadius="2" Margin="0,0,2,0" ToolTip="{Binding Parent.ServiceManager.State, Converter={StaticResource EnumConverter}}">
+                    <Border.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="{loc:Localization sStart}" Command="{Binding Parent.StartService}"/>
+                            <MenuItem Header="{loc:Localization sStop}" Command="{Binding Parent.StopService}"/>
+                            <MenuItem Header="{loc:Localization sRestart}" Command="{Binding Parent.RestartService}"/>
+                        </ContextMenu>
+                    </Border.ContextMenu>
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Style="{DynamicResource Icon}" Margin="10,3,2,0">
+                            <Rectangle.OpacityMask>
+                                <VisualBrush Stretch="Fill" Visual="{StaticResource IconProcessor}" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                        <Label Content="{loc:Localization sProcessor}"/>
+                        <ctr:StatusIndicator x:Name="ProcessorStatus" Margin="2,2,8,0" Status="{Binding Parent.ServiceManager.State, Converter={StaticResource ServiceStatusConverter}}"/>
+                    </StackPanel>
+                </Border>
+
+                <Rectangle Style="{DynamicResource Splitter}"/>
+                <Label Content="{loc:Localization sSource}" Margin="5,0,4,0"/>
+                <ComboBox Width="100" Height="24" Margin="5,0,2,0" SelectedIndex="0">
+                    <ComboBoxItem FontSize="10" Height="20" Content="Local"/>
+                </ComboBox>
+                <TextBox Height="24" Width="250" FontSize="10" Margin="5,0,2,0" IsReadOnly="True" Text="{Binding SourcePath}"/>
+                <Button Content="..." Height="24" Width="24" Margin="2,0,2,0" Command="{Binding BroswePath}"/>
+
+                <Button Style="{DynamicResource ToolButton}" ToolTip="{loc:Localization sRefresh}" Command="{Binding Refresh}">
+                    <Rectangle Style="{DynamicResource Icon}" Width="10" Height="10">
+                        <Rectangle.OpacityMask>
+                            <VisualBrush Stretch="Uniform" Visual="{StaticResource IconRefresh}" />
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                </Button>
+                
+                <Rectangle Style="{DynamicResource Splitter}"/>
+                <CheckBox IsChecked="{Binding TopMost}" Content="{loc:Localization sTopMost}" Margin="10,0,0,0" Width="100" />
+            </StackPanel>
+
+            <!-- Bottom Bar -->
+            <Grid Grid.Row="2" Height="40" Background="#FF861B2D">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="230"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left: Current time + Play/Stop -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                    <Button Style="{DynamicResource ToolButton}" Command="{Binding Run}" Background="Transparent" adonisExtensions:CursorSpotlightExtension.BackgroundBrush="#40FFFFFF">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}">
+                                    <Grid>
+                                        <Rectangle x:Name="RunIcon" Style="{DynamicResource Icon}" Width="10" Height="10" Fill="WhiteSmoke">
+                                            <Rectangle.OpacityMask>
+                                                <VisualBrush Stretch="Uniform" Visual="{StaticResource IconRunFill}"/>
+                                            </Rectangle.OpacityMask>
+                                        </Rectangle>
+
+                                        <Rectangle x:Name="StopIcon" Style="{DynamicResource Icon}" Width="10" Height="10" Fill="WhiteSmoke">
+                                            <Rectangle.OpacityMask>
+                                                <VisualBrush Stretch="Uniform" Visual="{StaticResource IconStop}" />
+                                            </Rectangle.OpacityMask>
+                                        </Rectangle>
+                                    </Grid>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <!-- When IsRunning = true -> show Stop, hide Run -->
+                                    <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                        <Setter TargetName="RunIcon" Property="Visibility" Value="Collapsed" />
+                                        <Setter TargetName="StopIcon" Property="Visibility" Value="Visible" />
+                                        <Setter Property="ToolTip" Value="{loc:Localization sStop}" />
+                                    </DataTrigger>
+
+                                    <!-- When IsRunning = false -> show Run, hide Stop -->
+                                    <DataTrigger Binding="{Binding IsRunning}" Value="False">
+                                        <Setter TargetName="RunIcon" Property="Visibility" Value="Visible" />
+                                        <Setter TargetName="StopIcon" Property="Visibility" Value="Collapsed" />
+                                        <Setter Property="ToolTip" Value="{loc:Localization sRun}" />
+                                    </DataTrigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <Rectangle Style="{DynamicResource Splitter}" VerticalAlignment="Center" Height="20" Margin="10,0,10,0"/>
+
+
+                    <TextBlock Text="{loc:Localization sCurrent}" VerticalAlignment="Center" Margin="10,0,5,0" Foreground="White"/>
+                    <TextBlock Text="{Binding CurrentBeaconModel.DateTime, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" VerticalAlignment="Center" Foreground="White" Margin="0,0,10,0"/>
+                </StackPanel>
+
+                <!-- Middle: Start time | Slider | End time -->
+                <Border Grid.Column="1" BorderThickness="1,0,1,0" BorderBrush="#FF651422">
+                    <Grid Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="145"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="145"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Start time -->
+                        <TextBlock Grid.Column="0" Margin="20,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{Binding FirstBeaconModel.DateTime, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" Foreground="White"/>
+
+                        <!-- Slider (1-second precision) -->
+                        <Slider Grid.Column="1" Margin="5,0,5,0" VerticalAlignment="Center" Minimum="0" Maximum="{Binding DurationSeconds}"
+                                Value="{Binding SelectedOffsetSeconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                IsSnapToTickEnabled="True" TickFrequency="1"/>
+
+                        <!-- End time -->
+                        <TextBlock Grid.Column="2" Margin="0,0,20,0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding SliderDateTime, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" Foreground="White"/>
+                    </Grid>
+                </Border>
+
+                <!-- Right: Start Time(Show data only elapsed this time) -->
+                <Grid Grid.Column="2">
+                    <CheckBox HorizontalAlignment="Left" VerticalAlignment="Center" Margin="15,0,0,0" Foreground="Black" IsChecked="{Binding IsStartLimit}"/>
+                    <TextBlock Text="{loc:Localization sStart}" VerticalAlignment="Center" Margin="35,0,0,0" Foreground="White"/>
+                    <ctr:DateTimePicker Height="26" Width="140" Margin="0,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                        SelectedDate="{Binding DataContext.StartLimit, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                </Grid>
+            </Grid>
+
+
+            <!-- Main Content -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="320"/>
+                    <ColumnDefinition Width="1.5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="245"/>
+                    <RowDefinition Height="1.5"/>
+                    <RowDefinition Height="170"/>
+                    <RowDefinition Height="1.5"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="5" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"/>
+                <GridSplitter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="1" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"/>
+                <GridSplitter Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="1" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"/>
+
+                <GroupBox Grid.Row="0" Grid.Column="0" >
+                    <GroupBox.Header>
+                        <TextBlock Text="UHF Module" FontWeight="Bold" FontFamily="Arial"/>
+                    </GroupBox.Header>
+                    <ScrollViewer>
+                        <StackPanel Margin="0,10,0,0" Orientation="Vertical">
+                            <StackPanel.Resources>
+                                <Style TargetType="Grid">
+                                    <Setter Property="Height" Value="24"/>
+                                </Style>
+                            </StackPanel.Resources>
+                            <Grid>
+                                <TextBlock Text="Beacon Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.beacon_status}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.uhf_data.beacon_status, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="GCS Connection" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.gcs_connection_status}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.uhf_data.gcs_connection_status, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="FRAM Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.fram_status}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.uhf_data.beacon_status, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Radio Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.radio_status}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.uhf_data.beacon_status, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Reset Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.reset_status}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.uhf_data.beacon_status, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="RF Mode" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.rf_mode}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Rx Error Packets" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0">
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.uhf_rx_error_packets}"/>
+                                    <TextBlock Text="/"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.uhf_rx_packets}"/>
+                                </TextBlock>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Antenna Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0">
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.antenna_1_status, Converter={StaticResource BoolShortConverter}}"
+                                               Foreground="{Binding CurrentBeaconModel.Structure.uhf_data.antenna_1_status, Converter={StaticResource BoolColorConverter}}"/>
+                                    <TextBlock Text="|"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.antenna_2_status, Converter={StaticResource BoolShortConverter}}"
+                                               Foreground="{Binding CurrentBeaconModel.Structure.uhf_data.antenna_2_status, Converter={StaticResource BoolColorConverter}}"/>
+                                    <TextBlock Text="|"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.antenna_3_status, Converter={StaticResource BoolShortConverter}}"
+                                               Foreground="{Binding CurrentBeaconModel.Structure.uhf_data.antenna_3_status, Converter={StaticResource BoolColorConverter}}"/>
+                                    <TextBlock Text="|"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.antenna_4_status, Converter={StaticResource BoolShortConverter}}"
+                                               Foreground="{Binding CurrentBeaconModel.Structure.uhf_data.antenna_4_status, Converter={StaticResource BoolColorConverter}}"/>
+                                </TextBlock>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+                </GroupBox>
+
+                <GroupBox Grid.Row="2" Grid.Column="0" >
+                    <GroupBox.Header>
+                        <TextBlock Text="OBC" FontWeight="Bold" FontFamily="Arial"/>
+                    </GroupBox.Header>
+                    <ScrollViewer>
+                        <StackPanel Margin="0,10,0,0" Orientation="Vertical">
+                            <StackPanel.Resources>
+                                <Style TargetType="Grid">
+                                    <Setter Property="Height" Value="24"/>
+                                </Style>
+                            </StackPanel.Resources>
+                            <Grid>
+                                <TextBlock Text="OBC Uptime" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.OBC_Uptime}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="GNSS Time" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0:0000}-{1:00}-{2:00} {3:00}:{4:00}:{5:00}">
+                                            <Binding Path="CurrentBeaconModel.Structure.gnss_data.year"/>
+                                            <Binding Path="CurrentBeaconModel.Structure.gnss_data.month"/>
+                                            <Binding Path="CurrentBeaconModel.Structure.gnss_data.day"/>
+                                            <Binding Path="CurrentBeaconModel.Structure.gnss_data.hour"/>
+                                            <Binding Path="CurrentBeaconModel.Structure.gnss_data.minute"/>
+                                            <Binding Path="CurrentBeaconModel.Structure.gnss_data.second"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Total Reset Count" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.totalResetCount}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Reset Reason" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.resetReasonBitField}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="ConOps Mode" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource ConOpsConverter}">
+                                            <Binding Path="CurrentBeaconModel.Structure.obc_data.Irst_Opsmode.ROOT"/>
+                                            <Binding Path="CurrentBeaconModel.Structure.obc_data.Irst_Opsmode.LEOP"/>
+                                            <Binding Path="CurrentBeaconModel.Structure.obc_data.Irst_Opsmode.CMS"/>
+                                            <Binding Path="CurrentBeaconModel.Structure.obc_data.Irst_Opsmode.NM"/>
+                                            <Binding Path="CurrentBeaconModel.Structure.obc_data.Irst_Opsmode.NM_STATE_CHG"/>
+                                            <Binding Path="CurrentBeaconModel.Structure.obc_data.Irst_Opsmode.NM_STATE_MS"/>
+                                            <Binding Path="CurrentBeaconModel.Structure.obc_data.Irst_Opsmode.NM_STATE_PS"/>
+                                            <Binding Path="CurrentBeaconModel.Structure.obc_data.Irst_Opsmode.EM"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+                </GroupBox>
+
+                <GroupBox Grid.Row="4" Grid.Column="0" >
+                    <GroupBox.Resources>
+                        <BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+                    </GroupBox.Resources>
+                    <GroupBox.Header>
+                        <TextBlock Text="OPS MODE" FontWeight="Bold" FontFamily="Arial" />
+                    </GroupBox.Header>
+                    <ScrollViewer>
+                        <StackPanel Margin="0,10,0,0" Orientation="Vertical">
+                            <StackPanel.Resources>
+                                <Style TargetType="Grid">
+                                    <Setter Property="Height" Value="24"/>
+                                </Style>
+                            </StackPanel.Resources>
+                            <Grid>
+                                <TextBlock Text="LEOP SCH Done" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.LEOP_SCH_Done}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.LEOP_SCH_Done, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="CMS SCH Done" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.CMS_SCH_Done}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.CMS_SCH_Done, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Major Fault Discover" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.Major_Fault_Discover}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.Major_Fault_Discover, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Mission Completed" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.Mission_Completed}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.Mission_Completed, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Mission Timeout" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.Mission_Timeout}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.Mission_Timeout, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Mission Battery Low" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.Mission_Battery_Low}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.Mission_Battery_Low, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="BP CriticalFault" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.BP_Critical_Fault}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.BP_Critical_Fault, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="ACDS RD Complete" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.ADCS_RD_Complete}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.ADCS_RD_Complete, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="Mission Execute Ready" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.Mission_Execute_Ready}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.Mission_Execute_Ready, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="RW CMS Recheck" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.RW_CMS_recheck}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.IRST_OpsMode_flags.RW_CMS_recheck, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="LEOP Wait Finished" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.LEOP_Context_Bit_Field.is_wait_finished}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.LEOP_Context_Bit_Field.is_wait_finished, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="LEOP Ejected" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.LEOP_Context_Bit_Field.is_ejected}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.LEOP_Context_Bit_Field.is_ejected, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="LEOP MAG Deployed" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.LEOP_Context_Bit_Field.is_magnetometer_deployed}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.LEOP_Context_Bit_Field.is_magnetometer_deployed, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="LEOP Antenna Deployed" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.LEOP_Context_Bit_Field.is_antenna_deployed}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.LEOP_Context_Bit_Field.is_antenna_deployed, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="LEOP Beacon On" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.LEOP_Context_Bit_Field.is_beacon_on}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.LEOP_Context_Bit_Field.is_beacon_on, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="LEOP Finalized" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.LEOP_Context_Bit_Field.is_finalized}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                           Foreground="{Binding CurrentBeaconModel.Structure.obc_data.LEOP_Context_Bit_Field.is_finalized, Converter={StaticResource BoolColorConverter}}"/>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+                </GroupBox>
+
+
+                <Grid Grid.Row="0" Grid.RowSpan="5" Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="1.5"/>
+                        <ColumnDefinition Width="360"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="150"/>
+                        <RowDefinition Height="1.5"/>
+                        <RowDefinition Height="340"/>
+                        <RowDefinition Height="1.5"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="5" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"/>
+                    <GridSplitter Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="1" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"/>
+                    <GridSplitter Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="1" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"/>
+
+                    <GroupBox Grid.Column="3" Grid.Row="0">
+                        <GroupBox.Header>
+                            <TextBlock Text="EPS" FontWeight="Bold" FontFamily="Arial"/>
+                        </GroupBox.Header>
+                        <ScrollViewer>
+                            <StackPanel Margin="0,10,0,0" Orientation="Vertical">
+                                <StackPanel.Resources>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Height" Value="24"/>
+                                    </Style>
+                                </StackPanel.Resources>
+                                <Grid>
+                                    <TextBlock Text="EPS BP Mode" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.eps_data.bp_mode}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="EPS Voltage" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.eps_data.voltage}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="EPS Current" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.eps_data.current}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="EPS Temperature" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.eps_data.temperature}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </GroupBox>
+
+                    <GroupBox Grid.Column="3" Grid.Row="2">
+                        <GroupBox.Resources>
+                            <BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+                        </GroupBox.Resources>
+                        <GroupBox.Header>
+                            <TextBlock Text="FDIR" FontWeight="Bold" FontFamily="Arial"/>
+                        </GroupBox.Header>
+                        <ScrollViewer>
+                            <StackPanel Margin="0,10,0,0" Orientation="Vertical">
+                                <StackPanel.Resources>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Height" Value="24"/>
+                                    </Style>
+                                </StackPanel.Resources>
+                                <Grid>
+                                    <TextBlock Text="SX Band Cmd Exec Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.fdir_s_x_band_cmd_exec_status.error_code}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="BP Battery Info Error Code" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.eps2inst0_fdir_cmd_exec_status.EPSII_BP_1_GetBatteryInfo_ErrorCode}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="BP Device Health Info Error Code" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.eps2inst0_fdir_cmd_exec_status.EPSII_BP_1_GetDeviceHealthInfo_ErrorCode}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="BP Raw Sensors 1 Error Code" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.eps2inst0_fdir_cmd_exec_status.EPSII_BP_1_GetRAWSensors_1_ErrorCode}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="BP Raw Sensors 2 Error Code" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.eps2inst0_fdir_cmd_exec_status.EPSII_BP_1_GetRAWSensors_2_ErrorCode}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="BP Raw Sensors 3 Error Code" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.eps2inst0_fdir_cmd_exec_status.EPSII_BP_1_GetRAWSensors_3_ErrorCode}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+
+                                <Grid>
+                                    <TextBlock Text="PDM Power Distribution Error Code" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.fdir_eps_ii_pdm_cmd_exec_status.EPSII_PDM_1_GetPowerDistributionInfo_ErrorCode}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="PDM Device Health Info Error Code" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.fdir_eps_ii_pdm_cmd_exec_status.EPSII_PDM_1_GetDeviceHealthInfo_ErrorCode}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="PDM Raw Sensors 1 Error Code" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.fdir_eps_ii_pdm_cmd_exec_status.EPSII_PDM_1_GetRAWSensors_PDM1_ErrorCode}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="PDM Raw Sensors 2 Error Code" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.fdir_eps_ii_pdm_cmd_exec_status.EPSII_PDM_1_GetRAWSensors_PDM2_ErrorCode}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="PDM Get Basic Settings Error Code" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.fdir_eps_ii_pdm_cmd_exec_status.EPSII_PDM_1_GetBasicSettings_ErrorCode}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="PDM Set Basic Settings Error Code" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.obc_data.fdir_eps_ii_pdm_cmd_exec_status.EPSII_PDM_1_SetBasicSettings_ErrorCode}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+
+                            </StackPanel>
+                        </ScrollViewer>
+                    </GroupBox>
+
+                    <GroupBox Grid.Column="5" Grid.Row="4">
+                        <GroupBox.Resources>
+                            <BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+                        </GroupBox.Resources>
+                        <GroupBox.Header>
+                            <TextBlock Text="ADCS" FontWeight="Bold" FontFamily="Arial"/>
+                        </GroupBox.Header>
+                        <ScrollViewer>
+                            <StackPanel Margin="0,10,0,0" Orientation="Vertical">
+                                <StackPanel.Resources>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Height" Value="24"/>
+                                    </Style>
+                                </StackPanel.Resources>
+                                <Grid>
+                                    <TextBlock Text="ADCS Mode" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.adcs_data.mode}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="ADCS Mode AD" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.adcs_data.modeAD}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="ADCS Mode AC" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.adcs_data.modeAC}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="Sun Flags" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.adcs_data.sun_flags}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="HW MAG Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.adcs_data.HW_status.mag_status}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="HW SUN Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.adcs_data.HW_status.sun_status}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="HW IMU Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.adcs_data.HW_status.imu_status}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="HW GNSS Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.adcs_data.HW_status.gnss_status}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="HW MTQ Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.adcs_data.HW_status.mtq_status}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="HW RWx Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.adcs_data.HW_status.rwx_status}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="HW RWy Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
+                                    <Rectangle Style="{StaticResource Splitter}" Margin="210,0,0,0"/>
+                                    <TextBlock Text="{Binding CurrentBeaconModel.Structure.adcs_data.HW_status.rwy_status}" Style="{StaticResource ContentTextBlock}"  Margin="220,0,0,0"/>
+                                </Grid>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </GroupBox>
+
+                    <Grid Grid.Column="0" Grid.Row="0" Grid.RowSpan="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- PLOT: GNSS POSITION X-->
+                        <Border BorderThickness="0.5" Grid.Row="0" Grid.Column="0" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                            <lvc:CartesianChart Margin="5" ZoomMode="Both">
+                                <lvc:CartesianChart.Title>
+                                    <lvc:XamlDrawnLabelVisual Text="{Binding PlotDataTitle, Converter={StaticResource PlotTitleConverter}, ConverterParameter=0}" Paint="#303030" TextSize="14" Padding="15"/>
+                                </lvc:CartesianChart.Title>
+
+                                <lvc:CartesianChart.Series>
+                                    <lvc:SeriesCollection>
+                                        <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=0}"
+                                GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+                                Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                                    </lvc:SeriesCollection>
+                                </lvc:CartesianChart.Series>
+
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:AxesCollection>
+                                        <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                                    </lvc:AxesCollection>
+                                </lvc:CartesianChart.XAxes>
+
+                            </lvc:CartesianChart>
+                        </Border>
+
+                        <!-- PLOT: GNSS POSITION Y-->
+                        <Border BorderThickness="0.5" Grid.Row="0" Grid.Column="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                            <lvc:CartesianChart Margin="5" ZoomMode="Both">
+                                <lvc:CartesianChart.Title>
+                                    <lvc:XamlDrawnLabelVisual Text="{Binding PlotDataTitle, Converter={StaticResource PlotTitleConverter}, ConverterParameter=1}" Paint="#303030" TextSize="14" Padding="15"/>
+                                </lvc:CartesianChart.Title>
+
+                                <lvc:CartesianChart.Series>
+                                    <lvc:SeriesCollection>
+                                        <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=1}"
+                GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+                Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                                    </lvc:SeriesCollection>
+                                </lvc:CartesianChart.Series>
+
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:AxesCollection>
+                                        <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                                    </lvc:AxesCollection>
+                                </lvc:CartesianChart.XAxes>
+
+                            </lvc:CartesianChart>
+                        </Border>
+
+                        <!-- PLOT: GNSS POSITION Z-->
+                        <Border BorderThickness="0.5" Grid.Row="0" Grid.Column="2" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                            <lvc:CartesianChart Margin="5" ZoomMode="Both">
+                                <lvc:CartesianChart.Title>
+                                    <lvc:XamlDrawnLabelVisual Text="{Binding PlotDataTitle, Converter={StaticResource PlotTitleConverter}, ConverterParameter=2}" Paint="#303030" TextSize="14" Padding="15"/>
+                                </lvc:CartesianChart.Title>
+
+                                <lvc:CartesianChart.Series>
+                                    <lvc:SeriesCollection>
+                                        <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=2}"
+                GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+                Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                                    </lvc:SeriesCollection>
+                                </lvc:CartesianChart.Series>
+
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:AxesCollection>
+                                        <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                                    </lvc:AxesCollection>
+                                </lvc:CartesianChart.XAxes>
+
+                            </lvc:CartesianChart>
+                        </Border>
+
+                        <!-- PLOT: IMU Yaw-->
+                        <Border BorderThickness="0.5" Grid.Row="1" Grid.Column="0" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                            <lvc:CartesianChart Margin="5" ZoomMode="Both">
+                                <lvc:CartesianChart.Title>
+                                    <lvc:XamlDrawnLabelVisual Text="{Binding PlotDataTitle, Converter={StaticResource PlotTitleConverter}, ConverterParameter=6}" Paint="#303030" TextSize="14" Padding="15"/>
+                                </lvc:CartesianChart.Title>
+
+                                <lvc:CartesianChart.Series>
+                                    <lvc:SeriesCollection>
+                                        <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=6}"
+                GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+                Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                                    </lvc:SeriesCollection>
+                                </lvc:CartesianChart.Series>
+
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:AxesCollection>
+                                        <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                                    </lvc:AxesCollection>
+                                </lvc:CartesianChart.XAxes>
+
+                            </lvc:CartesianChart>
+                        </Border>
+
+                        <!-- PLOT: IMU Pitch-->
+                        <Border BorderThickness="0.5" Grid.Row="1" Grid.Column="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                            <lvc:CartesianChart Margin="5" ZoomMode="Both">
+                                <lvc:CartesianChart.Title>
+                                    <lvc:XamlDrawnLabelVisual Text="{Binding PlotDataTitle, Converter={StaticResource PlotTitleConverter}, ConverterParameter=7}" Paint="#303030" TextSize="14" Padding="15"/>
+                                </lvc:CartesianChart.Title>
+
+                                <lvc:CartesianChart.Series>
+                                    <lvc:SeriesCollection>
+                                        <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=7}"
+GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                                    </lvc:SeriesCollection>
+                                </lvc:CartesianChart.Series>
+
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:AxesCollection>
+                                        <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                                    </lvc:AxesCollection>
+                                </lvc:CartesianChart.XAxes>
+
+                            </lvc:CartesianChart>
+                        </Border>
+
+                        <!-- PLOT: IMU Roll-->
+                        <Border BorderThickness="0.5" Grid.Row="1" Grid.Column="2" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                            <lvc:CartesianChart Margin="5" ZoomMode="Both">
+                                <lvc:CartesianChart.Title>
+                                    <lvc:XamlDrawnLabelVisual Text="{Binding PlotDataTitle, Converter={StaticResource PlotTitleConverter}, ConverterParameter=8}" Paint="#303030" TextSize="14" Padding="15"/>
+                                </lvc:CartesianChart.Title>
+
+                                <lvc:CartesianChart.Series>
+                                    <lvc:SeriesCollection>
+                                        <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=8}"
+GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                                    </lvc:SeriesCollection>
+                                </lvc:CartesianChart.Series>
+
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:AxesCollection>
+                                        <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                                    </lvc:AxesCollection>
+                                </lvc:CartesianChart.XAxes>
+
+                            </lvc:CartesianChart>
+                        </Border>
+
+                        <!-- PLOT: Angle Rate Wx-->
+                        <Border BorderThickness="0.5" Grid.Row="2" Grid.Column="0" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                            <lvc:CartesianChart Margin="5" ZoomMode="Both">
+                                <lvc:CartesianChart.Title>
+                                    <lvc:XamlDrawnLabelVisual Text="{Binding PlotDataTitle, Converter={StaticResource PlotTitleConverter}, ConverterParameter=9}" Paint="#303030" TextSize="14" Padding="15"/>
+                                </lvc:CartesianChart.Title>
+
+                                <lvc:CartesianChart.Series>
+                                    <lvc:SeriesCollection>
+                                        <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=9}"
+GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                                    </lvc:SeriesCollection>
+                                </lvc:CartesianChart.Series>
+
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:AxesCollection>
+                                        <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                                    </lvc:AxesCollection>
+                                </lvc:CartesianChart.XAxes>
+
+                            </lvc:CartesianChart>
+                        </Border>
+
+                        <!-- PLOT: Angle Rate Wy-->
+                        <Border BorderThickness="0.5" Grid.Row="2" Grid.Column="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                            <lvc:CartesianChart Margin="5" ZoomMode="Both">
+                                <lvc:CartesianChart.Title>
+                                    <lvc:XamlDrawnLabelVisual Text="{Binding PlotDataTitle, Converter={StaticResource PlotTitleConverter}, ConverterParameter=10}" Paint="#303030" TextSize="14" Padding="15"/>
+                                </lvc:CartesianChart.Title>
+
+                                <lvc:CartesianChart.Series>
+                                    <lvc:SeriesCollection>
+                                        <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=10}"
+GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                                    </lvc:SeriesCollection>
+                                </lvc:CartesianChart.Series>
+
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:AxesCollection>
+                                        <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                                    </lvc:AxesCollection>
+                                </lvc:CartesianChart.XAxes>
+
+                            </lvc:CartesianChart>
+                        </Border>
+
+                        <!-- PLOT: Angle Rate Wz-->
+                        <Border BorderThickness="0.5" Grid.Row="2" Grid.Column="2" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                            <lvc:CartesianChart Margin="5" ZoomMode="Both">
+                                <lvc:CartesianChart.Title>
+                                    <lvc:XamlDrawnLabelVisual Text="{Binding PlotDataTitle, Converter={StaticResource PlotTitleConverter}, ConverterParameter=11}" Paint="#303030" TextSize="14" Padding="15"/>
+                                </lvc:CartesianChart.Title>
+
+                                <lvc:CartesianChart.Series>
+                                    <lvc:SeriesCollection>
+                                        <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=11}"
+GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                                    </lvc:SeriesCollection>
+                                </lvc:CartesianChart.Series>
+
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:AxesCollection>
+                                        <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                                    </lvc:AxesCollection>
+                                </lvc:CartesianChart.XAxes>
+
+                            </lvc:CartesianChart>
+                        </Border>
+                        
+                        
+                        <!-- PLOT: EPS Voltage-->
+                        <Border BorderThickness="0.5" Grid.Row="3" Grid.Column="0" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                            <lvc:CartesianChart Margin="5" ZoomMode="Both">
+                                <lvc:CartesianChart.Title>
+                                    <lvc:XamlDrawnLabelVisual Text="{Binding PlotDataTitle, Converter={StaticResource PlotTitleConverter}, ConverterParameter=12}" Paint="#303030" TextSize="14" Padding="15"/>
+                                </lvc:CartesianChart.Title>
+
+                                <lvc:CartesianChart.Series>
+                                    <lvc:SeriesCollection>
+                                        <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=12}"
+                GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+                Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                                    </lvc:SeriesCollection>
+                                </lvc:CartesianChart.Series>
+
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:AxesCollection>
+                                        <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                                    </lvc:AxesCollection>
+                                </lvc:CartesianChart.XAxes>
+
+                            </lvc:CartesianChart>
+                        </Border>
+
+                        <!-- PLOT: EPS Current-->
+                        <Border BorderThickness="0.5" Grid.Row="3" Grid.Column="1" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                            <lvc:CartesianChart Margin="5" ZoomMode="Both">
+                                <lvc:CartesianChart.Title>
+                                    <lvc:XamlDrawnLabelVisual Text="{Binding PlotDataTitle, Converter={StaticResource PlotTitleConverter}, ConverterParameter=13}" Paint="#303030" TextSize="14" Padding="15"/>
+                                </lvc:CartesianChart.Title>
+
+                                <lvc:CartesianChart.Series>
+                                    <lvc:SeriesCollection>
+                                        <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=13}"
+GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                                    </lvc:SeriesCollection>
+                                </lvc:CartesianChart.Series>
+
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:AxesCollection>
+                                        <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                                    </lvc:AxesCollection>
+                                </lvc:CartesianChart.XAxes>
+
+                            </lvc:CartesianChart>
+                        </Border>
+
+                        <!-- PLOT: EPS Temperature-->
+                        <Border BorderThickness="0.5" Grid.Row="3" Grid.Column="2" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}">
+                            <lvc:CartesianChart Margin="5" ZoomMode="Both">
+                                <lvc:CartesianChart.Title>
+                                    <lvc:XamlDrawnLabelVisual Text="{Binding PlotDataTitle, Converter={StaticResource PlotTitleConverter}, ConverterParameter=14}" Paint="#303030" TextSize="14" Padding="15"/>
+                                </lvc:CartesianChart.Title>
+
+                                <lvc:CartesianChart.Series>
+                                    <lvc:SeriesCollection>
+                                        <lvc:XamlLineSeries Values="{Binding PlotData, Converter={StaticResource SeriesSelectorConverter}, ConverterParameter=14}"
+GeometryFill="{x:Null}" GeometryStroke="{x:Null}" LineSmoothness="0"
+Stroke="{lvc:SolidColorPaint Color='#1976D2', StrokeWidth=0.5}"/>
+
+                                    </lvc:SeriesCollection>
+                                </lvc:CartesianChart.Series>
+
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:AxesCollection>
+                                        <lvc:XamlDateTimeAxis Interval="0.00:00:01" DateFormatter="{Binding Formatter}"/>
+                                    </lvc:AxesCollection>
+                                </lvc:CartesianChart.XAxes>
+
+                            </lvc:CartesianChart>
+                        </Border>
+
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

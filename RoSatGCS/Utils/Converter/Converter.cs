@@ -19,6 +19,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using FileListView.ViewModels;
 using RoSatGCS.Utils.Files;
+using RoSatGCS.Utils.Logger;
 
 
 namespace RoSatGCS.Utils.Converter
@@ -409,5 +410,92 @@ namespace RoSatGCS.Utils.Converter
             return Binding.DoNothing;
         }
         public object ConvertBack(object v, Type t, object p, CultureInfo c) => throw new NotSupportedException();
+    }
+
+    public sealed class PlotTitleConverter : IValueConverter
+    {
+        public object Convert(object value, Type t, object parameter, CultureInfo c)
+        {
+            if (value is string[] strs && parameter is string s &&
+                ushort.TryParse(s, out var id) && id < strs.Length)
+                return strs[id];
+            return Binding.DoNothing;
+        }
+
+        public object ConvertBack(object v, Type t, object p, CultureInfo c) => throw new NotSupportedException();
+    }
+
+    public class BoolColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+            {
+                return boolValue ? Brushes.Green : Brushes.Red;
+            }
+            return Binding.DoNothing;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
+        }
+    }
+    public class BoolShortConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+            {
+                return boolValue ? "T" : "F";
+            }
+            return Binding.DoNothing;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
+        }
+    }
+
+    public class LogColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is LogEntry log)
+            {
+                return log.Level switch
+                {
+                    LogLevel.Info => Brushes.White,
+                    LogLevel.Warning => new SolidColorBrush(Color.FromRgb(0xE6, 0xA2, 0x2C)),
+                    LogLevel.Error => new SolidColorBrush(Color.FromRgb(0xF5, 0x6C, 0x6C)),
+                    _ => Brushes.White
+                };
+            }
+            return Binding.DoNothing;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
+        }
+    }
+
+    public class ConOpsConverter :IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            string[] modes = { "ROOT", "LEOP", "CMS", "NM", "NM_STATE_CHG", "NM_STATE_MS", "NM_STATE_PS", "EM" };
+            string current_mode = "UNKNOWN";
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (values[i] is bool b && b)
+                {
+                    current_mode = modes[i];
+                    return current_mode;
+                }
+            }
+            return current_mode;
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+            => throw new NotSupportedException();
     }
 }

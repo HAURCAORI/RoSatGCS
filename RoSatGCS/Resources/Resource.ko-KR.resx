@@ -552,4 +552,22 @@
   <data name="sAbort" xml:space="preserve">
     <value>취소</value>
   </data>
+  <data name="sSource" xml:space="preserve">
+    <value>소스</value>
+  </data>
+  <data name="sTime" xml:space="preserve">
+    <value>시간</value>
+  </data>
+  <data name="sLatest" xml:space="preserve">
+    <value>최근</value>
+  </data>
+  <data name="sTopMost" xml:space="preserve">
+    <value>창 고정</value>
+  </data>
+  <data name="sCurrent" xml:space="preserve">
+    <value>현재</value>
+  </data>
+  <data name="sLog" xml:space="preserve">
+    <value>로그</value>
+  </data>
 </root>

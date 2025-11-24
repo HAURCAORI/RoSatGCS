@@ -4,6 +4,7 @@ using FileSystemModels;
 using FileSystemModels.Browse;
 using FileSystemModels.Events;
 using FileSystemModels.Interfaces;
+using Microsoft.Win32;
 using RoSatGCS.Models;
 using RoSatGCS.Utils.Files;
 using RoSatGCS.Utils.Localization;
@@ -111,6 +112,81 @@ namespace RoSatGCS.ViewModels
             set { if (UInt64.TryParse(value, out var ret)) SetProperty(ref _flags, ret); }
         }
 
+
+
+        #endregion
+
+        #region FileDownload Parameters
+        private bool _isFileDownloadStopped = true;
+        public bool IsFileDownloadStopped
+        {
+            get => _isFileDownloadStopped;
+            set => SetProperty(ref _isFileDownloadStopped, value);
+        }
+
+        private string _fileDownloadPath = string.Empty;
+        public string FileDownloadPath
+        {
+            get => _fileDownloadPath;
+            set => SetProperty(ref _fileDownloadPath, value);
+        }
+
+        private DateTime _selectedScheduleDate = DateTime.Now;
+        public DateTime SelectedScheduleDate 
+        {
+            get => _selectedScheduleDate;
+            set => SetProperty(ref _selectedScheduleDate, value);
+        }
+
+        private bool _isEnableSchedule = false;
+        public bool IsEnableSchedule
+        {
+            get => _isEnableSchedule;
+            set => SetProperty(ref _isEnableSchedule, value);
+        }
+
+        private string _savePath = string.Empty;
+        public string SavePath
+        {
+            get => _savePath;
+            set => SetProperty(ref _savePath, value);
+        }
+
+        private string _downloadStauts = "None";
+        public string DownloadStatus
+        {
+            get => _downloadStauts;
+            set => SetProperty(ref _downloadStauts, value);
+        }
+        
+        private ObservableCollection<FileDownloadModel> _fileDownloadList = new();
+        public ObservableCollection<FileDownloadModel> FileDownloadList
+        {
+            get => _fileDownloadList;
+            set => SetProperty(ref _fileDownloadList, value);
+        }
+
+        private ObservableCollection<FileDownloadModel> _selectedFileDownloadItem = new();
+        public ObservableCollection<FileDownloadModel> SelectedFileDownloadItem
+        {
+            get => _selectedFileDownloadItem;
+            set => SetProperty(ref _selectedFileDownloadItem, value);
+        }
+
+
+        public RelayCommand AddFileDownloadPath { get; }
+        public RelayCommand BrowseSavePath { get; }
+        public RelayCommand StartDownloadCommand { get; }
+        public RelayCommand StopDownloadCommand { get; }
+
+        // Context Menu
+        public RelayCommand RemoveFileDownListElement { get; }
+        public RelayCommand AddFileDownListCommand { get; }
+        public RelayCommand<object> UpdateFileDownloadListItmes { get; }
+
+        public RelayCommand DownloadFileMoveUp { get; }
+        public RelayCommand DownloadFileMoveDown { get; }
+
         #endregion
 
         private bool _isFileTransfering = false;
@@ -157,6 +233,7 @@ namespace RoSatGCS.ViewModels
         public RelayCommand RemoteSelectedEraseCommand { get; }
         public RelayCommand RemoteSelectedDownloadCommand { get; }
         public ICommand RefreshExplorer { get; }
+        
 
 
         public PageFileShareViewModel()
@@ -198,6 +275,19 @@ namespace RoSatGCS.ViewModels
 
             WeakEventManager<ICanNavigate, BrowsingEventArgs>
                 .AddHandler(TreeBrowser, "BrowseEvent", Control_BrowseEvent);
+
+
+            AddFileDownListCommand = new RelayCommand(OnAddFileDownListCommand);
+            RemoveFileDownListElement = new RelayCommand(OnRemoveFileDownListElement);
+            AddFileDownloadPath = new RelayCommand(OnAddFileDownloadPath);
+            BrowseSavePath = new RelayCommand(OnBrowseSavePath);
+
+            StartDownloadCommand = new RelayCommand(OnStartDownloadCommand, () => IsFileDownloadStopped);
+            StopDownloadCommand = new RelayCommand(OnStopDownloadCommand, () => !IsFileDownloadStopped);
+            UpdateFileDownloadListItmes = new RelayCommand<object>(OnUpdateFileDownloadListItmes);
+
+            DownloadFileMoveUp = new RelayCommand(OnDownloadFileMoveUp, () => SelectedFileDownloadItem.Count == 1);
+            DownloadFileMoveDown = new RelayCommand(OnDownloadFileMoveDown, () => SelectedFileDownloadItem.Count == 1);
         }
 
         private async void OnSendFirmwareUpdate(string path, bool isBundle, bool isFile)
@@ -418,6 +508,58 @@ namespace RoSatGCS.ViewModels
             }
             IsFileTransfering = false;
             return false;
+        }
+
+        private async Task<Tuple<bool,string>> FileDownloadManagerAsync(string path)
+        {
+            SatelliteMethodModel _method = new SatelliteMethodModel(1450, false, "filedownload_cp", "filedownload_cp", "download", 0);
+            SatelliteCommandModel _command = new SatelliteCommandModel(_method);
+            string fileFormat = path;
+            string paddedString = fileFormat.PadRight(48, '\0');
+
+            List<object> parameters = new List<object>();
+            byte[] bytes = Encoding.Default.GetBytes(paddedString);
+            parameters.Add(bytes);
+            _command.InputParameters.Add(parameters);
+            _command.InputSerialized = QueryExecutorBase.Serializer(_command.InputParameters);
+
+            try
+            {
+                var ret = await ZeroMqQueryExecutor.Instance.ExecuteAsync(_command, DispatcherType.FileTransfer);
+                if (ret is byte[] b)
+                {
+                    string outputPath;
+                    string dir = SavePath;
+
+                    if (string.IsNullOrWhiteSpace(dir))
+                    {
+                        outputPath = Path.Combine(FolderTextPath.CurrentFolder,path.Split('/').Last());
+                    }
+                    else
+                    {
+                        string full = Path.GetFullPath(Environment.ExpandEnvironmentVariables(dir));
+                        Directory.CreateDirectory(full);
+                        outputPath = Path.Combine(full, path.Split('/').Last());
+                    }
+
+                    await File.WriteAllBytesAsync(outputPath, b);
+
+                    // Return received bytes as info
+                    return new Tuple<bool, string>(true, $"{b.Length} bytes received.");
+                }
+                else if (ret is string retStr)
+                {
+                    // Return error message as info
+                    return new Tuple<bool, string>(false, retStr);
+                }
+            }
+            catch (Exception)
+            {
+                // Return exception message as info
+                return new Tuple<bool, string>(false, "Exception occurred during file download.");
+            }
+
+            return new Tuple<bool, string>(false, "Unknown error occurred during file download.");
         }
 
 
@@ -685,6 +827,213 @@ namespace RoSatGCS.ViewModels
             else
             {
                 NavigateToFolder(PathFactory.Create(FolderTextPath.CurrentFolder));
+            }
+        }
+
+        private void OnAddFileDownListCommand()
+        {
+            foreach (var f in SelectedRemoteFiles)
+            {
+                FileDownloadList.Add(new FileDownloadModel() { Path = f.Path, Name = f.Name, Status = FileDownloadStatus.Pending });
+            }
+        }
+
+        private void OnRemoveFileDownListElement()
+        {
+            if (SelectedFileDownloadItem.Count == 0) { return; }
+            foreach (var item in SelectedFileDownloadItem.ToList())
+            {
+                FileDownloadList.Remove(item);
+            }
+        }
+
+        private void OnAddFileDownloadPath()
+        {
+            if (string.IsNullOrEmpty(FileDownloadPath)) { return; }
+            FileDownloadList.Add(new FileDownloadModel() { Path = FileDownloadPath, Name = FileDownloadPath.Split('/').Last(), Status = FileDownloadStatus.Pending });
+            FileDownloadPath = string.Empty;
+        }
+
+        private void OnBrowseSavePath()
+        {
+            var dialogue = new OpenFolderDialog
+            {
+                Title = "Select Save Path",
+                InitialDirectory = SavePath,
+            };
+
+            if (dialogue.ShowDialog() == false) return;
+
+            SavePath = dialogue.FolderName;
+        }
+
+        private void OnStartDownloadCommand()
+        {
+            IsFileDownloadStopped = false;
+            StartDownloadCommand.NotifyCanExecuteChanged();
+            StopDownloadCommand.NotifyCanExecuteChanged();
+
+            if(FileDownloadList.Count == 0)
+            {
+                DownloadStatus = "No files to download.";
+                IsFileDownloadStopped = true;
+                StartDownloadCommand.NotifyCanExecuteChanged();
+                StopDownloadCommand.NotifyCanExecuteChanged();
+                return;
+            }
+
+            if(IsFileTransfering == true)
+            {
+                DownloadStatus = "File transfer in progress. Please wait.";
+                IsFileDownloadStopped = true;
+                StartDownloadCommand.NotifyCanExecuteChanged();
+                StopDownloadCommand.NotifyCanExecuteChanged();
+                return;
+            }
+
+            if(SavePath == string.Empty)
+            {
+                DownloadStatus = "Please select a save path.";
+                IsFileDownloadStopped = true;
+                StartDownloadCommand.NotifyCanExecuteChanged();
+                StopDownloadCommand.NotifyCanExecuteChanged();
+                return;
+            }
+
+            Application.Current.Dispatcher.Invoke(async () =>
+            {
+                //Initialize download process
+                foreach (var item in FileDownloadList)
+                {
+                    if (IsFileDownloadStopped)
+                    {
+                        break;
+                    }
+
+
+                    if (item.Status != FileDownloadStatus.Completed)
+                    {
+                        item.Status = FileDownloadStatus.Pending;
+                        item.ExecutedTime = string.Empty;
+                        item.Info = string.Empty;
+                    }
+                }
+
+                DownloadStatus = "Download started.";
+
+                await Task.Delay(500);
+
+                // Check Schedule
+                if (IsEnableSchedule)
+                {
+                    // Wait until scheduled time
+                    while (true)
+                    {   
+                        if (IsFileDownloadStopped)
+                        {
+                            break;
+                        }
+
+                        await Task.Delay(1000);
+
+                        var now = DateTime.Now;
+                        if (now >= SelectedScheduleDate)
+                        {
+                            break;
+                        }
+                        DownloadStatus = $"Waiting {(SelectedScheduleDate - now).ToString(@"dd\.hh\:mm\:ss")}";
+                    }
+
+                    if(IsFileDownloadStopped)
+                    {
+                        DownloadStatus = "Download stopped.";
+                        return;
+                    }
+                }
+
+
+                // Start download
+                IsFileTransfering = true;
+                foreach (var item in FileDownloadList)
+                {
+                    if (IsFileDownloadStopped)
+                    {
+                        break;
+                    }
+                    if (item.Status == FileDownloadStatus.Pending)
+                    {
+                        item.Status = FileDownloadStatus.InProgress;
+
+                        item.ExecutedTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                        DownloadStatus = $"Downloading: {item.Name}";
+                        var result = await FileDownloadManagerAsync(item.Path);
+                        item.Info = result.Item2;
+
+                        if (result.Item1)
+                        {
+                            item.Status = FileDownloadStatus.Completed;
+                        }
+                        else
+                        {
+                            item.Status = FileDownloadStatus.Failed;
+                        }
+
+                    }
+                }
+                IsFileTransfering = false;
+
+                IsFileDownloadStopped = true;
+                StartDownloadCommand.NotifyCanExecuteChanged();
+                StopDownloadCommand.NotifyCanExecuteChanged();
+                DownloadStatus = "Download stopped.";
+            });
+        }
+
+        private void OnStopDownloadCommand()
+        {
+            IsFileDownloadStopped = true;
+            StartDownloadCommand.NotifyCanExecuteChanged();
+            StopDownloadCommand.NotifyCanExecuteChanged();
+            DownloadStatus = "Download stopped.";
+        }
+
+        private void OnUpdateFileDownloadListItmes(object? obj)
+        {
+            if (obj is IList<object> list)
+            {
+                SelectedFileDownloadItem.Clear();
+                foreach (var item in list)
+                {
+                    if (item is FileDownloadModel model)
+                    {
+                        SelectedFileDownloadItem.Add(model);
+                    }
+                }
+                DownloadFileMoveUp.NotifyCanExecuteChanged();
+                DownloadFileMoveDown.NotifyCanExecuteChanged();
+            }
+        }
+
+        private void OnDownloadFileMoveUp()
+        {
+            if (SelectedFileDownloadItem.Count != 1) { return; }
+            var item = SelectedFileDownloadItem[0];
+            var index = FileDownloadList.IndexOf(item);
+            if (index > 0)
+            {
+                FileDownloadList.Move(index, index - 1);
+            }
+        }
+
+        private void OnDownloadFileMoveDown()
+        {
+            if (SelectedFileDownloadItem.Count != 1) { return; }
+            var item = SelectedFileDownloadItem[0];
+            var index = FileDownloadList.IndexOf(item);
+            if (index < FileDownloadList.Count - 1)
+            {
+                FileDownloadList.Move(index, index + 1);
             }
         }
 

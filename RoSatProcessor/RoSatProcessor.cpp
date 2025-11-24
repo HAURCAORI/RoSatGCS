@@ -56,8 +56,8 @@ void TaskDefinition() {
 	auto taskWebSocketConnector = RoSatProcessor::TaskWebSocketConnector(SERVICE_NAME, TEXT("WebSocketConnector"));
 	RoSatProcessor::RoSatTaskManager::addTask(taskWebSocketConnector);
 
-    auto taskBeaconData = RoSatProcessor::TaskBeaconData(SERVICE_NAME, TEXT("BeaconData"));
-	RoSatProcessor::RoSatTaskManager::addTask(taskBeaconData);
+    //auto taskBeaconData = RoSatProcessor::TaskBeaconData(SERVICE_NAME, TEXT("BeaconData"));
+	//RoSatProcessor::RoSatTaskManager::addTask(taskBeaconData);
 }
 
 int wmain(int argc, TCHAR* argv[])

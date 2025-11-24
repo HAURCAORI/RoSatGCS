@@ -1,0 +1,93 @@
+﻿<Window x:Class="RoSatGCS.Views.WindowLog"
+        x:Name="RootWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RoSatGCS.Views"
+        xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+        xmlns:loc="clr-namespace:RoSatGCS.Utils.Localization"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:bv="clr-namespace:RoSatGCS.Behaviors"
+        xmlns:cvt="clr-namespace:RoSatGCS.Utils.Converter"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterOwner"
+        Title="WindowLog" Height="350" Width="800" Topmost="{Binding TopMost}">
+    <Window.Resources>
+        <cvt:LogColorConverter x:Key="LogColorConverter"/>
+        <Style x:Key="Splitter" TargetType="Rectangle">
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Height" Value="14"/>
+            <Setter Property="Width" Value="1"/>
+            <Setter Property="Stroke" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}">
+            <Button Style="{DynamicResource ToolButton}" ToolTip="{loc:Localization sClear}" Command="{Binding ClearLogCommand}" Margin="5,0,0,0">
+                <Rectangle Style="{DynamicResource Icon}" Width="15" Height="9">
+                    <Rectangle.OpacityMask>
+                        <VisualBrush Stretch="Uniform" Visual="{StaticResource IconTrash}" />
+                    </Rectangle.OpacityMask>
+                </Rectangle>
+            </Button>
+            <Button Style="{DynamicResource ToolButton}" ToolTip="{loc:Localization sSave}" Command="{Binding SaveLog}" Margin="0,0,5,0">
+                <Rectangle Style="{DynamicResource Icon}" Width="9" Height="9   ">
+                    <Rectangle.OpacityMask>
+                        <VisualBrush Stretch="Uniform" Visual="{StaticResource IconSave}" />
+                    </Rectangle.OpacityMask>
+                </Rectangle>
+            </Button>
+            <Rectangle Style="{DynamicResource Splitter}"/>
+            <CheckBox Content="TopMost" IsChecked="{Binding TopMost}" Margin="4,0"/>
+            <CheckBox Content="AutoScroll" IsChecked="{Binding AutoScroll}" Margin="4,0"/>
+        </StackPanel>
+
+
+        <Grid Grid.Row="1">
+            <Border CornerRadius="2" BorderThickness="0.5" BorderBrush="Gray" Margin="5"
+          Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}">
+                <ListBox ItemsSource="{Binding Logger.Logs}"
+             FontSize="12"
+             VirtualizingPanel.IsVirtualizing="True"
+             VirtualizingPanel.VirtualizationMode="Recycling"
+             ScrollViewer.CanContentScroll="True"
+             ScrollViewer.VerticalScrollBarVisibility="Auto"
+             ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                    <i:Interaction.Behaviors>
+                        <bv:AutoScrollBehavior IsEnabled="{Binding AutoScroll}"/>
+                    </i:Interaction.Behaviors>
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Background" Value="{Binding Converter={StaticResource LogColorConverter}}"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"  Margin="2" MaxWidth="1000">
+                                <TextBlock.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Copy" Command="{Binding DataContext.CopyLogCommand, Source={x:Reference RootWindow}}" CommandParameter="{Binding}" />
+                                        <MenuItem Header="Show" Command="{Binding DataContext.ShowLogCommand, Source={x:Reference RootWindow}}" CommandParameter="{Binding}" />
+                                    </ContextMenu>
+                                </TextBlock.ContextMenu>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+        </Grid>
+
+    </Grid>
+</Window>

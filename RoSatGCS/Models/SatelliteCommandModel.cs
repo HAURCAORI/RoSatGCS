@@ -1,25 +1,30 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MessagePack;
+using Newtonsoft.Json.Linq;
 using NLog;
+using OpenTK.Graphics.ES20;
 using RoSatGCS.Controls;
-using RoSatGCS.Utils.Query;
 using RoSatGCS.Utils.Localization;
+using RoSatGCS.Utils.Query;
 using RoSatGCS.Utils.Timer;
 using RoSatGCS.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.Entity.Core.Common.CommandTrees;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Navigation;
-using System.Windows.Documents;
-using System.IO;
-using Newtonsoft.Json.Linq;
-using System.Reflection;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RoSatGCS.Models
 {
@@ -68,7 +73,7 @@ namespace RoSatGCS.Models
         [IgnoreMember]
         public List<byte> InputSerialized { get => _inputSerialized; internal set => SetProperty(ref _inputSerialized, value); }
         [IgnoreMember]
-        public List<List<object>> InputParameters { get => _inputParameters; internal set => _inputParameters = value; }
+        public List<List<object>> InputParameters { get => _inputParameters; internal set => SetProperty(ref _inputParameters, value); }
         [IgnoreMember]
         public List<List<object>> OutputParameters { get => _outputParameters; internal set => _outputParameters = value; }
         [IgnoreMember]
@@ -292,7 +297,7 @@ namespace RoSatGCS.Models
 
         private async void OnExecute()
         {
-            if(!IsValid)
+            if (!IsValid)
             {
                 MessageBoxResult result = await Application.Current.Dispatcher.InvokeAsync(() =>
                 MessageBox.Show(TranslationSource.Instance["zParametersInvalid"] + "\r\n" + TranslationSource.Instance["zExecuteAnyway"], TranslationSource.Instance["sInvalid"],
@@ -303,7 +308,14 @@ namespace RoSatGCS.Models
             }
 
             string byte_hex = string.Join(" ", InputSerialized.Select(b => b.ToString("X2")));
-            ShowMessageOnce(() => MessageBox.Show(byte_hex, "Info", MessageBoxButton.OK));
+            string message = "Input Data:\r\n" + (byte_hex == string.Empty ? "(null)" : byte_hex);
+            // Cancelable MessageBox
+            var msgResult = await Application.Current.Dispatcher.InvokeAsync(() => {
+             return MessageBox.Show(message, "Confirmation", MessageBoxButton.OKCancel, MessageBoxImage.None);
+            });
+            if (msgResult != MessageBoxResult.OK)
+                return;
+
 
             IsExecuting = true;
             try
@@ -332,6 +344,18 @@ namespace RoSatGCS.Models
                         param.Value = OutputParameters[ResultParameters.IndexOf(param)];
                         param.ReceivedEvent(null);
                     }
+
+                    string dump = DumpResult(this).ReplaceLineEndings("");
+                    dump = Regex.Replace(dump, @"\s+", " ");
+                    Utils.Logger.Logger.LogInfo(dump);
+
+                    const string output_folder = "CommandResults"; // Relative to application working directory
+                    if (!Directory.Exists(output_folder))
+                    {
+                        Directory.CreateDirectory(output_folder);
+                    }
+                    string filename = $"{output_folder}/{DateTime.Now:yyyyMMdd_HHmmss}_{FIDLId}_{Id}.json";
+                    await System.IO.File.WriteAllTextAsync(filename, DumpResult(this));
                 }
                 else if (ret is string s)
                     MessageBox.Show(s);
@@ -441,6 +465,201 @@ namespace RoSatGCS.Models
             base.Dispose(disposing);
         }
 
+
+        public static string DumpResult(SatelliteCommandModel model)
+        {
+            var resultObject = new Dictionary<string, object?>();
+            int index = 0;
+
+            foreach (var param in model.MethodOut)
+            {
+                if (param.DataType == SatelliteFunctionFileModel.DataType.None)
+                    continue;
+
+                var value = BuildValueForParameter(param, model, ref index);
+
+                if (value == null)
+                    continue;
+
+                resultObject[param.Name] = value;
+            }
+
+            var root = new Dictionary<string, object?>
+            {
+                ["FIDL"] = model.FIDLId,
+                ["Function"] = model.Name,      // or model.CommandName, etc.
+                ["FunctionID"] = model.Id,
+                ["Result"] = resultObject
+            };
+
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            return JsonSerializer.Serialize(root, options);
+        }
+
+        /// <summary>
+        /// Build the value (primitive / array / struct / array-of-struct) for a single ParameterModel.
+        /// This function mirrors the traversal logic of ConvertBack, but reads from OutputParameters
+        /// instead of from raw bytes.
+        /// </summary>
+        private static object? BuildValueForParameter(ParameterModel param, SatelliteCommandModel model, ref int index)
+        {
+            var dataType = param.DataType;
+            var baseType = param.BaseType;
+
+            if (dataType == SatelliteFunctionFileModel.DataType.None)
+                return null;
+
+            // User-defined types (structs, enums, etc.)
+            if (dataType == SatelliteFunctionFileModel.DataType.UserDefined)
+            {
+                if (baseType == SatelliteFunctionTypeModel.ArgumentType.Struct)
+                {
+                    if (!model.AssociatedType.TryGetValue(param.UserDefinedType, out var structType))
+                        throw new InvalidDataException($"Unknown user-defined struct type '{param.UserDefinedType}'.");
+
+                    if (param.IsArray)
+                    {
+                        // Array of structs:
+                        // elementSize = sum of ByteSize of each field (one struct instance)
+                        int elementSize = GetStructByteSize(structType);
+                        int elementCount = elementSize == 0 ? 0 : param.ByteSize / elementSize;
+
+                        var list = new List<object?>();
+                        for (int i = 0; i < elementCount; i++)
+                        {
+                            var structValue = BuildStructValue(structType, model, ref index);
+                            list.Add(structValue);
+                        }
+
+                        return list;
+                    }
+                    else
+                    {
+                        // Single struct
+                        return BuildStructValue(structType, model, ref index);
+                    }
+                }
+                else if (baseType == SatelliteFunctionTypeModel.ArgumentType.Enum)
+                {
+                    // ConvertBack uses:
+                    // ret.Add(ParameterModel.ConvertValue(Enumeration, ...));
+                    // -> one OutputParameters entry for the enum (possibly array)
+                    var valueList = model.OutputParameters[index++];
+                    if (!param.IsArray && valueList.Count == 1)
+                        return valueList[0];
+
+                    return valueList; // enum array (or multi-value) as list
+                }
+                else
+                {
+                    throw new NotImplementedException(
+                        $"UserDefined type with base type {baseType} is not supported.");
+                }
+            }
+
+            // Built-in types (integers, floats, bool, string, etc.)
+            // ConvertBack always does: ret.Add(ParameterModel.ConvertValue(...));
+            // so we just pick the next entry from OutputParameters.
+            {
+                var valueList = model.OutputParameters[index++];
+
+                // Strings / primitives / enums: if not array and only one element, unwrap it.
+                if (!param.IsArray && valueList.Count == 1)
+                    return valueList[0];
+
+                // Arrays (or multi-valued fields) -> keep as list
+                return valueList;
+            }
+        }
+
+        /// <summary>
+        /// Build a dictionary representing a struct instance (hierarchical JSON object).
+        /// </summary>
+        private static Dictionary<string, object?> BuildStructValue(SatelliteFunctionTypeModel structType, SatelliteCommandModel model, ref int index)
+        {
+            var dict = new Dictionary<string, object?>();
+
+            foreach (var field in structType.Parameters)
+            {
+                if (field.DataType == SatelliteFunctionFileModel.DataType.None)
+                    continue;
+
+                var value = BuildValueForParameter(field, model, ref index);
+
+                if (value != null)
+                    dict[field.Name] = value;
+            }
+
+            return dict;
+        }
+
+        /// <summary>
+        /// Compute the byte size of a single instance of the given struct type.
+        /// This matches the way ConvertBack consumes bytes for one struct:
+        /// sum of ByteSize of all fields, including nested structs/arrays.
+        /// </summary>
+        private static int GetStructByteSize(SatelliteFunctionTypeModel structType)
+        {
+            int total = 0;
+
+            foreach (var field in structType.Parameters)
+            {
+                // For each field, ByteSize already encodes its full size
+                // (including an internal array or nested struct contents).
+                total += field.ByteSize;
+            }
+
+            return total;
+        }
+
         #endregion
+
+        public static void ApplyDefaultInputValues(SatelliteCommandModel command)
+        {
+            // 1) Telemetry => setTelemetryPresetConfig
+            if (command.FIDLId == 258 && command.Id == 3)
+            {
+                if (command.InSize == 151)
+                {
+                    const ushort default_data_id = 0xffff;
+                    const byte default_active = 0;
+                    const ushort default_period_ms = 1000;
+
+                    List<List<object>> initial = [];
+                    initial.Add(new List<object>() { (byte)0 });
+
+                    for (int i = 0; i < 30; i++)
+                    {
+                        initial.Add(new List<object>() { default_data_id });
+                        initial.Add(new List<object>() { default_active });
+                        initial.Add(new List<object>() { default_period_ms });
+
+                    }
+                    command.InputParameters = initial;
+                }
+            }
+            // 2) Beacon => set
+            if (command.FIDLId == 257 && command.Id == 3)
+            {
+                if (command.InSize == 120)
+                {
+                    const ushort default_id = 0xffff;
+                    List<List<object>> initial = [];
+
+                    List<object> inside = [];
+                    for(int i = 0; i < 60; i++)
+                    {
+                        inside.Add(default_id);
+                    }
+                    initial.Add(inside);
+
+                    command.InputParameters = initial;
+                }
+            }
+        }
     }
 }

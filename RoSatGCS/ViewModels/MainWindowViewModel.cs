@@ -28,12 +28,15 @@ namespace RoSatGCS.ViewModels
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private static readonly string PathCacheSetting = "Cache/setting";
 
-
         public MainDataContext MainDataContext => MainDataContext.Instance;
+        
         
         private WindowSettings? windowSettings;
         private WindowOnboardScheduler? windowOnboardScheduler;
         private WindowFunctionProperty? windowFunctionProperty;
+        private WindowDashboard? windowDashboard;
+        private WindowLog? windowLog;
+
         private ServiceManager? _serviceManager;
 
         private Page? _navigationSource;
@@ -56,6 +59,8 @@ namespace RoSatGCS.ViewModels
         public ICommand StopService { get; }
         public ICommand RestartService { get; }
         public ICommand OpenOnboardScheduler { get; }
+        public ICommand OpenDashboard { get; }
+        public ICommand OpenLogWindow { get; }
 
         public MainWindowViewModel()
         {
@@ -85,6 +90,8 @@ namespace RoSatGCS.ViewModels
             StopService = new RelayCommand(OnStopService);
             RestartService = new RelayCommand(OnRestartService);
             OpenOnboardScheduler = new RelayCommand(() => OnWindowOpen("onboardscheduler"));
+            OpenDashboard = new RelayCommand(OnWindowOpenDashboard);
+            OpenLogWindow = new RelayCommand(OnOpenLogWindow);
 
             _serviceManager = ServiceManager.Instance;
             _serviceManager.Start();
@@ -128,9 +135,6 @@ namespace RoSatGCS.ViewModels
                     break;
                 case "command":
                     NavigationSource = MainDataContext.PageCommand;
-                    break;
-                case "dashboard":
-                    NavigationSource = MainDataContext.PageDashboard;
                     break;
                 case "groundtrack":
                     NavigationSource = MainDataContext.PageGroundTrack;
@@ -191,6 +195,31 @@ namespace RoSatGCS.ViewModels
             windowFunctionProperty.Show();
             windowFunctionProperty.Focus();
         }
+
+        public void OnWindowOpenDashboard()
+        {
+            if (windowDashboard == null)
+            {
+                windowDashboard = new WindowDashboard(this);
+                windowDashboard.Closed += (a, b) => windowDashboard = null;
+            }
+            windowDashboard.ShowInTaskbar = false;
+            windowDashboard.Show();
+            windowDashboard.Focus();
+        }
+
+        public void OnOpenLogWindow()
+        {
+            if (windowLog == null)
+            {
+                windowLog = new WindowLog();
+                windowLog.Closed += (a, b) => windowLog = null;
+            }
+            windowLog.ShowInTaskbar = false;
+            windowLog.Show();
+            windowLog.Focus();
+        }
+
 
         private void WindowFunctionProperty_Closed(object? sender, EventArgs e)
         {

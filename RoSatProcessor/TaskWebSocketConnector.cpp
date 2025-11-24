@@ -83,6 +83,11 @@ void RoSatProcessor::TaskWebSocketConnector::task()
 #ifdef _DEBUG
 	std::cout << "Send: " << packet.Get() << std::endl;
 #endif
+	// Send Info Query Response
+	QueryPacket infoPacket = { {}, "Info", QueryType::Info, DispatcherType::NoResponse };
+	infoPacket.Payload = InfoPacket::SerializePacket(InfoPacket(packet.Get(), InfoType::Send)).toVector();
+	RoSatTaskManager::message(TEXT("QueryResponse"), std::move(QueryPacket::SerializePacket(infoPacket)));
+
 
 	auto timer = std::make_shared<boost::asio::steady_timer>(boost::asio::make_strand(ioContext_), std::chrono::milliseconds(200000));
 	timer->async_wait(boost::bind(&TaskWebSocketConnector::onTimeout, this, packet.Id()));
@@ -126,6 +131,13 @@ void RoSatProcessor::TaskWebSocketConnector::onReceived(const std::string& str)
 		std::cout <<"Recv: " << str << std::endl;
 #endif
 
+		// Send Info Query Response
+		QueryPacket infoPacket = { {}, "Info", QueryType::Info, DispatcherType::NoResponse };
+		infoPacket.Payload = InfoPacket::SerializePacket(InfoPacket(str, InfoType::Receive)).toVector();
+		RoSatTaskManager::message(TEXT("QueryResponse"), std::move(QueryPacket::SerializePacket(infoPacket)));
+		
+
+		// Process Packet
 		std::lock_guard<std::mutex> l(_m_e);
 
 		try {

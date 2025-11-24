@@ -17,7 +17,8 @@ enum class QueryType {
     Config,
     Debug,
     FwUpdate,
-    Cancel
+    Cancel,
+    Info
 };
 MSGPACK_ADD_ENUM(QueryType);
 
@@ -45,6 +46,16 @@ enum class DataType {
     Boolean
 };
 MSGPACK_ADD_ENUM(DataType);
+
+enum class InfoType {
+    None,
+    Send,
+	Receive,
+    Status,
+	Warning,
+	Error
+};
+MSGPACK_ADD_ENUM(InfoType);
 
 #pragma endregion
 
@@ -122,6 +133,15 @@ namespace RoSatProcessor {
         CancelPacket() = default;
         CancelPacket(uint64_t commandId) : CommandId(commandId) {}
         MSGPACK_DEFINE(CommandId);
+	};
+
+    struct InfoPacket : PacketBase<InfoPacket> {
+        std::array<uint8_t, 16> QueryId = {};
+        std::string Info = "";
+		InfoType Type = InfoType::None;
+        InfoPacket() = default;
+        InfoPacket(const std::string& info, InfoType type) : Info(info), Type(type) {}
+		MSGPACK_DEFINE(Info, Type);
 	};
 
 

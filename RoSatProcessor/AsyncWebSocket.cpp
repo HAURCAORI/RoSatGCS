@@ -2,6 +2,10 @@
 #include "AsyncWebSocket.h"
 #include <boost/asio/ssl.hpp>
 #include <boost/asio/strand.hpp>
+#include "QueryPacket.h"
+#include "RoSatTaskManager.h"
+
+using namespace RoSatProcessor;
 
 AsyncWebSocket::AsyncWebSocket()
 	: resolver_(boost::asio::make_strand(ioContext_)), sslContext_(boost::asio::ssl::context::tlsv12_client), useTLS_(false), connected_(false), connecting_(false) {
@@ -38,6 +42,10 @@ void AsyncWebSocket::connect(const std::string& host, const std::string& port, b
 
 	connecting_ = true;
     spdlog::info("Try to connect websocket server: " + Address());
+
+    QueryPacket infoPacket = { {}, "Info", QueryType::Info, DispatcherType::NoResponse };
+    infoPacket.Payload = InfoPacket::SerializePacket(InfoPacket("Try to connect websocket server: " + Address(), InfoType::Status)).toVector();
+    RoSatTaskManager::message(TEXT("QueryResponse"), std::move(QueryPacket::SerializePacket(infoPacket)));
 
     if (useTLS_) {
         sslStream_ = std::make_unique<ssl_stream>(boost::asio::make_strand(ioContext_), sslContext_);
@@ -156,6 +164,12 @@ void AsyncWebSocket::onHandshake(const beast::error_code& ec) {
         connected_ = true;
         connecting_ = false;
         spdlog::info("Websocket Connected: " + Address());
+
+		// Send Info Query Response
+		QueryPacket infoPacket = { {}, "Info", QueryType::Info, DispatcherType::NoResponse };
+		infoPacket.Payload = InfoPacket::SerializePacket(InfoPacket("Websocket Connected: " + Address(), InfoType::Status)).toVector();
+		RoSatTaskManager::message(TEXT("QueryResponse"), std::move(QueryPacket::SerializePacket(infoPacket)));
+
         doRead();
 	}
 	else {

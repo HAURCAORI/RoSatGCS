@@ -552,4 +552,22 @@
   <data name="sAbort" xml:space="preserve">
     <value>Abort</value>
   </data>
+  <data name="sSource" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="sTime" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="sLatest" xml:space="preserve">
+    <value>Latest</value>
+  </data>
+  <data name="sTopMost" xml:space="preserve">
+    <value>TopMost</value>
+  </data>
+  <data name="sCurrent" xml:space="preserve">
+    <value>Current</value>
+  </data>
+  <data name="sLog" xml:space="preserve">
+    <value>Log</value>
+  </data>
 </root>

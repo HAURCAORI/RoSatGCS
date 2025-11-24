@@ -20,6 +20,7 @@
       xmlns:EditInPlace="clr-namespace:InplaceEditBoxLib.Views;assembly=InplaceEditBoxLib"
       xmlns:fvloc="clr-namespace:FileSystemModels.Local;assembly=FileSystemModels"
       xmlns:fbviews="clr-namespace:FolderBrowser.Views;assembly=FolderBrowser"
+      xmlns:ctr="clr-namespace:RoSatGCS.Controls"
       
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
@@ -55,13 +56,16 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="180"/>
+            <RowDefinition Height="2"/>
+            <RowDefinition Height="240"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="230"/>
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
+
+        <GridSplitter Grid.Row="1" Grid.ColumnSpan="3" Background="LightGray"/>
 
         <!-- Left: Property Setting -->
         <Grid Grid.Row="0" Grid.Column="0" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}">
@@ -423,7 +427,9 @@
                                 <ContextMenu>
                                     <MenuItem Command="{Binding RemoteSelectedDownloadCommand}" Header="Download"/>
                                     <Separator />
-                                    <MenuItem Command="{Binding RemoteSelectedEraseCommand}" Header="Remove"/>
+                                    <MenuItem Command="{Binding RemoteSelectedEraseCommand}" Header="Remove" IsEnabled="{Binding IsFileDownloadStopped}"/>
+                                    <Separator />
+                                    <MenuItem Command="{Binding AddFileDownListCommand}" Header="Add Download List" IsEnabled="{Binding IsFileDownloadStopped}"/>
                                 </ContextMenu>
                             </ListView.ContextMenu>
                             <ListView.View>
@@ -479,13 +485,171 @@
         </Grid>
 
         <!-- bottom pane -->
-        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"  Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}">
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"  Background="{DynamicResource {x:Static adonisUi:Brushes.Layer2BackgroundBrush}}">
             <Border Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}" BorderThickness="0.5"
                 BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" Margin="5">
                 <Grid>
+                    <Grid.Resources>
+                        <Style TargetType="GroupBox">
+                            
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="28"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="500"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Margin="10,0,10,0" Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" BorderThickness="0,0,0,0.5">
+                        <TextBlock Margin="5,2,0,0" Text="File Download" FontWeight="Bold" VerticalAlignment="Center"/>
+                    </Border>
 
+                    <Border BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" BorderThickness="0.3,0.3,0.3,0.3" Grid.Row="1" VerticalAlignment="Stretch" Margin="10,10,10,5">
+                        <ListView ItemsSource="{Binding FileDownloadList}" x:Name="FileDownloadList">
+                            <b:Interaction.Triggers>
+                                <b:EventTrigger EventName="SelectionChanged">
+                                    <b:InvokeCommandAction Command="{Binding UpdateFileDownloadListItmes}" CommandParameter="{Binding Path=SelectedItems, ElementName=FileDownloadList}"/>
+                                </b:EventTrigger>
+                            </b:Interaction.Triggers>
+                            <ListView.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Command="{Binding RemoveFileDownListElement}" Header="Remove"/>
+                                    <Separator/>
+                                    <MenuItem Command="{Binding DownloadFileMoveUp}" Header="MoveUp"/>
+                                    <MenuItem Command="{Binding DownloadFileMoveDown}" Header="MoveDown"/>
+                                </ContextMenu>
+                            </ListView.ContextMenu>
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="{Binding ElementName=fdl_helperField0, Path=ActualWidth}">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock TextTrimming="CharacterEllipsis"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Path"  DisplayMemberBinding="{Binding Path}" Width="{Binding ElementName=fdl_helperField1, Path=ActualWidth}">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock TextTrimming="CharacterEllipsis"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Status"  DisplayMemberBinding="{Binding StatusString}" Width="{Binding ElementName=fdl_helperField2, Path=ActualWidth}">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock TextTrimming="CharacterEllipsis"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Executed Time"  DisplayMemberBinding="{Binding ExecutedTime}" Width="{Binding ElementName=fdl_helperField3, Path=ActualWidth}">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock TextTrimming="CharacterEllipsis"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="Info"  DisplayMemberBinding="{Binding Info}" Width="{Binding ElementName=fdl_helperField3, Path=ActualWidth}">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock TextTrimming="CharacterEllipsis"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </Border>
+
+                    <Grid Visibility="Hidden">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="5*"/>
+                            <ColumnDefinition Width="65"/>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="40"/>
+                        </Grid.ColumnDefinitions>
+                        <!--This is the hidden helper Field which is used to bind to, using the "Fill" column of the helper grid-->
+                        <Grid Grid.Column="0" x:Name="fdl_helperField0"/>
+                        <Grid Grid.Column="1" x:Name="fdl_helperField1"/>
+                        <Grid Grid.Column="2" x:Name="fdl_helperField2"/>
+                        <Grid Grid.Column="3" x:Name="fdl_helperField3"/>
+                        <Grid Grid.Column="4" x:Name="fdl_helperField4"/>
+                    </Grid>
+
+
+                    <GroupBox Grid.Row="1" Grid.Column="1" Margin="5,5,10,5">
+                        <GroupBox.Header>
+                            <Label Content="File Manager"/>
+                        </GroupBox.Header>
+                        <Grid Margin="5,5,5,5">
+                            <Grid.Resources>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="25"/>
+                                <RowDefinition Height="15"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="25"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="File Path" />
+                            <Rectangle Grid.Row="0" Height="20" Margin="85,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Stretch" Stroke="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"/>
+
+                            <TextBox Grid.Row="0" Grid.Column="0" Margin="100,0,70,0" Height="24" HorizontalAlignment="Stretch" Text="{Binding FileDownloadPath}"/>
+                            <Button Grid.Row="0" Grid.Column="0" Margin="0,0,0,0" Width="60" Height="24" Content="Add" HorizontalAlignment="Right" Command="{Binding AddFileDownloadPath}" IsEnabled="{Binding IsFileDownloadStopped}"/>
+
+                            <Rectangle Grid.Row="1" Margin="0,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Stroke="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"/>
+
+                            <Grid Grid.Row="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="30"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Schedule" />
+                                <Rectangle Grid.Row="0" Height="20" Margin="85,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Stretch" Stroke="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"/>
+                                <ctr:DateTimePickerSecond Grid.Row="0" Grid.Column="1" Width="150" Height="24" HorizontalAlignment="Left" IsEnabled="{Binding IsFileDownloadStopped}" SelectedDate="{Binding SelectedScheduleDate, Mode=TwoWay}"/>
+                                <CheckBox Grid.Row="0" Grid.Column="1" Content="Enable Schedule" Margin="170,0,0,0" IsEnabled="{Binding IsFileDownloadStopped}" IsChecked="{Binding IsEnableSchedule}"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Save Path" />
+                                <Rectangle Grid.Row="1" Height="20" Margin="85,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Stretch" Stroke="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,40,0" Height="24" HorizontalAlignment="Stretch" IsReadOnly="True" Text="{Binding SavePath}"/>
+                                <Button Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Width="30" Height="24" Content="..." Command="{Binding BrowseSavePath}"/>
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Stauts" />
+                                <Rectangle Grid.Row="2" Height="20" Margin="85,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Stretch" Stroke="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding DownloadStatus}"/>
+
+
+                            </Grid>
+
+                            <Button Grid.Row="4" Content="{loc:Localization sStart}" Width="90" Height="24" Margin="0,0,100,0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Command="{Binding StartDownloadCommand}"/>
+                            <Button Grid.Row="4" Content="{loc:Localization sStop}" Width="90" Height="24" HorizontalAlignment="Right" VerticalAlignment="Bottom" Command="{Binding StopDownloadCommand}"/>
+                            
+
+                        </Grid>
+                    </GroupBox>
                 </Grid>
-
             </Border>
         </Grid>
 

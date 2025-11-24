@@ -23,7 +23,7 @@ namespace RoSatGCS.ViewModels
 
 
         public PlotDataContainer PlotData { get => MainDataContext.Instance.PlotDataContainer; }
-        public Func<DateTime, string> Formatter { get; set; } = date => date.ToString("HH:mm:ss");
+        
         public PageDashboardViewModel()
         {
 
