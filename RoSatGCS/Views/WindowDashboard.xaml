@@ -23,6 +23,7 @@
         <cvt:BoolShortConverter x:Key="BoolShortConverter"/>
         <cvt:PlotTitleConverter x:Key="PlotTitleConverter"/>
         <cvt:ConOpsConverter x:Key="ConOpsConverter"/>
+        <cvt:FalseNormalConverter x:Key="FalseNormalConverter"/>
 
         <Style TargetType="GroupBox">
             <Setter Property="Margin" Value="5"/>
@@ -281,31 +282,31 @@
                             <Grid>
                                 <TextBlock Text="Beacon Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
                                 <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
-                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.beacon_status}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.beacon_status, Converter={StaticResource FalseNormalConverter}}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
                                            Foreground="{Binding CurrentBeaconModel.Structure.uhf_data.beacon_status, Converter={StaticResource BoolColorConverter}}"/>
                             </Grid>
                             <Grid>
                                 <TextBlock Text="GCS Connection" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
                                 <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
-                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.gcs_connection_status}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.gcs_connection_status, Converter={StaticResource FalseNormalConverter}}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
                                            Foreground="{Binding CurrentBeaconModel.Structure.uhf_data.gcs_connection_status, Converter={StaticResource BoolColorConverter}}"/>
                             </Grid>
                             <Grid>
                                 <TextBlock Text="FRAM Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
                                 <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
-                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.fram_status}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.fram_status, Converter={StaticResource FalseNormalConverter}}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
                                            Foreground="{Binding CurrentBeaconModel.Structure.uhf_data.beacon_status, Converter={StaticResource BoolColorConverter}}"/>
                             </Grid>
                             <Grid>
                                 <TextBlock Text="Radio Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
                                 <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
-                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.radio_status}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.radio_status, Converter={StaticResource FalseNormalConverter}}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
                                            Foreground="{Binding CurrentBeaconModel.Structure.uhf_data.beacon_status, Converter={StaticResource BoolColorConverter}}"/>
                             </Grid>
                             <Grid>
                                 <TextBlock Text="Reset Status" Style="{StaticResource ContentTextBlock}" Margin="10,0,0,0"/>
                                 <Rectangle Style="{StaticResource Splitter}" Margin="160,0,0,0"/>
-                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.reset_status}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
+                                <TextBlock Text="{Binding CurrentBeaconModel.Structure.uhf_data.reset_status, Converter={StaticResource FalseNormalConverter}}" Style="{StaticResource ContentTextBlock}"  Margin="170,0,0,0"
                                            Foreground="{Binding CurrentBeaconModel.Structure.uhf_data.beacon_status, Converter={StaticResource BoolColorConverter}}"/>
                             </Grid>
                             <Grid>
